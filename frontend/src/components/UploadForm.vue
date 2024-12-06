@@ -2,7 +2,7 @@
 <template>
   <div>
     <FileUploader 
-      :backendBaseUrl="backendBaseUrl" 
+      :backendBaseUrl="backendBaseUrl"
       @file-selected="onFileSelected"
       @upload-success="handleUploadSuccess"
       @upload-error="handleUploadError"
@@ -11,17 +11,17 @@
     <UploadProgress 
       :visible="uploading" 
       :percentage="uploadProgress" 
-      :status="uploadProgress === 100 ? 'success' : 'active'"
+      :status="uploadStatus"
     />
 
     <FileInfo 
       v-if="fileInfo" 
       :fileInfo="fileInfo" 
-      @remove-file="removeSelectedFile" 
+      @remove-file="removeSelectedFile"
     />
 
     <ModelSelector 
-      v-if="fileInfo && !processing" 
+      v-if="showModelSelector" 
       :fileId="fileId" 
       :processing="processing" 
       :selectedModel="selectedModel" 
@@ -35,7 +35,7 @@
       :selectedModel="selectedModel"
       :processing="processing" 
       :downloadUrl="downloadUrl"
-      :reportDownloadUrl="report_download_url"
+      :reportDownloadUrl="reportDownloadUrl"
       @start-upload="handleManualUpload"
       @start-prediction="startPrediction"
       @download-file="downloadFile"
@@ -46,6 +46,7 @@
       :visible="uploading" 
       message="上传中..." 
     />
+
     <LoadingIndicator 
       :visible="processing" 
       message="预测中..." 
@@ -59,16 +60,15 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { io } from 'socket.io-client';
-
+import { uploadFile, predict } from '@/services/apiService';  // 使用 API 服务
+import { useSocket } from '@/composables/useSocket'; // 使用组合式 API 来管理 WebSocket
 import FileUploader from './FileUploader.vue';
 import FileInfo from './FileInfo.vue';
 import ModelSelector from './ModelSelector.vue';
 import PredictionButtons from './PredictionButtons.vue';
 import LogViewer from './LogViewer.vue';
 import LoadingIndicator from './LoadingIndicator.vue';
-import UploadProgress from './UploadProgress.vue'; // 新增
+import UploadProgress from './UploadProgress.vue';
 
 export default {
   name: 'UploadForm',
@@ -79,26 +79,34 @@ export default {
     PredictionButtons,
     LogViewer,
     LoadingIndicator,
-    UploadProgress // 注册
+    UploadProgress,
   },
   data() {
     return {
-      downloadUrl: '',
-      report_download_url: '',
       backendBaseUrl: 'http://127.0.0.1:5000',
       fileId: null,
-      processing: false,
       selectedFile: null,
       uploading: false,
-      uploadProgress: 0, // 新增
+      uploadProgress: 0,
       fileInfo: null,
       selectedModel: null,
+      downloadUrl: '',
+      reportDownloadUrl: '',
       logs: '',
+      processing: false,
       socket: null,
     };
   },
+  computed: {
+    showModelSelector() {
+      return this.fileInfo && !this.processing;
+    },
+    uploadStatus() {
+      return this.uploadProgress === 100 ? 'success' : 'active';
+    }
+  },
   methods: {
-    // 处理选中的文件
+    // 处理文件选择
     onFileSelected(file) {
       this.resetState();
       this.selectedFile = file;
@@ -106,155 +114,120 @@ export default {
         name: file.name,
         size: file.size,
         type: file.type,
-        uploadDate: new Date().toLocaleString()
+        uploadDate: new Date().toLocaleString(),
       };
     },
-    // 上传成功的回调
+
+    // 上传成功回调
     handleUploadSuccess(response) {
       this.uploading = false;
-      this.uploadProgress = 0; // 重置进度
-
+      this.uploadProgress = 0;
       if (response.file_id) {
         this.fileId = response.file_id;
         this.$message.success('文件上传成功！请点击“开始预测”以执行预测。');
         this.initializeSocket();
       }
-
       if (response.download_url) {
         this.downloadUrl = `${this.backendBaseUrl}${response.download_url}`;
         this.$message.success('文件上传并处理成功！');
       }
-
       if (response.report_download_url) {
-        this.report_download_url = `${this.backendBaseUrl}${response.report_download_url}`;
+        this.reportDownloadUrl = `${this.backendBaseUrl}${response.report_download_url}`;
         this.$message.success('预测报告已生成，您可以下载报告。');
       }
-
-      if (this.fileInfo) {
-        this.fileInfo.uploadDate = new Date().toLocaleString();
-      }
-
-      if (!response.file_id && !response.download_url && !response.report_download_url) {
-        this.$message.error('未知的服务器响应。');
-      }
-
       this.selectedFile = null;
     },
-    // 上传失败的回调
+
+    // 上传失败回调
     handleUploadError(error) {
       this.uploading = false;
-      this.uploadProgress = 0; // 重置进度
+      this.uploadProgress = 0;
       console.error('文件上传失败:', error);
-      if (error && error.message) {
-        this.$message.error(`文件上传失败：${error.message}`);
-      } else {
-        this.$message.error('文件上传失败！');
-      }
+      this.$message.error(`文件上传失败：${error.message || '未知错误'}`);
     },
-    // 删除选中的文件
+
+    // 删除文件
     removeSelectedFile() {
       this.resetState();
       this.$message.info('已删除选中的文件。');
     },
-    // 模型选择的回调
+
+    // 选择模型回调
     onModelSelected(model) {
       this.selectedModel = model;
     },
-    // 手动触发上传的函数
+
+    // 手动触发上传
     handleManualUpload() {
       if (!this.selectedFile) {
         this.$message.error('请先选择一个文件！');
         return;
       }
       this.uploading = true;
-      this.uploadProgress = 0; // 初始化进度
-      const formData = new FormData();
-      formData.append('file', this.selectedFile);
+      this.uploadProgress = 0;
 
-      axios.post(`${this.backendBaseUrl}/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.lengthComputable) {
-            this.uploadProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          }
+      uploadFile(this.selectedFile, (progressEvent) => {
+        if (progressEvent.lengthComputable) {
+          this.uploadProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
         }
       })
-      .then(response => {
-        this.handleUploadSuccess(response.data);
-      })
-      .catch(error => {
-        this.uploading = false;
-        this.uploadProgress = 0; // 重置进度
-        this.handleUploadError(error);
-      });
+        .then(response => {
+          this.handleUploadSuccess(response.data);
+        })
+        .catch(error => {
+          this.handleUploadError(error);
+        });
     },
-    // 手动触发预测的函数
+
+    // 手动触发预测
     startPrediction() {
       if (!this.fileId || !this.selectedModel) {
         this.$message.error('请先选择文件并指定模型！');
         return;
       }
       this.processing = true;
-      axios.post(`${this.backendBaseUrl}/predict`, { 
-        file_id: this.fileId, 
-        model: this.selectedModel 
-      })
-      .then(response => {
-        if (response.data.download_url) {
-          this.downloadUrl = `${this.backendBaseUrl}${response.data.download_url}`;
-          this.$message.success('预测完成！您可以下载预测结果。');
-        } else {
-          this.$message.error('预测完成，但未返回下载链接。');
-        }
-        if (response.data.report_download_url) {
-          this.report_download_url = `${this.backendBaseUrl}${response.data.report_download_url}`;
-          this.$message.success('预测报告已生成，您可以下载报告。');
-        } else {
-          this.$message.error('预测完成，但未返回报告下载链接。');
-        }
-      })
-      .catch(error => {
-        if (error.response && error.response.data && error.response.data.error) {
-          this.$message.error(`预测失败：${error.response.data.error}`);
-        } else {
-          this.$message.error('预测失败！请稍后重试。');
-        }
-      })
-      .finally(() => {
-        this.processing = false;
-      });
+      predict(this.fileId, this.selectedModel)
+        .then(response => {
+          if (response.data.download_url) {
+            this.downloadUrl = `${this.backendBaseUrl}${response.data.download_url}`;
+            this.$message.success('预测完成！您可以下载预测结果。');
+          } else {
+            this.$message.error('预测完成，但未返回下载链接。');
+          }
+          if (response.data.report_download_url) {
+            this.reportDownloadUrl = `${this.backendBaseUrl}${response.data.report_download_url}`;
+            this.$message.success('预测报告已生成，您可以下载报告。');
+          } else {
+            this.$message.error('预测完成，但未返回报告下载链接。');
+          }
+        })
+        .catch(error => {
+          this.$message.error(`预测失败：${error.response?.data?.error || '未知错误'}`);
+        })
+        .finally(() => {
+          this.processing = false;
+        });
     },
-    // 下载预测结果的函数
+
+    // 下载文件
     downloadFile() {
       window.open(this.downloadUrl);
     },
-    // 下载报告的函数
+
+    // 下载报告
     downloadReport() {
-      if (this.report_download_url) {
-        window.open(this.report_download_url);
+      if (this.reportDownloadUrl) {
+        window.open(this.reportDownloadUrl);
       } else {
         this.$message.error('报告下载链接不可用。');
       }
     },
-    // 初始化 Socket.IO 连接
+
+    // 初始化 WebSocket 连接
     initializeSocket() {
-      if (this.socket) {
-        return;
-      }
-      this.socket = io(this.backendBaseUrl);
+      if (this.socket) return;
 
-      this.socket.on('connect', () => {
-        console.log('Connected to SocketIO server');
-        this.logs += '[系统] 已连接到日志服务器。\n';
-      });
-
-      this.socket.on('disconnect', () => {
-        console.log('Disconnected from SocketIO server');
-        this.logs += '[系统] 与日志服务器断开连接。\n';
-      });
-
+      this.socket = useSocket(this.backendBaseUrl);
       this.socket.on('log', (data) => {
         this.logs += `${data.message}\n`;
         this.$nextTick(() => {
@@ -264,29 +237,27 @@ export default {
           }
         });
       });
-
-      this.socket.on('response', (data) => {
-        console.log(data.message);
-        this.logs += `[系统] ${data.message}\n`;
-      });
     },
+
     // 清空日志
     clearLogs() {
       this.logs = '';
     },
-    // 重置所有相关状态
+
+    // 重置状态
     resetState() {
       this.selectedFile = null;
       this.fileInfo = null;
       this.fileId = null;
-      this.downloadUrl = '';
       this.uploading = false;
-      this.uploadProgress = 0; // 重置进度
+      this.uploadProgress = 0;
       this.processing = false;
       this.selectedModel = null;
-      this.report_download_url = '';
+      this.downloadUrl = '';
+      this.reportDownloadUrl = '';
     }
   },
+
   beforeUnmount() {
     if (this.socket) {
       this.socket.disconnect();
