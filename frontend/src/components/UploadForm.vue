@@ -8,6 +8,12 @@
       @upload-error="handleUploadError"
     />
 
+    <UploadProgress 
+      :visible="uploading" 
+      :percentage="uploadProgress" 
+      :status="uploadProgress === 100 ? 'success' : 'active'"
+    />
+
     <FileInfo 
       v-if="fileInfo" 
       :fileInfo="fileInfo" 
@@ -62,6 +68,7 @@ import ModelSelector from './ModelSelector.vue';
 import PredictionButtons from './PredictionButtons.vue';
 import LogViewer from './LogViewer.vue';
 import LoadingIndicator from './LoadingIndicator.vue';
+import UploadProgress from './UploadProgress.vue'; // 新增
 
 export default {
   name: 'UploadForm',
@@ -71,7 +78,8 @@ export default {
     ModelSelector,
     PredictionButtons,
     LogViewer,
-    LoadingIndicator
+    LoadingIndicator,
+    UploadProgress // 注册
   },
   data() {
     return {
@@ -82,6 +90,7 @@ export default {
       processing: false,
       selectedFile: null,
       uploading: false,
+      uploadProgress: 0, // 新增
       fileInfo: null,
       selectedModel: null,
       logs: '',
@@ -103,6 +112,7 @@ export default {
     // 上传成功的回调
     handleUploadSuccess(response) {
       this.uploading = false;
+      this.uploadProgress = 0; // 重置进度
 
       if (response.file_id) {
         this.fileId = response.file_id;
@@ -133,6 +143,7 @@ export default {
     // 上传失败的回调
     handleUploadError(error) {
       this.uploading = false;
+      this.uploadProgress = 0; // 重置进度
       console.error('文件上传失败:', error);
       if (error && error.message) {
         this.$message.error(`文件上传失败：${error.message}`);
@@ -156,12 +167,18 @@ export default {
         return;
       }
       this.uploading = true;
+      this.uploadProgress = 0; // 初始化进度
       const formData = new FormData();
       formData.append('file', this.selectedFile);
 
       axios.post(`${this.backendBaseUrl}/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.lengthComputable) {
+            this.uploadProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          }
         }
       })
       .then(response => {
@@ -169,6 +186,7 @@ export default {
       })
       .catch(error => {
         this.uploading = false;
+        this.uploadProgress = 0; // 重置进度
         this.handleUploadError(error);
       });
     },
@@ -263,6 +281,7 @@ export default {
       this.fileId = null;
       this.downloadUrl = '';
       this.uploading = false;
+      this.uploadProgress = 0; // 重置进度
       this.processing = false;
       this.selectedModel = null;
       this.report_download_url = '';
@@ -277,4 +296,5 @@ export default {
 </script>
 
 <style scoped>
+/* 现有样式 */
 </style>
