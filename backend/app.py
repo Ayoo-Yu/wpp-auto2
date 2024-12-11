@@ -24,6 +24,7 @@ from routes.upload import upload_bp
 from routes.predict import predict_bp
 from routes.download import download_bp
 
+
 app.register_blueprint(upload_bp, url_prefix='/')
 app.register_blueprint(predict_bp, url_prefix='/')
 app.register_blueprint(download_bp, url_prefix='/')

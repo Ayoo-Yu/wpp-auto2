@@ -1,12 +1,14 @@
-from flask import Blueprint, request, jsonify, current_app
-import datetime
 import os
+import pandas as pd
+from flask import Blueprint, request, jsonify, current_app, send_file
+import glob
+import datetime
 import shutil
 from services.file_service import find_file_by_id
 from services.prediction_service import run_prediction
 from services.evaluation_service import run_evaluation
 from werkzeug.utils import secure_filename
-
+# 预测蓝图
 predict_bp = Blueprint('predict', __name__)
 
 @predict_bp.route('/predict', methods=['POST'])
@@ -82,3 +84,30 @@ def predict():
         'download_url': download_url,
         'report_download_url': report_download_url
     }), 200
+
+# 新增接口：获取 daily_metrics.csv 文件
+@predict_bp.route('/get-daily-metrics', methods=['GET'])
+def get_daily_metrics():
+    file_id = request.args.get('file_id')
+    if not file_id:
+        return jsonify({'error': '缺少 file_id 参数'}), 400
+
+    # 假设动态目录为 evaluation_output_dir
+    upload_path = find_file_by_id(file_id, current_app.config['UPLOAD_FOLDER'])
+    if not upload_path:
+        return jsonify({'error': '无效的 file_id'}), 400
+
+    filename_wo_ext = os.path.splitext(os.path.basename(upload_path))[0]
+    evaluation_output_dir = os.path.join(current_app.config['DOWNLOAD_FOLDER'], f"evaluation_{filename_wo_ext}_*")
+
+    # 找到动态目录下的 daily_metrics.csv 文件
+    evaluation_dir = glob.glob(evaluation_output_dir)
+    if not evaluation_dir:
+        return jsonify({'error': '找不到评估结果文件'}), 404
+
+    daily_metrics_path = os.path.join(evaluation_dir[0], 'daily_metrics.csv')
+    if not os.path.exists(daily_metrics_path):
+        return jsonify({'error': '找不到 daily_metrics.csv 文件'}), 404
+
+    # 返回 CSV 文件内容给前端
+    return send_file(daily_metrics_path, mimetype='text/csv', as_attachment=False)
