@@ -330,33 +330,31 @@ export default {
       const accValues = [];  // ACC 数值列表
       const kValues = [];    // K 数值列表
 
-      // 跳过标题行，从第二行开始处理
-      const dataRows = data.slice(1); // 去掉第一行标题
+      const dataRows = data.slice(1); // 跳过标题行，从第二行开始处理
 
-      // 遍历每一行，处理数据
       dataRows.forEach(item => {
-        // 解析日期，确保是有效的日期
-        const date = new Date(item[0]);  // 日期在第一列
+        const rawDate = item[0]; // 原始日期字符串
+        const date = new Date(rawDate);  // 转换为 Date 对象
         if (isNaN(date.getTime())) {  // 如果日期无效，跳过该行
-          console.warn('Skipping invalid date:', item[0]);
+          console.warn('Skipping invalid date:', rawDate);
           return;
         }
 
-        // 解析各个指标（确保数值有效）
+        // 格式化日期为 `YYYYMMDD`
+        const formattedDate = date.toISOString().slice(0, 10).replace(/-/g, '/');
+        labels.push(formattedDate);
+
         const mae = parseFloat(item[1]);
         const mse = parseFloat(item[2]);
         const rmse = parseFloat(item[3]);
         const acc = parseFloat(item[4]);
         const k = parseFloat(item[5]);
 
-        // 如果某些指标无效（NaN 或空值），跳过该行
         if (isNaN(mae) || isNaN(mse) || isNaN(rmse) || isNaN(acc) || isNaN(k)) {
           console.warn('Skipping row with invalid values:', item);
           return;
         }
 
-        // 将有效的日期和数值添加到相应的数组
-        labels.push(date);
         maeValues.push(mae);
         mseValues.push(mse);
         rmseValues.push(rmse);
@@ -364,60 +362,22 @@ export default {
         kValues.push(k);
       });
 
-      // 输出调试信息，查看数据是否正确
-      console.log('Processed Labels:', labels); // 查看生成的 labels
-      console.log('Processed MAE Values:', maeValues); // 查看 MAE 数据
-      console.log('Processed MSE Values:', mseValues); // 查看 MSE 数据
-      console.log('Processed RMSE Values:', rmseValues); // 查看 RMSE 数据
-
-      // 如果没有有效的数据，显示错误信息
       if (labels.length === 0 || maeValues.length === 0) {
         this.$message.error('无效的数据，无法绘制图表');
         return;
       }
 
-      // 设置不同图表的数据
       this.chartData = [
-        {
-          label: 'MAE',
-          data: maeValues,
-          borderColor: '#4caf50',
-          backgroundColor: 'rgba(76, 175, 80, 0.2)',
-          fill: true,
-        },
-        {
-          label: 'MSE',
-          data: mseValues,
-          borderColor: '#ff5722',
-          backgroundColor: 'rgba(255, 87, 34, 0.2)',
-          fill: true,
-        },
-        {
-          label: 'RMSE',
-          data: rmseValues,
-          borderColor: '#2196f3',
-          backgroundColor: 'rgba(33, 150, 243, 0.2)',
-          fill: true,
-        },
-        {
-          label: 'ACC',
-          data: accValues,
-          borderColor: '#ff9800',
-          backgroundColor: 'rgba(255, 152, 0, 0.2)',
-          fill: true,
-        },
-        {
-          label: 'K',
-          data: kValues,
-          borderColor: '#9c27b0',
-          backgroundColor: 'rgba(156, 39, 176, 0.2)',
-          fill: true,
-        },
+        { label: 'MAE', data: maeValues, borderColor: '#4caf50', backgroundColor: 'rgba(76, 175, 80, 0.2)', fill: true },
+        { label: 'MSE', data: mseValues, borderColor: '#ff5722', backgroundColor: 'rgba(255, 87, 34, 0.2)', fill: true },
+        { label: 'RMSE', data: rmseValues, borderColor: '#2196f3', backgroundColor: 'rgba(33, 150, 243, 0.2)', fill: true },
+        { label: 'ACC', data: accValues, borderColor: '#ff9800', backgroundColor: 'rgba(255, 152, 0, 0.2)', fill: true },
+        { label: 'K', data: kValues, borderColor: '#9c27b0', backgroundColor: 'rgba(156, 39, 176, 0.2)', fill: true },
       ];
 
-      // 渲染图表
       this.renderCharts(labels);
     },
+
 
 
 
@@ -449,14 +409,14 @@ export default {
                   x: {
                     type: 'category',
                     title: {
-                      display: true,
+                      display: false,
                       text: '日期',
                     },
                   },
                   y: {
                     type: 'linear',
                     title: {
-                      display: true,
+                      display: false,
                       text: dataset.label,
                     },
                   },
