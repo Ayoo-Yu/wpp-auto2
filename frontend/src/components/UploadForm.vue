@@ -63,7 +63,7 @@
     <div v-if="chartData" class="charts-container">
       <div v-for="(chart, index) in chartData" :key="index" class="chart-container">
         <canvas :id="'chart' + index"></canvas>
-        <p>{{ chart.label }}</p>
+
       </div>
     </div>
   </div>
@@ -317,6 +317,7 @@ export default {
           console.error('Error fetching daily metrics:', error);
         });
     },
+    
     processChartData(data) {
       if (!data || data.length === 0) {
         this.$message.error('CSV 数据格式错误，请检查文件内容');
@@ -329,7 +330,7 @@ export default {
       const rmseValues = []; // RMSE 数值列表
       const accValues = [];  // ACC 数值列表
       const kValues = [];    // K 数值列表
-
+      const peValues = [];    // pe 数值列表
       const dataRows = data.slice(1); // 跳过标题行，从第二行开始处理
 
       dataRows.forEach(item => {
@@ -349,8 +350,8 @@ export default {
         const rmse = parseFloat(item[3]);
         const acc = parseFloat(item[4]);
         const k = parseFloat(item[5]);
-
-        if (isNaN(mae) || isNaN(mse) || isNaN(rmse) || isNaN(acc) || isNaN(k)) {
+        const pe = parseFloat(item[6]);
+        if (isNaN(mae) || isNaN(mse) || isNaN(rmse) || isNaN(acc) || isNaN(k)|| isNaN(pe)) {
           console.warn('Skipping row with invalid values:', item);
           return;
         }
@@ -360,6 +361,7 @@ export default {
         rmseValues.push(rmse);
         accValues.push(acc);
         kValues.push(k);
+        peValues.push(pe);
       });
 
       if (labels.length === 0 || maeValues.length === 0) {
@@ -373,14 +375,12 @@ export default {
         { label: 'RMSE', data: rmseValues, borderColor: '#2196f3', backgroundColor: 'rgba(33, 150, 243, 0.2)', fill: true },
         { label: 'ACC', data: accValues, borderColor: '#ff9800', backgroundColor: 'rgba(255, 152, 0, 0.2)', fill: true },
         { label: 'K', data: kValues, borderColor: '#9c27b0', backgroundColor: 'rgba(156, 39, 176, 0.2)', fill: true },
+        { label: 'Pe', data: peValues, borderColor: '#00bcd4', backgroundColor: 'rgba(0, 188, 212, 0.2)', fill: true },
       ];
 
       this.renderCharts(labels);
     },
-
-
-
-
+    
     renderCharts(labels) {
       console.log('Rendering charts with labels:', labels);  // 查看传入的 labels
 

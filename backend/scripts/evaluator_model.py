@@ -125,6 +125,7 @@ class ModelEvaluator:
             mse = mean_squared_error(actual, predicted)
             rmse = np.sqrt(mse)
             acc = 1 - rmse / 453.5
+            pe = (0.83 - acc) * 453.5 if acc < 0.83 else 0 
     
             # 计算自定义指标 K
             m_values =  ((predicted - actual) / np.maximum(actual, threshold)) ** 2
@@ -138,6 +139,7 @@ class ModelEvaluator:
                 'RMSE': rmse,
                 'ACC': acc,
                 'K': k_value,
+                'Pe': pe,
                 'n_samples': len(group)
             })
     
