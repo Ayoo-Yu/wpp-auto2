@@ -52,15 +52,16 @@
     />
 
     <LogViewer 
+      v-if="fileId"
       :logs="logs" 
       @clear-logs="clearLogs" 
     />
 
     <!-- 获取日常指标按钮 -->
-    <button @click="fetchDailyMetrics" v-if="fileId && !processing">获取日常指标</button>
+    <button @click="fetchDailyMetrics" v-if="fileId && !processing && downloadUrl">获取日常指标</button>
 
     <!-- 图表展示 -->
-    <div v-if="chartData" class="charts-container">
+    <div v-if="chartData && downloadUrl" class="charts-container">
       <div v-for="(chart, index) in chartData" :key="index" class="chart-container">
         <canvas :id="'chart' + index"></canvas>
 
