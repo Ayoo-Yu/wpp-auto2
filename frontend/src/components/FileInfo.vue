@@ -3,16 +3,15 @@
   <el-card v-if="fileInfo" class="file-info-card" style="margin-top: 20px;">
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <h3>文件信息</h3>
-      <el-button type="text" @click="$emit('remove-file')" style="color: #f56c6c;">
+      <el-button type="link" @click="$emit('remove-file')" style="color: #f56c6c;">
         删除
       </el-button>
     </div>
     <el-descriptions column="1">
-      <el-descriptions-item label="文件名称">{{ fileInfo.name }}</el-descriptions-item>
-      <el-descriptions-item label="文件大小">{{ formattedSize }}</el-descriptions-item>
-      <el-descriptions-item label="文件类型">{{ fileInfo.type }}</el-descriptions-item>
-      <el-descriptions-item label="上传时间">{{ fileInfo.uploadDate }}</el-descriptions-item>
-      <!-- 如果有更多信息，可以继续添加 -->
+      <el-descriptions-item label="文件名称：">{{ fileInfo.name }}</el-descriptions-item>
+      <el-descriptions-item label="文件大小：">{{ formattedSize }}</el-descriptions-item>
+      <el-descriptions-item label="文件类型：">{{ fileInfo.type }}</el-descriptions-item>
+      <el-descriptions-item label="上传时间：">{{ fileInfo.uploadDate }}</el-descriptions-item>
     </el-descriptions>
   </el-card>
 </template>
@@ -41,14 +40,14 @@ export default {
 
 <style scoped>
 .file-info-card {
-  border: 1px solid #ebeef5;
+  border: 4px solid #ebeef5;
   padding: 20px;
 }
 .file-info-card h3 {
   margin-bottom: 20px;
 }
 .file-info-card .el-button {
-  padding: 0;
-  font-size: 14px;
+  padding: 20;
+  font-size: 20px;
 }
 </style>

@@ -22,7 +22,7 @@
     <el-button 
       v-if="downloadUrl" 
       type="success" 
-      @click="$emit('download-file')"
+      @click="$emit('download-file',  downloadUrl)"
       style="margin-right: 10px;"
     >
       下载预测结果
@@ -31,7 +31,7 @@
     <el-button 
       v-if="reportDownloadUrl" 
       type="success" 
-      @click="$emit('download-report')"
+      @click="$emit('download-file', reportDownloadUrl)"
     >
       下载预测结果报告
     </el-button>

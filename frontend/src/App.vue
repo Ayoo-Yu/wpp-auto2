@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import UploadForm from './components/UploadForm.vue'
+import UploadForm from './components/ModelTrain.vue'
 
 export default {
   name: 'App',

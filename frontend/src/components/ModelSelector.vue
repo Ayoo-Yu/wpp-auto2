@@ -1,7 +1,7 @@
 <!-- src/components/ModelSelector.vue -->
 <template>
   <el-select 
-    v-if="fileId && !processing" 
+    v-if="fileId && !processing && !predictionstate" 
     v-model="selectedModelLocal" 
     placeholder="请选择模型" 
     style="margin-top: 20px; width: 200px;"
@@ -28,6 +28,9 @@ export default {
     selectedModel: {
       type: String,
       default: null
+    },
+    predictionstate:{
+      type:Boolean,
     }
   },
   data() {

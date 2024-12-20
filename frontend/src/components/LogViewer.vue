@@ -3,7 +3,7 @@
   <el-card class="log-card" style="margin-top: 20px;">
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <h3>实时日志</h3>
-      <el-button type="text" @click="$emit('clear-logs')" style="color: #f56c6c;">
+      <el-button type="link" @click="$emit('clear-logs')" style="color: #f56c6c;">
         清空
       </el-button>
     </div>
@@ -27,10 +27,14 @@ export default {
 
 <style scoped>
 .log-card {
-  border: 1px solid #ebeef5;
+  border: 4px solid #ebeef5;
   padding: 20px;
   max-height: 300px;
   overflow-y: auto;
+}
+.log-card .el-button {
+  padding: 20;
+  font-size: 20px;
 }
 .log-content {
   background-color: #f5f5f5;

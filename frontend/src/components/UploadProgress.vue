@@ -1,6 +1,8 @@
 <!-- src/components/UploadProgress.vue -->
+ <!-- 展示文件上传进度 -->
 <template>
   <div v-if="visible" class="upload-progress">
+    <span class="progress-label">文件上传进度条</span>
     <el-progress :percentage="percentage" :status="status"></el-progress>
     <span>{{ percentage }}%</span>
   </div>
@@ -20,7 +22,7 @@ export default {
     },
     status: {
       type: String,
-      default: 'active' // 'active', 'success', 'exception'
+      default: 'active' // 'active', 'success'
     }
   }
 };
@@ -34,5 +36,9 @@ export default {
 }
 .upload-progress span {
   margin-left: 10px;
+}
+.progress-label {
+  font-size:15px;
+  margin-right: 10px;
 }
 </style>
