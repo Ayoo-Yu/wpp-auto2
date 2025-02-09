@@ -1,19 +1,36 @@
-<!-- src/components/FileInfo.vue -->
 <template>
-  <el-card v-if="fileInfo" class="file-info-card" style="margin-top: 20px;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h3>文件信息</h3>
-      <el-button type="link" @click="$emit('remove-file')" style="color: #f56c6c;">
-        删除
-      </el-button>
+  <div class="file-info-content">
+    <div class="file-details" v-if="fileInfo">
+      <div class="info-row">
+        <span class="label">文件名称：</span>
+        <span class="value">{{ fileInfo.name || '-' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">文件大小：</span>
+        <span class="value">{{ formatFileSize(fileInfo.size) }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">文件类型：</span>
+        <span class="value">{{ fileInfo.type || '-' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">上传时间：</span>
+        <span class="value">{{ fileInfo.uploadDate || '-' }}</span>
+      </div>
     </div>
-    <el-descriptions column="1">
-      <el-descriptions-item label="文件名称：">{{ fileInfo.name }}</el-descriptions-item>
-      <el-descriptions-item label="文件大小：">{{ formattedSize }}</el-descriptions-item>
-      <el-descriptions-item label="文件类型：">{{ fileInfo.type }}</el-descriptions-item>
-      <el-descriptions-item label="上传时间：">{{ fileInfo.uploadDate }}</el-descriptions-item>
-    </el-descriptions>
-  </el-card>
+    <div class="action-buttons">
+      <el-button 
+        type="primary" 
+        class="action-button" 
+        @click="$emit('start-upload')"
+      >上传文件</el-button>
+      <el-button 
+        type="danger" 
+        class="action-button" 
+        @click="$emit('remove-file')"
+      >删除</el-button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -25,29 +42,79 @@ export default {
       required: true
     }
   },
-  computed: {
-    formattedSize() {
-      if (!this.fileInfo) return '';
-      const size = this.fileInfo.size;
-      if (size < 1024) return `${size} B`;
-      else if (size < 1024 * 1024) return `${(size / 1024).toFixed(2)} KB`;
-      else if (size < 1024 * 1024 * 1024) return `${(size / (1024 * 1024)).toFixed(2)} MB`;
-      else return `${(size / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  methods: {
+    formatFileSize(bytes) {
+      if (!bytes) return '-';
+      const units = ['B', 'KB', 'MB', 'GB'];
+      let size = bytes;
+      let unitIndex = 0;
+      
+      while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024;
+        unitIndex++;
+      }
+      
+      return `${size.toFixed(2)} ${units[unitIndex]}`;
     }
   }
 };
 </script>
 
 <style scoped>
-.file-info-card {
-  border: 4px solid #ebeef5;
-  padding: 20px;
+.file-info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
-.file-info-card h3 {
-  margin-bottom: 20px;
+
+.file-details {
+  display: grid;
+  gap: 12px;
 }
-.file-info-card .el-button {
-  padding: 20;
-  font-size: 20px;
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  color: #86868b;
+  min-width: 80px;
+}
+
+.value {
+  color: #1d1d1f;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.action-button {
+  flex: 1;
+  height: 40px !important;  /* 强制统一高度 */
+  padding: 0 20px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  transition: all 0.3s ease !important;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 覆盖 el-button 的默认样式 */
+:deep(.el-button) {
+  margin: 0;
+  height: 40px;
+  line-height: 40px;
 }
 </style>

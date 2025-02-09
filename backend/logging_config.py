@@ -10,32 +10,50 @@ class SocketIOHandler(logging.Handler):
 
     def emit(self, record):
         log_entry = self.format(record)
+        print(f"Emitting log: {log_entry}")  # 调试信息
         self.socketio.emit('log', {'message': log_entry})
 
 def configure_logging(app, socketio):
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
-
-    # 使用基于时间的日志轮换
-    file_handler = TimedRotatingFileHandler(
+    # 删除原有的RotatingFileHandler配置
+    # 改用更安全的日志处理方式
+    
+    # 控制台日志
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+    
+    # 文件日志（使用FileHandler替代RotatingFileHandler）
+    file_handler = logging.FileHandler(
         'logs/app.log', 
-        when='midnight',  # 每天午夜进行轮换
-        interval=1,       # 间隔1天
-        backupCount=10    # 保留最近10个日志文件
+        mode='a', 
+        encoding='utf-8'
     )
-    formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
-    file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
-
-    # 自定义 SocketIO 日志处理器
+    
+    # 添加 SocketIO 处理器
     socketio_handler = SocketIOHandler(socketio)
-    socketio_handler.setFormatter(formatter)
     socketio_handler.setLevel(logging.INFO)
-
-    # 将文件和 SocketIO 日志处理器添加到应用的日志系统中
+    
+    # 格式化
+    formatter = logging.Formatter(
+        '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+    )
+    console_handler.setFormatter(formatter)
+    file_handler.setFormatter(formatter)
+    socketio_handler.setFormatter(formatter)
+    
+    # 清空原有处理器
+    app.logger.handlers.clear()
+    
+    # 添加新处理器
+    app.logger.addHandler(console_handler)
     app.logger.addHandler(file_handler)
     app.logger.addHandler(socketio_handler)
+    app.logger.setLevel(logging.DEBUG)
+    
+    # 添加Socket.IO日志
+    engineio_logger = logging.getLogger('engineio')
+    engineio_logger.addHandler(console_handler)
+    engineio_logger.addHandler(file_handler)
+    engineio_logger.addHandler(socketio_handler)
 
-    # 设置日志记录级别为 INFO
-    app.logger.setLevel(logging.INFO)
     app.logger.info('Wind Forecast Backend Startup')

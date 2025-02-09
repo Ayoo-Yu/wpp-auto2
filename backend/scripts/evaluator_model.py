@@ -10,7 +10,7 @@ import os
 import pathlib
 
 class ModelEvaluator:
-    def __init__(self, data_path, output_dir=None):
+    def __init__(self, data_path, output_dir=None,wfcapacity=453.5):
         """
         初始化模型评估器
         
@@ -30,6 +30,7 @@ class ModelEvaluator:
         
         # 添加日期列
         self.data['date'] = self.data['Timestamp'].dt.date
+        self.wfcapacity = wfcapacity
         
         # 创建结果保存目录
         if output_dir:
@@ -76,7 +77,7 @@ class ModelEvaluator:
         rmse = np.sqrt(mse)
 
         # 添加自定义的Acc指标
-        acc = 1 - rmse / 453.5
+        acc = 1 - rmse / self.wfcapacity
 
         return {
             'MAE': mae,
@@ -95,7 +96,7 @@ class ModelEvaluator:
         """
         return self.calculate_metrics(
             self.data['Actual Power'],
-            self.data['Predicted Power']
+            self.data['Predicted Power'],
         )
 
     def calculate_daily_metrics(self):
@@ -113,7 +114,7 @@ class ModelEvaluator:
         daily_metrics = []
         
         # 阈值定义
-        threshold = 0.2 * 453.5
+        threshold = 0.2 * self.wfcapacity
     
         # 对每一天的数据单独计算指标
         for date, group in daily_groups:
@@ -124,8 +125,8 @@ class ModelEvaluator:
             mae = mean_absolute_error(actual, predicted)
             mse = mean_squared_error(actual, predicted)
             rmse = np.sqrt(mse)
-            acc = 1 - rmse / 453.5
-            pe = (0.83 - acc) * 453.5 if acc < 0.83 else 0 
+            acc = 1 - rmse / self.wfcapacity
+            pe = (0.83 - acc) * self.wfcapacity if acc < 0.83 else 0 
     
             # 计算自定义指标 K
             m_values =  ((predicted - actual) / np.maximum(actual, threshold)) ** 2
@@ -347,7 +348,8 @@ def evaluate_model(
     save_plots=True,
     save_csv=True,
     save_report=True,
-    custom_save_dir=None
+    custom_save_dir=None,
+    wfcapacity=453.5,
 ):
     """
     评估模型并生成相关报告和图表。
@@ -365,8 +367,9 @@ def evaluate_model(
     custom_save_dir : str, optional
         自定义的结果保存目录，如果不提供则使用默认目录结构
     """
-    evaluator = ModelEvaluator(data_path, output_dir=custom_save_dir)
-    
+    print("evaluator这一步了")
+    evaluator = ModelEvaluator(data_path, output_dir=custom_save_dir,wfcapacity=wfcapacity)
+    print("evaluator没问题")
     # 绘制并保存实际值 vs 预测值图
     if save_plots:
         evaluator.plot_actual_vs_predicted(save_path='actual_vs_predicted.png')

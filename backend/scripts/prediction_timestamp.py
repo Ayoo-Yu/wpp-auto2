@@ -1,6 +1,6 @@
 import pandas as pd
-import numpy as np
 import os
+from flask import current_app
 def post_process_predictions(original_data_path, predictions_path):
 
     # 读取原始数据集和预测数据集
@@ -52,7 +52,7 @@ def post_process_predictions(original_data_path, predictions_path):
     # 检查是否有未找到的时间戳
     missing_timestamps = predictions['Timestamp'].isnull().sum()
     if missing_timestamps > 0:
-        print(f"有 {missing_timestamps} 条记录未找到对应的时间戳。")
+        current_app.logger.warning(f"有 {missing_timestamps} 条记录未找到对应的时间戳。")
     
     # 固定字符串
     suffix = "timestamp"
@@ -66,6 +66,6 @@ def post_process_predictions(original_data_path, predictions_path):
     # 保存文件
     predictions.to_csv(new_predictions_path, index=False)
     
-    print(f"带顺序匹配时间戳的预测数据已保存为 '{new_predictions_path}'")
+    current_app.logger.info(f"已经为测试集预测结果匹配时间戳 '{new_predictions_path}'")
 
     return new_predictions_path

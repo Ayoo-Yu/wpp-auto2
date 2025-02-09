@@ -1,80 +1,128 @@
 <template>
-  <div>
-    <!-- //包含一个训练集上传组件，文件上传后调用onFileSelected事件 -->
-    <FileUploader 
-      @file-selected="onFileSelected"
-    />
+  <div class="model-train-container">
+    <!-- 页面标题 -->
+    <h1 class="page-title">风电功率预测模型训练</h1>
 
-    <!-- // 包含一个上传进度条组件，用于显示上传进度条 -->
+    <!-- Hero Section 装饰在标题之后 -->
+    <div class="hero-section"></div>
+
+    <!-- 主体内容区域：左右两栏 -->
+      <div class="content-area">
+        <!-- 左侧：文件上传、模型选择与操作面板 -->
+        <div class="left-panel">
+          <!-- 数据集上传区域 -->
+          <section class="panel-section">
+            <h2>选择训练数据集</h2>
+            <FileUploader
+              :processing="processing"
+              :acceptedFormats="['csv']"
+              :uploadText="customUploadText_modeltrain"
+              @file-selected="onFileSelected"
+            />
+            <p class="upload-tip">请上传CSV文件，且不超过200MB</p>
+          </section>
+
+          <!-- 文件信息区域 -->
+          <section class="panel-section" v-if="fileInfo">
+            <h2>文件信息</h2>
+            <FileInfo 
+              :fileInfo="fileInfo" 
+              @remove-file="removeSelectedFile"
+              @start-upload="handleManualUpload"
+            />
+          </section>
+
+          <!-- 模型选择区域 -->
+          <section class="panel-section" v-if="fileInfo">
+            <h2>选择训练模型</h2>
+            <ModelSelector 
+              :fileId="fileId" 
+              :processing="processing" 
+              :selectedModel="selectedModel" 
+              :wfCapacity="wfCapacity"
+              :predictionstate="predictionstate"
+              @model-selected="onModelSelected"
+              @model_wf_capacity="onWindFarmCapacityChange"
+            />
+          </section>
+
+          <!-- 操作面板区域 -->
+          <section class="panel-section">
+            <h2>操作面板</h2>
+            <div v-if="!fileInfo || !selectedModel" class="empty-operation-panel">
+              <el-icon class="empty-icon"><InfoFilled /></el-icon>
+              <p class="empty-text">请完成文件上传和模型选择</p>
+            </div>
+            <PredictionButtons 
+              v-else
+              :selectedFile="selectedFile" 
+              :uploading="uploading" 
+              :fileId="fileId" 
+              :wfCapacity="wfCapacity"
+              :processing="processing" 
+              :downloadUrl="downloadUrl"
+              :reportDownloadUrl="reportDownloadUrl"
+              @start-upload="handleManualUpload"
+              @start-prediction="startPrediction"
+              @download-file="downloadFile"
+              @fetch-daily-metrics="fetchDailyMetrics"
+            />
+          </section>
+        </div>
+
+        <!-- 右侧：日志展示区域 -->
+        <div class="right-panel">
+          <!-- 训练日志区域 -->
+          <section class="panel-section log-section">
+            <h2>训练日志</h2>
+            <div v-if="!logs" class="empty-log-panel">
+              <el-icon class="empty-icon"><InfoFilled /></el-icon>
+              <p class="empty-text">暂无日志信息</p>
+            </div>
+            <LogViewer 
+              v-if="logs"
+              :logs="logs" 
+              @clear-logs="clearLogs"
+            />
+          </section>
+        </div>
+      </div>
+    
+
+    <!-- 上传进度与加载提示 -->
     <UploadProgress 
       :visible="uploading" 
       :percentage="uploadProgress" 
       :status="uploadProgress === 100 ? 'success' : 'active'"
     />
- 
-    <!-- // 当文件确定上传后，显示上传的文件详细信息，包含删除功能 -->
-    <FileInfo 
-      v-if="fileInfo" 
-      :fileInfo="fileInfo" 
-      @remove-file="removeSelectedFile"
-    />
-
-    <!-- // 包含一个模型选择器组件，文件上传后且未处于处理状态时显示 -->
-    <ModelSelector 
-      v-if="fileInfo && !processing"
-      :fileId="fileId" 
-      :processing="processing" 
-      :selectedModel="selectedModel" 
-      :predictionstate="predictionstate"
-      @model-selected="onModelSelected"
-    />
-
-    <!-- // 预测按钮，根据不同的状态显示不同的按钮以触发相应的操作 -->
-    <PredictionButtons 
-      :selectedFile="selectedFile" 
-      :uploading="uploading" 
-      :fileId="fileId" 
-      :selectedModel="selectedModel"
-      :processing="processing" 
-      :downloadUrl="downloadUrl"
-      :reportDownloadUrl="reportDownloadUrl"
-      @start-upload="handleManualUpload"
-      @start-prediction="startPrediction"
-      @download-file="downloadFile"
-      @download-report="downloadReport"
-    />
-
     <LoadingIndicator 
       :visible="uploading" 
-      message="上传中..." 
+      message="上传中..."
     />
-
     <LoadingIndicator 
       :visible="processing" 
-      message="预测中..." 
+      message="训练中...请耐心等待"
     />
 
-    <LogViewer 
-      v-if="fileId"
-      :logs="logs" 
-      @clear-logs="clearLogs" 
-    />
-    <!-- 获取测试集预测指标并可视化 -->
-    <GetDailyMetrics
-      v-if="fileId &&!processing && downloadUrl"
-      :fileId="fileId"
-      :backendBaseUrl="backendBaseUrl"
-      :processing="processing"
-      :downloadUrl="downloadUrl"
-      :chartData="chartData"
-      @fetch-daily-metrics="fetchDailyMetrics"
-    />
+    <!-- 图表展示区域 -->
+    <section class="charts-section" v-if="chartData">
+      <h2>训练结果分析</h2>
+      <div class="chart-grid">
+        <div
+          v-for="(chart, index) in chartData" 
+          :key="index"
+          class="chart-wrapper"
+        >
+          <canvas :ref="`chart${index}`"></canvas>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
 <script>
-import { uploadFile, predict } from '@/services/apiService';  // 使用 API 服务
-import { useSocket } from '@/composables/useSocket'; // 使用组合式 API 来管理 WebSocket
+import { uploadFile, modeltrain } from '@/services/apiService';  
+import { useSocket } from '@/composables/useSocket'; 
 import FileUploader from './FileUploader.vue';
 import FileInfo from './FileInfo.vue';
 import ModelSelector from './ModelSelector.vue';
@@ -82,10 +130,22 @@ import PredictionButtons from './PredictionButtons.vue';
 import LogViewer from './LogViewer.vue';
 import LoadingIndicator from './LoadingIndicator.vue';
 import UploadProgress from './UploadProgress.vue';
-import GetDailyMetrics from './GetDailyMetrics.vue';
+import Papa from 'papaparse';
+import axios from 'axios';
+import { Chart, CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend, LineController } from 'chart.js';
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  LineController
+);
 
 export default {
-  name: 'UploadForm',
+  name: 'ModelTrain',
   components: {
     FileUploader,
     FileInfo,
@@ -94,11 +154,11 @@ export default {
     LogViewer,
     LoadingIndicator,
     UploadProgress,
-    GetDailyMetrics,
   },
   data() {
     return {
       backendBaseUrl: 'http://127.0.0.1:5000',
+      customUploadText_modeltrain: '点击上传训练数据集文件',
       fileId: null,
       selectedFile: null,
       uploading: false,
@@ -110,14 +170,17 @@ export default {
       logs: '',
       processing: false,
       socket: null,
-      predictionstate:false,
+      predictionReady: false,
+      predictionstate: false,
+      wfCapacity: 453.5,
+      dailyMetrics: null,
+      chartData: null,
+      chartInstances: [],
     };
   },
   methods: {
-    // 处理文件选择
     onFileSelected(file) {
-      console.log('触发了onFileSelected事件，文件已选择');
-      this.resetState();//文件信息初始化
+      this.resetState();
       this.selectedFile = file;
       this.fileInfo = {
         name: file.name,
@@ -125,19 +188,14 @@ export default {
         type: file.type,
         uploadDate: new Date().toLocaleString(),
       };
-      console.log('@',file.name);
-      console.log('@',this.selectedFile);
+      this.initializeSocket();
     },
-
-    // 上传成功回调
     handleUploadSuccess(response) {
-      console.log('触发了handleUploadSuccess事件');
       this.uploading = false;
       this.uploadProgress = 0;
       if (response.file_id) {
         this.fileId = response.file_id;
-        this.$message.success('文件上传成功！请点击“开始预测”以执行预测。');
-        this.initializeSocket();
+        this.$message.success('文件上传成功！请点击选择模型类型。');
       }
       if (response.download_url) {
         this.downloadUrl = `${this.backendBaseUrl}${response.download_url}`;
@@ -149,27 +207,25 @@ export default {
       }
       this.selectedFile = null;
     },
-
-    // 上传失败回调
     handleUploadError(error) {
       this.uploading = false;
       this.uploadProgress = 0;
       console.error('文件上传失败:', error);
       this.$message.error(`文件上传失败：${error.message || '未知错误'}`);
     },
-
-    // 删除文件
     removeSelectedFile() {
       this.resetState();
       this.$message.info('已删除选中的文件。');
     },
-
-    // 选择模型回调
     onModelSelected(model) {
       this.selectedModel = model;
     },
-
-    // 手动触发上传
+    onWindFarmCapacityChange(value) {
+      this.wfCapacity = value;
+    },
+    onPredictionReady(value) {
+      this.predictionReady = value;
+    },
     handleManualUpload() {
       if (!this.selectedFile) {
         this.$message.error('请先选择一个文件！');
@@ -190,15 +246,13 @@ export default {
           this.handleUploadError(error);
         });
     },
-
-    // 手动触发预测
     startPrediction() {
       if (!this.fileId || !this.selectedModel) {
         this.$message.error('请先选择文件并指定模型！');
         return;
       }
       this.processing = true;
-      predict(this.fileId, this.selectedModel)
+      modeltrain(this.fileId, this.selectedModel, this.wfCapacity)
         .then(response => {
           if (response.data.download_url) {
             this.downloadUrl = `${this.backendBaseUrl}${response.data.download_url}`;
@@ -221,17 +275,13 @@ export default {
         });
       this.predictionstate = true;
     },
-
-    // 下载文件
     downloadFile(downloadUrl) {
       window.open(downloadUrl);
     },
-
-    // 初始化 WebSocket 连接
     initializeSocket() {
       if (this.socket) return;
-
-      this.socket = useSocket(this.backendBaseUrl);
+      this.socket = useSocket(this.backendBaseUrl, { path: '/socket.io', transports: ['websocket'] });
+      this.socket.on('connect', () => {});
       this.socket.on('log', (data) => {
         this.logs += `${data.message}\n`;
         this.$nextTick(() => {
@@ -242,28 +292,429 @@ export default {
         });
       });
     },
-
-    // 清空日志
     clearLogs() {
       this.logs = '';
     },
-
-    // 重置状态
     resetState() {
-      this.selectedFile = null;// 是否已经选择文件
-      this.fileInfo = null;// 上传的文件信息
-      this.fileId = null;// 上传的文件 ID
-      this.uploading = false;// 是否正在上传
-      this.uploadProgress = 0;// 上传进度
-      this.processing = false;// 是否正在处理
-      this.selectedModel = null;// 选择的模型
-      this.downloadUrl = '';// 测试集预测数据下载链接
-      this.reportDownloadUrl = '';//模型训练报告下载链接
+      this.selectedFile = null;
+      this.fileInfo = null;
+      this.fileId = null;
+      this.uploading = false;
+      this.uploadProgress = 0;
+      this.processing = false;
+      this.selectedModel = null;
+      this.downloadUrl = '';
+      this.reportDownloadUrl = '';
       this.predictionstate = false;
+    },
+    async fetchDailyMetrics() {
+      if (!this.fileId) {
+        this.$message.error('请先上传文件！');
+        return;
+      }
+
+      try {
+        const response = await axios.get(`${this.backendBaseUrl}/get-daily-metrics?file_id=${this.fileId}`);
+        
+        if (!response.data) {
+          this.$message.error('未获取到日常指标数据');
+          return;
+        }
+
+        // 使用 Promise 包装 Papa.parse
+        const parseData = new Promise((resolve) => {
+          Papa.parse(response.data, {
+            complete: (result) => {
+              if (result.errors.length > 0) {
+                this.$message.error('CSV 解析失败');
+                console.error(result.errors);
+                return;
+              }
+              resolve(result.data);
+            }
+          });
+        });
+
+        const data = await parseData;
+        await this.processChartData(data);
+        
+      } catch (error) {
+        this.$message.error(`获取日常指标失败：${error.message}`);
+        console.error('Error fetching daily metrics:', error);
+      }
+    },
+    async processChartData(data) {
+      if (!data || data.length === 0) {
+        this.$message.error('CSV 数据格式错误，请检查文件内容');
+        return;
+      }
+
+      const labels = [];
+      const maeValues = [];
+      const mseValues = [];
+      const rmseValues = [];
+      const accValues = [];
+      const kValues = [];
+      const peValues = [];
+
+      const dataRows = data.slice(1);
+      dataRows.forEach(item => {
+        const rawDate = item[0];
+        const date = new Date(rawDate);
+        if (isNaN(date.getTime())) {
+          console.warn('Skipping invalid date:', rawDate);
+          return;
+        }
+        const formattedDate = date.toISOString().slice(0, 10).replace(/-/g, '/');
+        labels.push(formattedDate);
+        
+        const mae = parseFloat(item[1]);
+        const mse = parseFloat(item[2]);
+        const rmse = parseFloat(item[3]);
+        const acc = parseFloat(item[4]);
+        const k = parseFloat(item[5]);
+        const pe = parseFloat(item[6]);
+
+        if (isNaN(mae) || isNaN(mse) || isNaN(rmse) || isNaN(acc) || isNaN(k) || isNaN(pe)) {
+          console.warn('Skipping row with invalid values:', item);
+          return;
+        }
+
+        maeValues.push(mae);
+        mseValues.push(mse);
+        rmseValues.push(rmse);
+        accValues.push(acc);
+        kValues.push(k);
+        peValues.push(pe);
+      });
+
+      if (labels.length === 0 || maeValues.length === 0) {
+        this.$message.error('无效的数据，无法绘制图表');
+        return;
+      }
+
+      // 先清空之前的图表数据
+      this.chartData = null;
+      await this.$nextTick();
+
+      // 设置新的图表数据
+      this.chartData = [
+        { label: '平均绝对误差 MAE', data: maeValues, borderColor: '#4caf50', backgroundColor: 'rgba(76, 175, 80, 0.2)', fill: true },
+        { label: '均方误差 MSE', data: mseValues, borderColor: '#ff5722', backgroundColor: 'rgba(255, 87, 34, 0.2)', fill: true },
+        { label: '均方根误差 RMSE', data: rmseValues, borderColor: '#2196f3', backgroundColor: 'rgba(33, 150, 243, 0.2)', fill: true },
+        { label: '预测精度 ACC', data: accValues, borderColor: '#ff9800', backgroundColor: 'rgba(255, 152, 0, 0.2)', fill: true },
+        { label: '预测精度 K', data: kValues, borderColor: '#9c27b0', backgroundColor: 'rgba(156, 39, 176, 0.2)', fill: true },
+        { label: '日均考核电量 Pe', data: peValues, borderColor: '#00bcd4', backgroundColor: 'rgba(0, 188, 212, 0.2)', fill: true },
+      ];
+
+      await this.$nextTick();
+      this.renderCharts(labels);
+    },
+    renderCharts(labels) {
+      // 确保之前的图表实例被销毁
+      if (this.chartInstances) {
+        this.chartInstances.forEach(chart => chart.destroy());
+      }
+      this.chartInstances = [];
+
+      this.chartData.forEach((dataset, index) => {
+        const canvas = this.$refs[`chart${index}`][0];
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: dataset.label,
+                data: dataset.data,
+                borderColor: dataset.borderColor,
+                backgroundColor: dataset.backgroundColor,
+                fill: dataset.fill
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend: {
+                  position: 'top'
+                },
+                title: {
+                  display: true,
+                  text: dataset.label
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+          this.chartInstances.push(chart);
+        }
+      });
+    },
+    beforeDestroy() {
+      if (this.socket) {
+        this.socket.disconnect();
+        this.socket = null;
+      }
+      // 确保组件销毁时清理图表实例
+      if (this.chartInstances) {
+        this.chartInstances.forEach(chart => chart.destroy());
+      }
     },
   },
 };
 </script>
 
 <style scoped>
+.model-train-container {
+  min-height: 100vh;
+  padding: 40px;
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  position: relative;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.page-title {
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content-area {
+  display: grid;
+  grid-template-columns: minmax(400px, 1fr) minmax(500px, 1.2fr);
+  gap: 32px;
+  margin-bottom: 40px;
+  align-items: start;
+  min-height: calc(100vh - 200px);
+}
+
+.left-panel, .right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+}
+
+.left-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-section {
+  background: #ffffff;
+  border: 1px solid #ebeef5;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 24px;
+  padding: 32px;
+  margin-bottom: 24px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.panel-section:last-child {
+  margin-bottom: 0;
+}
+
+.panel-section:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--hover-shadow);
+}
+
+.panel-section h2 {
+  margin: 0 0 24px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.panel-section h3 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #1d1d1f;
+}
+
+.upload-tip {
+  color: #606266;
+  margin-top: 12px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.log-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+  margin-bottom: 0;
+}
+
+.log-section .log-content {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'SF Mono', Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #909399 #f4f4f5;
+}
+
+.log-section .log-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.log-section .log-content::-webkit-scrollbar-track {
+  background: #f4f4f5;
+  border-radius: 3px;
+}
+
+.log-section .log-content::-webkit-scrollbar-thumb {
+  background: #909399;
+  border-radius: 3px;
+}
+
+.log-section .log-content::-webkit-scrollbar-thumb:hover {
+  background: #606266;
+}
+
+.charts-section {
+  background: #ffffff;
+  border: 1px solid #ebeef5;
+  padding: 32px;
+  border-radius: 20px;
+  margin-top: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.charts-section h2 {
+  margin: 0 0 24px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.chart-wrapper {
+  aspect-ratio: 16/9;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 1200px) {
+  .content-area {
+    grid-template-columns: 1fr;
+  }
+  
+  .panel-section {
+    padding: 24px;
+  }
+  
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .model-train-container {
+    padding: 24px 16px;
+  }
+  
+  .page-title {
+    font-size: 28px;
+    margin-bottom: 32px;
+  }
+  
+  .panel-section {
+    padding: 20px;
+  }
+}
+
+/* 新增动效 */
+.section-enter-active, .section-leave-active {
+  transition: all 0.3s ease;
+}
+.section-enter, .section-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.empty-operation-panel, .empty-log-panel {
+  padding: 32px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-icon {
+  font-size: 24px;
+  color: #909399;
+  margin-bottom: 12px;
+}
+
+.empty-text {
+  color: #909399;
+  font-size: 14px;
+  text-align: center;
+  margin: 0;
+}
+
+/* 进度条样式 */
+.el-progress-bar__inner {
+  background: var(--primary-gradient) !important;
+}
+
+/* 添加 Hero Section 样式 */
+.hero-section {
+  text-align: center;
+  padding: 60px 20px;
+  position: relative;
+}
+
+.hero-section::before {
+  content: "✨";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  font-size: 24px;
+  opacity: 0.7;
+}
+
+.hero-section::after {
+  content: "✨";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 24px;
+  opacity: 0.7;
+}
 </style>
+

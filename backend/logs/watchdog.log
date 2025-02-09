@@ -1,0 +1,34 @@
+[2025-02-09 13:43:04,393] INFO: Wind Forecast Backend Startup
+[2025-02-09 13:43:06,634] WARNING:  * Debugger is active!
+[2025-02-09 13:43:06,645] INFO:  * Debugger PIN: 205-466-898
+[2025-02-09 13:43:09,579] INFO: 成功连接服务器！
+[2025-02-09 13:43:09,580] INFO: 这是一条测试日志消息
+[2025-02-09 13:43:09,581] DEBUG: 这是一条调试消息
+[2025-02-09 13:43:09,581] WARNING: 这是一条警告消息
+[2025-02-09 13:43:09,585] INFO: 成功连接服务器！
+[2025-02-09 13:43:09,587] INFO: 这是一条测试日志消息
+[2025-02-09 13:43:09,588] DEBUG: 这是一条调试消息
+[2025-02-09 13:43:09,588] WARNING: 这是一条警告消息
+[2025-02-09 13:43:09,590] INFO: 成功连接服务器！
+[2025-02-09 13:43:09,591] INFO: 这是一条测试日志消息
+[2025-02-09 13:43:09,592] DEBUG: 这是一条调试消息
+[2025-02-09 13:43:09,601] WARNING: 这是一条警告消息
+[2025-02-09 13:46:10,425] INFO: 收到预测请求: {'csvfileId': '20250209133913129731', 'modelfileId': '20250209133920323404', 'scalerfileId': '20250209133924649033'}
+[2025-02-09 13:46:10,426] INFO: 预测数据选择: 20250209133913129731, 预测模型选择: 20250209133920323404, 归一化模型选择: 20250209133924649033
+[2025-02-09 13:46:10,707] ERROR: 预测过程中出错: The feature names should match those that were passed during fit.
+Feature names must be in the same order as they were in fit.
+
+[2025-02-09 13:46:54,989] ERROR: Unhandled exception: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend\env\lib\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\my-vue-project\wind-power-forecast\backend\env\lib\site-packages\flask\app.py", line 1458, in dispatch_request
+    self.raise_routing_exception(req)
+  File "D:\my-vue-project\wind-power-forecast\backend\env\lib\site-packages\flask\app.py", line 1440, in raise_routing_exception
+    raise request.routing_exception  # type: ignore
+  File "D:\my-vue-project\wind-power-forecast\backend\env\lib\site-packages\flask\ctx.py", line 353, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "D:\my-vue-project\wind-power-forecast\backend\env\lib\site-packages\werkzeug\routing\map.py", line 652, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+

@@ -1,12 +1,7 @@
 <!-- src/components/GetDailyMetrics.vue -->
  <template>
   <div>
-    <el-card class="metrics-card" style="margin-top: 20px;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h3>测试集评估指标可视化</h3>
-      </div>
     <el-button @click="fetchDailyMetrics" v-if="fileId && !processing && downloadUrl" type ="success">图表展示</el-button>
-    </el-card>
     <div v-if="chartData && downloadUrl" class="charts-container">
       <div v-for="(chart, index) in chartData" :key="index" class="chart-container">
         <canvas :id="'chart' + index"></canvas>

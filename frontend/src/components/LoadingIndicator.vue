@@ -1,8 +1,10 @@
 <!-- src/components/LoadingIndicator.vue -->
 <template>
   <div v-if="visible" class="loading-overlay">
-    <el-spinner type="spinner" size="medium"></el-spinner>
-    <span>{{ message }}</span>
+    <div class="loading-content">
+      <el-spinner type="spinner" size="large"></el-spinner>
+      <span class="loading-message">{{ message }}</span>
+    </div>
   </div>
 </template>
 
@@ -24,11 +26,32 @@ export default {
 
 <style scoped>
 .loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.9);
   display: flex;
+  justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  z-index: 9999;
 }
-.loading-overlay .el-spinner {
-  margin-right: 10px;
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.loading-message {
+  font-size: 18px;
+  color: #409EFF;
+  font-weight: bold;
+}
+
+.el-spinner {
+  font-size: 32px;
 }
 </style>

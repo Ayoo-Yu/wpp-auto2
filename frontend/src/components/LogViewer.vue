@@ -1,16 +1,15 @@
 <!-- src/components/LogViewer.vue -->
 <template>
-  <el-card class="log-card" style="margin-top: 20px;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h3>实时日志</h3>
-      <el-button type="link" @click="$emit('clear-logs')" style="color: #f56c6c;">
-        清空
-      </el-button>
-    </div>
+  <div class="log-viewer">
     <div class="log-content">
       <pre>{{ logs }}</pre>
     </div>
-  </el-card>
+    <div class="log-actions">
+      <el-button type="text" @click="$emit('clear-logs')" class="clear-button">
+        清空日志
+      </el-button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -26,22 +25,35 @@ export default {
 </script>
 
 <style scoped>
-.log-card {
-  border: 4px solid #ebeef5;
-  padding: 20px;
-  max-height: 300px;
-  overflow-y: auto;
+.log-viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 12px;
 }
-.log-card .el-button {
-  padding: 20;
-  font-size: 20px;
-}
+
 .log-content {
-  background-color: #f5f5f5;
-  padding: 10px;
-  height: 200px;
+  flex: 1;
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 16px;
   overflow-y: auto;
-  white-space: pre-wrap;
-  font-family: monospace;
+  font-family: 'SF Mono', Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.log-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.clear-button {
+  color: #ff3b30;
+}
+
+.clear-button:hover {
+  color: #ff2d55;
 }
 </style>
