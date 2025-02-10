@@ -137,7 +137,6 @@ let intervalId = null
 
 onMounted(() => {
   fetchStatus()
-  intervalId = setInterval(fetchStatus, 60000)
 })
 
 onUnmounted(() => {
