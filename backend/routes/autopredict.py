@@ -277,6 +277,11 @@ def get_logs():
 def resurrect():
     try:
         # 你的重启逻辑
+        subprocess.run(
+            [pm2_cmd, 'resurrect'],
+            check=True
+        )
         return jsonify({"message": "Service resurrected successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+

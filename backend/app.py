@@ -36,7 +36,7 @@ from routes.autopredict import autopredict_bp
 app.register_blueprint(modeltrain_bp, url_prefix='/')
 app.register_blueprint(download_bp, url_prefix='/')
 app.register_blueprint(predict_bp, url_prefix='/')
-app.register_blueprint(autopredict_bp)
+app.register_blueprint(autopredict_bp, url_prefix='/')
 
 # 初始化数据库和存储桶
 def initialize():
@@ -59,60 +59,6 @@ def initialize():
 # 执行初始化
 initialize()
 
-# 文件上传接口（保留核心功能）
-# @app.route('/upload', methods=['POST'])
-# def upload_dataset():
-#     if 'file' not in request.files:
-#         return jsonify({"error": "No file part"}), 400
-        
-#     file = request.files['file']
-#     if file.filename == '':
-#         return jsonify({"error": "No selected file"}), 400
-
-#     print("\n=== 开始处理文件上传 ===")
-#     print(f"文件名: {file.filename}")
-#     print(f"内容类型: {file.content_type}")
-#     print(f"文件大小: {file.content_length} 字节")
-#     file_path = f"datasets/{datetime.now().strftime('%Y%m%d')}/{file.filename}"
-#     print(f"目标路径: {file_path}")
-#     print(f"当前数据库连接状态: {engine.pool.status()}")
-
-#     try:
-#         minio_client.put_object(
-#             MINIO_CONFIG["dataset_bucket"],
-#             file_path,
-#             file.stream,
-#             length=-1,
-#             part_size=10*1024*1024
-#         )
-        
-#         # 验证文件是否存在
-#         obj_info = minio_client.stat_object(MINIO_CONFIG["dataset_bucket"], file_path)
-#         print(f"✅ MinIO验证 - 文件大小：{obj_info.size} 最后修改时间：{obj_info.last_modified}")
-        
-#         # 保存到数据库
-#         db = next(get_db())
-#         try:
-#             db_dataset = Dataset(
-#                 filename=file.filename,
-#                 file_path=file_path,
-#                 upload_time=datetime.utcnow(),
-#                 file_size=file.content_length,
-#                 file_type=file.content_type,
-#                 local_path=file_path
-#             )
-#             db.add(db_dataset)
-#             db.commit()
-#             print(f"✅ 数据库记录已提交，文件ID：{db_dataset.id}")
-#             return jsonify({"message": "File uploaded successfully", "file_id": db_dataset.id})
-#         except Exception as e:
-#             db.rollback()
-#             print(f"❌ 数据库错误：{str(e)}")
-#             return jsonify({"error": "数据库操作失败"}), 500
-#         finally:
-#             db.close()  # 确保关闭连接
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
 @app.route('/upload', methods=['POST'])
 def upload_dataset():
     if 'file' not in request.files:
@@ -204,15 +150,6 @@ def handle_connect():
 @socketio.on('disconnect')
 def handle_disconnect():
     app.logger.info("与服务器断开连接！")
-
-# 在现有路由后添加健康检查接口
-# @app.route('/status', methods=['GET'])
-# def health_check():
-#     return jsonify({
-#         "status": "running",
-#         "timestamp": datetime.now().isoformat(),
-#         "database": "connected" if engine.pool.status() else "disconnected"
-#     })
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000, debug=True)
