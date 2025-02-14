@@ -121,7 +121,7 @@
 </template>
 
 <script>
-import { uploadFile, modeltrain } from '@/services/apiService';  
+import { upload_train_csv, modeltrain } from '@/services/apiService';  
 import { useSocket } from '@/composables/useSocket'; 
 import FileUploader from './FileUploader.vue';
 import FileInfo from './FileInfo.vue';
@@ -234,7 +234,7 @@ export default {
       this.uploading = true;
       this.uploadProgress = 0;
 
-      uploadFile(this.selectedFile, (progressEvent) => {
+      upload_train_csv(this.selectedFile, (progressEvent) => {
         if (progressEvent.lengthComputable) {
           this.uploadProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
         }

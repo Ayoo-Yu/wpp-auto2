@@ -9,7 +9,8 @@ POSTGRES_CONFIG = {
     "port": "5432",
     "user": "postgres",
     "password": "yzz0216yh",
-    "database": "windpower"
+    "database": "windpower",
+    "default_db": "postgres"  # 新增默认数据库配置
 }
 
 MINIO_CONFIG = {
@@ -17,11 +18,21 @@ MINIO_CONFIG = {
     "access_key": "minioadmin",
     "secret_key": "minioadmin",
     "secure": False,
-    "dataset_bucket": "datasets",
-    "model_bucket": "models",
+    "buckets": {
+        "datasets": "wind-datasets",
+        "models": "wind-models",
+        "predictions": "wind-predictions",
+        "scalers": "wind-scalers",
+        "metrics": "wind-metrics",
+        "logs": "wind-logs"
+    },
     "access_control": {
-        "datasets": "private",
-        "models": "public-read"
+        "wind-datasets": "private",
+        "wind-models": "public-read",
+        "wind-predictions": "private",
+        "wind-scalers": "private",
+        "wind-metrics": "public-read",
+        "wind-logs": "public-read"
     }
 }
 
@@ -40,7 +51,8 @@ class Config:
         "port": "5432",
         "user": "postgres",
         "password": "yzz0216yh",
-        "database": "windpower"
+        "database": "windpower",
+        "default_db": "postgres"  # 新增默认数据库配置
     }
     
     MINIO_CONFIG = {
@@ -48,12 +60,28 @@ class Config:
         "access_key": "minioadmin",
         "secret_key": "minioadmin",
         "secure": False,
-        "dataset_bucket": "datasets",
-        "model_bucket": "models",
+        "buckets": {
+            "datasets": "wind-datasets",
+            "models": "wind-models",
+            "predictions": "wind-predictions",
+            "scalers": "wind-scalers",
+            "metrics": "wind-metrics",
+            "logs": "wind-logs"
+        },
         "access_control": {
-            "datasets": "private",
-            "models": "public-read"
+            "wind-datasets": "private",
+            "wind-models": "public-read",
+            "wind-predictions": "private",
+            "wind-scalers": "private",
+            "wind-metrics": "public-read",
+            "wind-logs": "public-read"
         }
+    }
+
+    MODEL_STORAGE = {
+        'model_dir': os.path.join(BASE_DIR, 'saved_models'),
+        'scaler_dir': os.path.join(BASE_DIR, 'saved_scalers'),
+        'metrics_dir': os.path.join(BASE_DIR, 'saved_metrics')
     }
 
 class TestingConfig(Config):
@@ -70,12 +98,9 @@ minio_client = Minio(
 print(minio_client.list_buckets())  # 应该返回空列表或已有存储桶
 
 # 在Python交互环境中执行
-if not minio_client.bucket_exists("datasets"):
-    minio_client.make_bucket("datasets")
-if not minio_client.bucket_exists("models"):
-    minio_client.make_bucket("models")
+required_buckets = list(MINIO_CONFIG["buckets"].values())
 
-# 设置存储桶策略
+# 在创建存储桶后添加策略设置函数
 def set_bucket_policy(client, bucket_name, policy):
     """更精确的策略配置"""
     if policy == "private":
@@ -121,6 +146,16 @@ def set_bucket_policy(client, bucket_name, policy):
         })
     client.set_bucket_policy(bucket_name, policy_json)
 
-# 初始化时调用
-set_bucket_policy(minio_client, "datasets", "private")
-set_bucket_policy(minio_client, "models", "public-read")
+# 先创建存储桶
+for bucket in required_buckets:
+    if not minio_client.bucket_exists(bucket):
+        minio_client.make_bucket(bucket)
+        print(f"✅ 成功创建存储桶: {bucket}")
+
+# 再设置策略（此时存储桶已存在）
+set_bucket_policy(minio_client, "wind-datasets", "private")
+set_bucket_policy(minio_client, "wind-models", "public-read")
+set_bucket_policy(minio_client, "wind-predictions", "private")
+set_bucket_policy(minio_client, "wind-scalers", "private")
+set_bucket_policy(minio_client, "wind-metrics", "public-read")
+set_bucket_policy(minio_client, "wind-logs", "public-read")
