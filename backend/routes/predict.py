@@ -5,6 +5,9 @@ import shutil
 from services.file_service import find_file_by_id
 from services.predict_service import run_predict
 from werkzeug.utils import secure_filename
+from models import PredictionRecord, Model, Dataset
+from database_config import minio_client, SessionLocal
+
 # 预测蓝图
 predict_bp = Blueprint('predict', __name__)
 
@@ -34,6 +37,16 @@ def predict():
         current_app.logger.warning(f"没有找到对应id的归一化模型: {scalerfileId}")
         return jsonify({'error': '无效的scalerfileId'}), 400
 
+    # 获取数据库会话
+    db = SessionLocal()
+
+    # 获取关联的数据库记录
+    dataset_record = db.query(Dataset).filter(Dataset.file_id == csvfileId).first()
+    
+    if not dataset_record:
+        current_app.logger.error("找不到对应的数据集或模型记录")
+        return jsonify({'error': '无效的数据集或模型ID'}), 400
+
     # 运行预测与后处理
     try:
         forecast_file_path = run_predict(CSV_FILE_PATH=csvupload_path, MODEL_PATH=modelupload_path, SCALER_PATH=scalerupload_path)
@@ -54,13 +67,40 @@ def predict():
     try:
         shutil.copy(forecast_file_path, output_path)
         current_app.logger.info(f"将原生预测文件复制到以下路径： {output_path}")
+        
+        # 使用minio_client直接上传
+        bucket_name = "wind-predictions"
+        object_name = output_filename
+        
+        minio_client.fput_object(
+            bucket_name,
+            object_name,
+            forecast_file_path
+        )
+        current_app.logger.info(f"文件已上传到MinIO: {bucket_name}/{object_name}")
+        
+        # 创建预测记录时添加minio信息
+        prediction_record = PredictionRecord(
+            model_id=modelfileId,
+            input_data_id=csvfileId,
+            scaler_id=scalerfileId,
+            prediction_time=datetime.datetime.now(),
+            output_path=f"s3://{bucket_name}/{object_name}",  # 修改为minio路径
+            prediction_type='batch',
+            status='completed',
+        )
+        db.add(prediction_record)
+        db.commit()
+        
     except Exception as e:
-        current_app.logger.error(f"无法保存预测结果文件: {e}")
-        return jsonify({'error': '无法保存预测结果文件', 'details': str(e)}), 500
+        db.rollback()
+        current_app.logger.error(f"保存记录失败: {e}")
+        return jsonify({'error': '无法保存预测记录', 'details': str(e)}), 500
 
+    # 更新返回的下载URL为MinIO路径
     download_url = f"/download/{secure_filename(output_filename)}"
-    current_app.logger.info(f"预测文件下载url为: {download_url}")
-
+    
     return jsonify({
         'download_url': download_url,
+        'prediction_id': prediction_record.id  # 返回新创建的记录ID
     }), 200

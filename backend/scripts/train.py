@@ -45,7 +45,7 @@ def train_and_evaluate(X_train, y_train, X_val, y_val, params, scaler, models_di
     joblib.dump(scaler, scaler_filepath)
     current_app.logger.info(f"Scaler 已保存到 {scaler_filepath}")
     
-    return results_dict
+    return results_dict,model_filepath,scaler_filepath
 
 
 def save_predictions(results_dict, y_val, output_base_dir='results/'):

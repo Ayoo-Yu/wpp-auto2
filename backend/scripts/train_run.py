@@ -40,7 +40,7 @@ def train_run(DATA_FILE_PATH, MODEL):
     current_app.logger.info("模型参数获取完成!")
     current_app.logger.info(params)
     # 训练与评估
-    results_dict = train_and_evaluate(X_train_windows, y_train_windows, X_val_windows, y_val_windows, params, scaler)
+    results_dict,model_filepath,scaler_filepath = train_and_evaluate(X_train_windows, y_train_windows, X_val_windows, y_val_windows, params, scaler)
     current_app.logger.info("模型训练与评估完成!")
     # 保存预测结果
     forecast_df = save_predictions(results_dict, y_val_windows, output_base_dir=output_dir)
@@ -48,4 +48,4 @@ def train_run(DATA_FILE_PATH, MODEL):
     # 可视化结果
     visualize_results(results_dict, y_val_windows, output_path=os.path.join(output_dir, 'power_predictions_comparison.png'))
     current_app.logger.info("可视化结果完成!")
-    return forecast_df
+    return forecast_df,model_filepath,scaler_filepath

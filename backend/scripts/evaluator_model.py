@@ -72,18 +72,25 @@ class ModelEvaluator:
         --------
         dict : 包含各项评估指标的字典
         """
+        threshold = 0.2 * self.wfcapacity
         mae = mean_absolute_error(actual, predicted)
         mse = mean_squared_error(actual, predicted)
         rmse = np.sqrt(mse)
 
         # 添加自定义的Acc指标
         acc = 1 - rmse / self.wfcapacity
-
+        pe = (0.83 - acc) * self.wfcapacity if acc < 0.83 else 0 
+    
+        # 计算自定义指标 K
+        m_values =  ((predicted - actual) / np.maximum(actual, threshold)) ** 2
+        k_value = 1 - np.sqrt(np.mean(m_values))
         return {
             'MAE': mae,
             'MSE': mse,
             'RMSE': rmse,
-            'ACC': acc
+            'ACC': acc,
+            'PE': pe,
+            'K': k_value
         }
         
     def calculate_overall_metrics(self):

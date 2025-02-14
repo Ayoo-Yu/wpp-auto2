@@ -121,7 +121,7 @@
 </template>
 
 <script>
-import { uploadFile,predict } from '@/services/apiService';  // 使用 API 服务
+import { upload_predict_csv,upload_model,upload_scaler,predict } from '@/services/apiService';  // 使用 API 服务
 import { useSocket } from '@/composables/useSocket'; // 使用组合式 API 来管理 WebSocket
 import FileUploader from './FileUploader.vue';
 import StepHintBox from "./StepHintBox.vue";
@@ -257,17 +257,45 @@ export default {
       this.uploading = true;
       this.uploadProgress = 0;
 
-      uploadFile(file, (progressEvent) => {
-        if (progressEvent.lengthComputable) {
-          this.uploadProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-        }
-      })
+      if (type === 'Csv') {
+        upload_predict_csv(file, (progressEvent) => {
+          if (progressEvent.lengthComputable) {
+            this.uploadProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          }
+        })
         .then(response => {
           successCallback(response.data);
         })
         .catch(error => {
           this.handleUploadError(error);
         });
+      } else if (type === 'Model') {
+        upload_model(file, (progressEvent) => {
+          if (progressEvent.lengthComputable) {
+            this.uploadProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          }
+        })
+        .then(response => {
+          successCallback(response.data);
+        })
+        .catch(error => {
+          this.handleUploadError(error);
+        });
+      } else if (type === 'Scaler') {
+        upload_scaler(file, (progressEvent) => {
+          if (progressEvent.lengthComputable) {
+            this.uploadProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          }
+        })
+        .then(response => {
+          successCallback(response.data);
+        })
+        .catch(error => {
+          this.handleUploadError(error);
+        });
+      } else {
+        this.$message.error('文件类型错误！');
+      }
     },
 
     handlePredict() {

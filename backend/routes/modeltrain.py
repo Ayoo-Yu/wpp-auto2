@@ -8,6 +8,9 @@ from services.file_service import find_file_by_id
 from services.modeltrain_service import run_modeltrain
 from services.evaluation_service import run_evaluation
 from werkzeug.utils import secure_filename
+from database_config import minio_client, SessionLocal
+from models import Model, EvaluationMetrics, TrainingRecord
+import uuid
 # 预测蓝图
 modeltrain_bp = Blueprint('modeltrain', __name__)
 
@@ -31,7 +34,7 @@ def modeltrain():
 
     # 运行预测与后处理
     try:
-        forecast_file_path = run_modeltrain(upload_path, model)
+        forecast_file_path,model_filepath,scaler_filepath = run_modeltrain(upload_path, model)
     except Exception as e:
         current_app.logger.error(f"预测过程中出错: {e}")
         return jsonify({'error': '预测过程中出错', 'details': str(e)}), 500
@@ -79,6 +82,99 @@ def modeltrain():
     download_url = f"/download/{secure_filename(output_filename)}"
     current_app.logger.info(f"预测文件下载url为: {download_url}")
     current_app.logger.info(f"训练报告下载url为: {report_download_url}")
+
+    # 在模型训练之后增加MinIO上传和数据库记录
+    db = SessionLocal()
+    
+    try:
+        # 生成唯一标识
+        model_version = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+        
+        # 上传模型文件到MinIO（wind-model桶）
+        model_object_name = f"{model_version}/model.joblib"
+        minio_client.fput_object(
+            "wind-models", 
+            model_object_name,
+            model_filepath
+        )
+        
+        # 上传scaler文件到MinIO（wind-scaler桶）
+        scaler_object_name = f"{model_version}/scaler.joblib"
+        minio_client.fput_object(
+            "wind-scalers", 
+            scaler_object_name,
+            scaler_filepath
+        )
+        
+        # 上传评估文件到MinIO（wind-metrics桶）
+        metrics_files = []
+        for root, dirs, files in os.walk(evaluation_output_dir):
+            for file in files:
+                local_path = os.path.join(root, file)
+                object_name = f"{model_version}/metrics/{file}"
+                minio_client.fput_object(
+                    "wind-metrics",
+                    object_name,
+                    local_path
+                )
+                metrics_files.append(object_name)
+        
+        # 如果有评估报告则上传
+        if report_path and os.path.exists(report_path):
+            report_object_name = f"{model_version}/report.txt"
+            minio_client.fput_object(
+                "wind-metrics",
+                report_object_name,
+                report_path
+            )
+            metrics_files.append(report_object_name)
+
+        # 保存到数据库（修改model_path和scaler_path为MinIO路径）
+        new_model = Model(
+            dataset_id=str(file_id),
+            model_type=model,
+            model_name=model_version,
+            model_path=model_object_name,  # 改为MinIO路径
+            scaler_path=scaler_object_name,  # 改为MinIO路径
+            accuracy=float(evaluation_result['overall_metrics'].get('ACC')),
+            train_time=datetime.datetime.now(),
+            metrics_path=f"{model_version}/metrics",  # 改为存储父目录
+            is_active=True
+        )
+        db.add(new_model)
+        db.commit()
+        db.refresh(new_model)
+        # 保存评估指标
+        evaluation_metrics = EvaluationMetrics(
+            dataset_id=file_id,
+            model_id=new_model.id,
+            mae=float(evaluation_result['overall_metrics'].get('MAE')),
+            mse=float(evaluation_result['overall_metrics'].get('MSE')),
+            rmse=float(evaluation_result['overall_metrics'].get('RMSE')),
+            acc=float(evaluation_result['overall_metrics'].get('ACC')),
+            k=float(evaluation_result['overall_metrics'].get('K')),
+            pe=float(evaluation_result['overall_metrics'].get('PE'))
+        )
+        db.add(evaluation_metrics)
+
+        # 训练记录
+        training_record = TrainingRecord(
+            model_name=model_version,
+            status='completed',
+            dataset_path=upload_path,
+            duration=(datetime.datetime.now() - new_model.train_time).total_seconds(),
+            log_path=os.path.join(current_app.config['DOWNLOAD_FOLDER'], 'training_logs', f"{model_version}.log")
+        )
+        db.add(training_record)
+        
+        db.commit()
+
+    except Exception as e:
+        db.rollback()
+        current_app.logger.error(f"数据库操作失败: {e}")
+        return jsonify({'error': '数据库操作失败', 'details': str(e)}), 500
+    finally:
+        db.close()
 
     return jsonify({
         'download_url': download_url,
