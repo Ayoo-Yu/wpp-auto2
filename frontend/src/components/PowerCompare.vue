@@ -54,6 +54,32 @@
       </div>
     </div>
 
+    <!-- 在chart-container后添加新的每日指标区域 -->
+    <div class="daily-metrics-container">
+      <el-card class="metrics-card">
+        <div class="metrics-header">
+          <h3>每日评估指标</h3>
+          <div class="metric-buttons">
+            <el-radio-group v-model="currentMetric" @change="updateMetricChart">
+              <el-radio-button label="acc">ACC (%)</el-radio-button>
+              <el-radio-button label="mae">MAE (MW)</el-radio-button>
+              <el-radio-button label="mse">MSE (MW²)</el-radio-button>
+              <el-radio-button label="rmse">RMSE (MW)</el-radio-button>
+              <el-radio-button label="k">K值</el-radio-button>
+              <el-radio-button label="pe">Pe (MW)</el-radio-button>
+            </el-radio-group>
+          </div>
+        </div>
+        <div class="metrics-chart-wrapper">
+          <canvas 
+            v-show="dailyMetrics" 
+            ref="metricChart" 
+            style="width: 100%; height: 100%; display: block;"
+          ></canvas>
+        </div>
+      </el-card>
+    </div>
+
     <!-- 加载状态 -->
     <LoadingIndicator 
       :visible="loading" 
@@ -87,7 +113,15 @@ export default {
       chartData: null,
       chartInstance: null,
       loading: false,
-      wfcapacity: 453.5
+      wfcapacity: 453.5,
+      currentMetric: 'acc',
+      dailyMetrics: null,
+      metricChart: null,
+      colors: {
+        '超短期预测': '#4ECDC4',
+        '短期预测': '#45B7D1',
+        '中期预测': '#96CEB4'
+      }
     }
   },
   methods: {
@@ -115,7 +149,15 @@ export default {
     },
 
     processChartData(data) {
+      console.log('原始数据:', data)
       this.chartData = data
+
+      // 先计算每日指标
+      console.log('开始计算每日指标')
+      this.dailyMetrics = this.calculateDailyMetrics(data)
+      console.log('每日指标结果:', this.dailyMetrics)
+
+      // 然后创建主图表
       const datasets = []
       const colors = {
         '实测值': '#FF6B6B',
@@ -159,8 +201,11 @@ export default {
       }
 
       // 处理预测值数据集
-      ['超短期预测', '短期预测', '中期预测'].forEach(type => {
-        if (data[type] && data['实测值']) {
+      // 只处理存在的预测类型
+      const predictionTypes = ['超短期预测', '短期预测', '中期预测'].filter(type => data[type])
+      
+      predictionTypes.forEach(type => {
+        if (data['实测值']) {  // 确保有实测值用于对比
           const predictedMap = new Map(data[type].map(v => [
             new Date(v.timestamp).toISOString(),
             v.power
@@ -270,6 +315,12 @@ export default {
           }
         })
       })
+
+      // 最后更新指标图表
+      // 使用 nextTick 确保 DOM 已更新
+      this.$nextTick(() => {
+        this.updateMetricChart()
+      })
     },
 
     calculateMetrics(actual, predicted) {
@@ -337,6 +388,259 @@ export default {
             }
           }
         }
+      })
+    },
+
+    // 添加计算每日指标的方法
+    calculateDailyMetrics(data) {
+      console.log('计算每日指标的输入数据:', data)
+      if (!data['实测值']) {
+        console.warn('没有实测值数据')
+        return null
+      }
+
+      const dailyMetrics = {}
+      const predictionTypes = this.selectedTypes.filter(type => 
+        type !== '实测值' && data[type]
+      )
+      console.log('预测类型:', predictionTypes)
+
+      predictionTypes.forEach(type => {
+        console.log(`处理预测类型: ${type}`)
+        const metricsByDay = {}
+        
+        // 按日期分组数据（修复时区问题）
+        data[type].forEach(pred => {
+          // 使用本地时间转换
+          const dateObj = new Date(pred.timestamp)
+          // 转换为本地日期字符串（格式：YYYY-MM-DD）
+          const date = `${dateObj.getFullYear()}-${(dateObj.getMonth()+1).toString().padStart(2,'0')}-${dateObj.getDate().toString().padStart(2,'0')}`
+          
+          if (!metricsByDay[date]) {
+            metricsByDay[date] = {
+              predicted: [],
+              actual: []
+            }
+          }
+
+          const actualPoint = data['实测值'].find(
+            act => new Date(act.timestamp).getTime() === new Date(pred.timestamp).getTime()
+          )
+          if (actualPoint) {
+            metricsByDay[date].predicted.push(pred.power)
+            metricsByDay[date].actual.push(actualPoint.power)
+          }
+        })
+
+        console.log(`${type} 的每日数据:`, metricsByDay)
+
+        // 计算每日指标
+        dailyMetrics[type] = Object.entries(metricsByDay)
+          .filter(([dateStr]) => {
+            // 过滤在时间范围外的日期
+            const date = new Date(dateStr)
+            const startDate = new Date(this.timeRange[0])
+            const endDate = new Date(this.timeRange[1])
+            return date >= startDate && date <= endDate
+          })
+          .filter(([, dayData]) => dayData.predicted.length > 0)
+          .map(([date, dayData]) => {
+            const metrics = this.calculateMetrics(dayData.actual, dayData.predicted)
+            return { date, ...metrics }
+          })
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+
+        console.log(`${type} 的每日指标:`, dailyMetrics[type])
+      })
+
+      return dailyMetrics
+    },
+
+    // 更新指标图表的方法
+    updateMetricChart() {
+      console.log('开始更新指标图表')
+      
+      // 先销毁旧图表
+      if (this.metricChart) {
+        console.log('销毁旧图表')
+        this.metricChart.destroy()
+        this.metricChart = null
+      }
+
+      // 等待 DOM 更新（使用 nextTick 替代 requestAnimationFrame）
+      this.$nextTick(() => {
+        // 获取 canvas 元素
+        const canvas = this.$refs.metricChart
+        if (!canvas) {
+          console.error('Canvas element not found')
+          return
+        }
+
+        // 设置 canvas 尺寸（添加容错）
+        const container = canvas.parentElement
+        if (!container) return
+        
+        // 显式设置 canvas 的宽高（修复模糊问题）
+        const dpr = window.devicePixelRatio || 1
+        canvas.width = container.clientWidth * dpr
+        canvas.height = container.clientHeight * dpr
+        canvas.style.width = container.clientWidth + 'px'
+        canvas.style.height = container.clientHeight + 'px'
+
+        // 获取 context
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          console.error('Could not get canvas context')
+          return
+        }
+
+        if (!this.dailyMetrics) {
+          console.warn('没有每日指标数据')
+          return
+        }
+
+        const firstPredType = this.selectedTypes.find(type => 
+          type !== '实测值' && this.dailyMetrics[type]
+        )
+        console.log('首个预测类型:', firstPredType)
+
+        if (!firstPredType) {
+          console.warn('没有找到有效的预测类型')
+          return
+        }
+
+        const dateLabels = this.dailyMetrics[firstPredType]?.map(d => {
+          const date = new Date(d.date)
+          return `${date.getMonth()+1}/${date.getDate()}`
+        }) || []
+        console.log('日期标签:', dateLabels)
+
+        if (dateLabels.length === 0) {
+          console.warn('没有可用的日期标签')
+          return
+        }
+
+        const datasets = Object.entries(this.dailyMetrics)
+          .filter(([type]) => this.selectedTypes.includes(type) && type !== '实测值')
+          .map(([type, data]) => {
+            const values = data
+              .map(d => {
+                const value = this.currentMetric === 'acc' 
+                  ? d[this.currentMetric] * 100 
+                  : d[this.currentMetric]
+                return Number.isFinite(value) ? value : null
+              })
+              .filter(v => v !== null)
+            console.log(`${type} 的值:`, values)
+            const avg = values.reduce((a, b) => a + b, 0) / values.length
+            console.log(`${type} 的平均值:`, avg)
+
+            return {
+              label: `${type} (平均: ${avg.toFixed(2)}${this.currentMetric === 'acc' ? '%' : ''})`,
+              data: values,
+              borderColor: this.colors[type],
+              backgroundColor: `${this.colors[type]}33`,
+              tension: 0.3,
+              pointRadius: 3,
+              fill: false
+            }
+          })
+
+        if (datasets.length === 0) {
+          console.warn('没有数据集可以显示')
+          return
+        }
+
+        console.log('准备的数据集:', datasets)
+
+        const metric = {
+          acc: { label: 'ACC (%)', min: 0, max: 100 },
+          mae: { label: 'MAE (MW)', min: 0 },
+          mse: { label: 'MSE (MW²)', min: 0 },
+          rmse: { label: 'RMSE (MW)', min: 0 },
+          k: { label: 'K值', min: -1, max: 1 },
+          pe: { label: 'Pe (MW)', min: 0 }
+        }[this.currentMetric]
+
+        try {
+          console.log('最终图表配置:', {
+            labels: dateLabels,
+            datasets: datasets.map(d => ({
+              label: d.label,
+              data: d.data,
+              length: d.data.length
+            }))
+          })
+
+          this.metricChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: dateLabels,
+              datasets
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: false,
+              plugins: {
+                legend: {
+                  position: 'top',
+                  labels: {
+                    padding: 20,
+                    font: { size: 13 }
+                  }
+                },
+                title: {
+                  display: true,
+                  text: metric.label,
+                  font: { size: 16 },
+                  padding: 20
+                }
+              },
+              scales: {
+                x: {
+                  display: true,
+                  grid: { color: 'rgba(200,200,200,0.1)' },
+                  ticks: { 
+                    color: '#666',
+                    maxRotation: 45,
+                    minRotation: 45,
+                    display: true
+                  }
+                },
+                y: {
+                  display: true,
+                  beginAtZero: true,
+                  min: metric.min,
+                  max: metric.max,
+                  grid: { color: 'rgba(200,200,200,0.1)' },
+                  ticks: { 
+                    color: '#666',
+                    display: true,
+                    callback: (value) => {
+                      switch (this.currentMetric) {
+                        case 'acc': return value.toFixed(1) + '%'
+                        case 'mse': return value.toFixed(1) + ' MW²'
+                        case 'k': return value.toFixed(2)
+                        default: return value.toFixed(1) + ' MW'
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          })
+          console.log('图表实例创建成功:', this.metricChart)
+        } catch (error) {
+          console.error('创建图表时出错:', error)
+        }
+
+        // 添加图表 resize 事件监听
+        new ResizeObserver(() => {
+          if (this.metricChart) {
+            this.metricChart.resize()
+          }
+        }).observe(container)
       })
     }
   },
@@ -487,5 +791,69 @@ canvas {
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+.daily-metrics-container {
+  margin-top: 24px;
+}
+
+.metrics-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.metrics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.metrics-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.metric-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.metrics-chart-wrapper {
+  height: 500px;
+  min-height: 400px;
+  position: relative;
+  width: 100%;
+  background: white;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.metrics-chart-wrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+@media (max-width: 768px) {
+  .metrics-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .metric-buttons {
+    flex-wrap: wrap;
+  }
+}
+
+/* 在时间选择器附近添加提示 */
+.time-range-picker::after {
+  content: "（北京时间）";
+  color: #666;
+  font-size: 12px;
+  margin-left: 8px;
 }
 </style> 
