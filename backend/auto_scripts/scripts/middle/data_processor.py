@@ -53,11 +53,12 @@ def feature_engineering(X_train, X_val, lags):
     """
     特征工程：特征组合、滞后特征等
     """
+    n_points = len([col for col in X_train.columns if col.startswith('ws10_')])
     combined_features = {}
-    wind_speeds_10 = [f'ws10_{i}' for i in range(1, 16)]
-    wind_speeds_100 = [f'ws100_{i}' for i in range(1, 16)]
-    wind_speeds_200 = [f'ws200_{i}' for i in range(1, 16)]
-    
+    wind_speeds_10 = [f'ws10_{i}' for i in range(1, n_points+1)]
+    wind_speeds_100 = [f'ws100_{i}' for i in range(1, n_points+1)]
+    wind_speeds_200 = [f'ws200_{i}' for i in range(1, n_points+1)]
+
     # 生成高度10和100的风速差异特征
     for wind_speeds in [wind_speeds_100, wind_speeds_200]:
         for i in range(len(wind_speeds)):

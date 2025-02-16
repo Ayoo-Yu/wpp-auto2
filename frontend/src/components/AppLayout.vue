@@ -50,6 +50,11 @@
           <el-icon><Timer /></el-icon>
           <template #title>自动预测</template>
         </el-menu-item>
+
+        <el-menu-item index="/powercompare">
+          <el-icon><TrendCharts /></el-icon>
+          <template #title>功率对比</template>
+        </el-menu-item>
       </el-menu>
     </el-aside>
 

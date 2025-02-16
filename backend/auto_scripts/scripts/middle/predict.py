@@ -3,6 +3,7 @@ import pandas as pd
 import joblib
 from data_processor import preprocess_data_pre, feature_engineering, create_time_window_pre
 from config import LAGS, OUTPUT_DIR_PRE,Today
+import requests  # 添加在文件开头的导入部分
 
 flag_file = os.path.join(OUTPUT_DIR_PRE, Today,f'{Today}_predict_done.flag')
 def load_models_and_scaler(model_path, scaler_path):
@@ -51,7 +52,7 @@ def make_predictions(model, scaler, X_new, window_size,LAGS):
 
 def save_predictions_to_csv(predictions,timestamp):
     """
-    保存预测结果到 CSV 文件
+    保存预测结果到 CSV 文件并将数据传入数据库
     """
     today = Today
     output_dir = os.path.join(OUTPUT_DIR_PRE,today)
@@ -63,6 +64,21 @@ def save_predictions_to_csv(predictions,timestamp):
     csv_filepath = os.path.join(output_dir,f'{today}.csv')
     df.to_csv(csv_filepath, index=False)
     print(f"预测结果已保存到 {csv_filepath}")
+    
+    # 调用接口将数据传入数据库
+    try:
+        url = 'http://localhost:5000/prediction2database/batch_mid_power'
+        files = {'file': open(csv_filepath, 'rb')}
+        response = requests.post(url, files=files)
+        
+        if response.status_code == 201:
+            print("数据已成功导入数据库")
+            result = response.json()
+            print(f"总记录数: {result['total']}, 更新: {result['updated']}, 插入: {result['inserted']}")
+        else:
+            print(f"数据导入失败: {response.json()['error']}")
+    except Exception as e:
+        print(f"调用接口失败: {str(e)}")
     
     return csv_filepath
     

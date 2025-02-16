@@ -34,6 +34,9 @@ from routes.autopredict import autopredict_bp
 from routes.training import training_bp
 from routes.predict import predict_bp
 from routes.autotask import autotask_bp
+from routes.actual_power_router import actual_power_bp
+from routes.prediction2database import prediction2database_bp
+from routes.power_compare import bp as power_compare_bp
 
 # app.register_blueprint(upload_bp, url_prefix='/')
 app.register_blueprint(modeltrain_bp, url_prefix='/')
@@ -42,7 +45,9 @@ app.register_blueprint(predict_bp, url_prefix='/')
 app.register_blueprint(autopredict_bp, url_prefix='/')
 app.register_blueprint(training_bp, url_prefix='/')
 app.register_blueprint(autotask_bp, url_prefix='/')
-
+app.register_blueprint(actual_power_bp)
+app.register_blueprint(prediction2database_bp)
+app.register_blueprint(power_compare_bp)
 # 初始化数据库和存储桶
 def initialize():
     with app.app_context():
