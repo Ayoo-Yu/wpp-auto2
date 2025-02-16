@@ -5,7 +5,7 @@ import ModelTrain from '../components/ModelTrain.vue' // 父组件
 import AppLayout from '../components/AppLayout.vue' // 布局组件
 import PowerPredict from '../components/PowerPredict.vue' // 预测组件
 import AutoPredict  from '../components/AutoPredict.vue'
-
+import PowerCompare from '../components/PowerCompare.vue'
 
 const routes = [
   {
@@ -31,6 +31,11 @@ const routes = [
         path: 'autopredict',
         name: 'AutoPredict',
         component: AutoPredict
+      },
+      {
+        path: 'powercompare',
+        name: 'PowerCompare',
+        component: PowerCompare
       },
       // 更多子路由
     ]

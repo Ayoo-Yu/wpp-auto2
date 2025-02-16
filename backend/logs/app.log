@@ -3005,3 +3005,305 @@ LINE 1: ...me, output_path, prediction_type, status) VALUES ('202502121...
 [2025-02-14 15:40:18,371] INFO in predict: 预测数据选择: 20250214153911501545, 预测模型选择: 20250214154015780624, 归一化模型选择: 20250214154017436547
 [2025-02-14 15:40:18,685] INFO in predict: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_test1_-__20250214153911501545_20250214154018.csv
 [2025-02-14 15:40:19,397] INFO in predict: 文件已上传到MinIO: wind-predictions/forecast_test1_-__20250214153911501545_20250214154018.csv
+[2025-02-14 15:46:45,853] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-14 15:48:15,231] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-14 15:48:20,032] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-14 15:48:26,490] INFO in app: 成功连接服务器！
+[2025-02-14 15:48:27,721] INFO in app: 成功连接服务器！
+[2025-02-14 15:48:29,779] INFO in app: 与服务器断开连接！
+[2025-02-14 15:48:29,788] INFO in app: 与服务器断开连接！
+[2025-02-14 15:48:30,584] INFO in app: 成功连接服务器！
+[2025-02-14 15:48:36,249] INFO in app: 成功连接服务器！
+[2025-02-14 15:48:40,314] INFO in modeltrain: 收到模型训练请求: {'file_id': '20250214154837513736', 'model': 'GBDT', 'wfcapacity': 453.5}
+[2025-02-14 15:48:40,318] INFO in modeltrain: 训练集id: 20250214154837513736, 模型选择: GBDT, 装机容量: 453.5,类型: <class 'float'>
+[2025-02-14 15:48:40,323] INFO in train_run: 输出结果将保存到: results\20250214_154840
+[2025-02-14 15:48:40,411] INFO in train_run: 数据加载完成!
+[2025-02-14 15:48:40,435] INFO in train_run: 数据预处理完成!
+[2025-02-14 15:48:40,653] INFO in train_run: 特征工程完成!
+[2025-02-14 15:48:40,698] INFO in train_run: 数据标准化完成!
+[2025-02-14 15:48:40,752] INFO in train_run: 时间窗口创建完成!
+[2025-02-14 15:48:40,754] INFO in train_run: 模型参数获取完成!
+[2025-02-14 15:48:40,757] INFO in train_run: {'boosting_type': 'gbdt', 'objective': 'regression', 'metric': 'rmse', 'num_leaves': 31, 'learning_rate': 0.05, 'feature_fraction': 0.9, 'name': 'GBDT'}
+[2025-02-14 15:48:40,760] INFO in train: 模型和 scaler 将被保存到目录: models\20250214_154840
+[2025-02-14 15:48:40,761] INFO in train: 开始训练 GBDT 模型...
+[2025-02-14 15:49:34,460] INFO in train: GBDT 均方误差: 149.7425066010432
+[2025-02-14 15:49:34,491] INFO in train: GBDT 模型已保存到 models\20250214_154840\GBDT.joblib
+[2025-02-14 15:49:34,502] INFO in train: Scaler 已保存到 models\20250214_154840\scaler.joblib
+[2025-02-14 15:49:34,515] INFO in train_run: 模型训练与评估完成!
+[2025-02-14 15:49:34,533] INFO in train: 原生预测结果已保存到 results\20250214_154840\GBDT_predicted_vs_actual_power.csv
+[2025-02-14 15:49:34,538] INFO in train_run: 预测结果保存完成!
+[2025-02-14 15:49:35,121] INFO in train_run: 可视化结果完成!
+[2025-02-14 15:49:35,205] INFO in prediction_timestamp: 已经为测试集预测结果匹配时间戳 'results\20250214_154840\GBDT_predicted_vs_actual_power_timestamp.csv'
+[2025-02-14 15:49:35,209] INFO in modeltrain: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_test1_20250214154837513736_20250214154935.csv
+[2025-02-14 15:49:40,893] INFO in modeltrain: 测试集评估完成。相关结果保存在以下路径：D:\my-vue-project\wind-power-forecast\backend\forecasts\evaluation_test1_20250214154837513736_20250214154935
+[2025-02-14 15:49:40,896] INFO in modeltrain: 将原生报告复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\report_test1_20250214154837513736_20250214154935.txt
+[2025-02-14 15:49:40,898] INFO in modeltrain: 预测文件下载url为: /download/forecast_test1_20250214154837513736_20250214154935.csv
+[2025-02-14 15:49:40,899] INFO in modeltrain: 训练报告下载url为: /download/report_test1_20250214154837513736_20250214154935.txt
+[2025-02-14 15:49:41,713] INFO in app: 成功连接服务器！
+[2025-02-14 15:49:41,718] INFO in app: 与服务器断开连接！
+[2025-02-14 15:49:41,720] INFO in app: 与服务器断开连接！
+[2025-02-14 15:49:41,724] INFO in app: 成功连接服务器！
+[2025-02-14 15:49:51,792] INFO in app: 成功连接服务器！
+[2025-02-14 15:50:12,333] INFO in predict: 收到预测请求: {'csvfileId': '20250214155010656064', 'modelfileId': '20250214155010844828', 'scalerfileId': '20250214155011398513'}
+[2025-02-14 15:50:12,334] INFO in predict: 预测数据选择: 20250214155010656064, 预测模型选择: 20250214155010844828, 归一化模型选择: 20250214155011398513
+[2025-02-14 15:50:12,698] INFO in predict: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_test1_-__20250214155010656064_20250214155012.csv
+[2025-02-14 15:50:12,712] INFO in predict: 文件已上传到MinIO: wind-predictions/forecast_test1_-__20250214155010656064_20250214155012.csv
+[2025-02-14 15:50:14,085] INFO in download: 正在下载以下文件： forecast_test1_-__20250214155010656064_20250214155012.csv
+[2025-02-14 16:20:23,232] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-14 16:20:28,325] INFO in app: 成功连接服务器！
+[2025-02-14 16:20:28,331] INFO in app: 成功连接服务器！
+[2025-02-14 16:20:28,408] INFO in app: 成功连接服务器！
+[2025-02-14 16:20:57,212] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-14 16:21:01,053] INFO in app: 成功连接服务器！
+[2025-02-14 16:21:01,056] INFO in app: 成功连接服务器！
+[2025-02-14 16:21:01,116] INFO in app: 成功连接服务器！
+[2025-02-14 16:21:56,652] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-14 16:22:00,954] INFO in app: 成功连接服务器！
+[2025-02-14 16:22:00,957] INFO in app: 成功连接服务器！
+[2025-02-14 16:22:01,014] INFO in app: 成功连接服务器！
+[2025-02-14 17:42:40,993] INFO in app: 与服务器断开连接！
+[2025-02-14 17:42:41,174] INFO in app: 与服务器断开连接！
+[2025-02-14 17:42:41,602] INFO in app: 成功连接服务器！
+[2025-02-14 17:42:43,206] INFO in app: 成功连接服务器！
+[2025-02-14 17:45:25,984] INFO in app: 与服务器断开连接！
+[2025-02-14 17:45:26,035] INFO in app: 与服务器断开连接！
+[2025-02-14 17:45:26,979] INFO in app: 成功连接服务器！
+[2025-02-14 17:45:28,324] INFO in app: 成功连接服务器！
+[2025-02-14 17:45:35,771] INFO in app: 与服务器断开连接！
+[2025-02-14 17:45:35,775] INFO in app: 与服务器断开连接！
+[2025-02-14 17:45:35,777] INFO in app: 与服务器断开连接！
+[2025-02-15 15:06:39,194] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 15:06:58,010] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 15:30:53,190] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 15:38:56,191] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 15:39:48,129] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 15:41:46,976] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 15:44:16,896] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 15:44:30,693] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 16:03:34,647] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 16:12:15,361] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 16:12:49,878] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 23:11:18,952] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 23:16:12,198] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 23:18:11,891] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 23:18:26,226] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 23:23:20,165] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 23:50:00,019] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-15 23:50:15,701] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 00:01:15,714] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 00:01:32,176] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 00:04:08,913] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 00:05:05,864] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 00:05:21,651] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 00:08:40,226] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 00:12:27,094] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 00:17:05,519] ERROR in prediction2database: 批量插入/更新失败: 'pre_at' is an invalid keyword argument for SupershortlPower
+[2025-02-16 00:20:10,569] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:14:15,840] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:14:31,967] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:17:15,973] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:17:29,899] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:21:08,784] ERROR in actual_power_router: 文件处理失败: 'timestamp'
+[2025-02-16 21:22:20,072] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:22:30,020] ERROR in actual_power_router: 文件处理失败: 'wp_true'
+[2025-02-16 21:34:12,569] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:36:50,154] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:38:22,056] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:42:20,536] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:42:34,091] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:44:35,228] INFO in app: 成功连接服务器！
+[2025-02-16 21:45:38,216] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:45:54,142] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:45:57,265] INFO in app: 成功连接服务器！
+[2025-02-16 21:48:33,029] INFO in app: 与服务器断开连接！
+[2025-02-16 21:48:33,778] INFO in app: 成功连接服务器！
+[2025-02-16 21:51:46,824] INFO in app: 与服务器断开连接！
+[2025-02-16 21:51:47,425] INFO in app: 成功连接服务器！
+[2025-02-16 21:53:53,879] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:53:59,508] INFO in app: 成功连接服务器！
+[2025-02-16 21:54:06,892] INFO in app: 与服务器断开连接！
+[2025-02-16 21:54:07,486] INFO in app: 成功连接服务器！
+[2025-02-16 21:55:29,516] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:55:47,135] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 21:55:50,515] INFO in app: 成功连接服务器！
+[2025-02-16 21:55:58,880] INFO in app: 与服务器断开连接！
+[2025-02-16 21:56:00,117] INFO in app: 成功连接服务器！
+[2025-02-16 22:03:27,031] INFO in app: 与服务器断开连接！
+[2025-02-16 22:03:28,624] INFO in app: 成功连接服务器！
+[2025-02-16 23:12:48,721] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 23:13:02,973] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 23:13:10,289] INFO in app: 成功连接服务器！
+[2025-02-16 23:13:11,272] INFO in app: 与服务器断开连接！
+[2025-02-16 23:13:11,567] INFO in app: 成功连接服务器！
+[2025-02-16 23:15:19,628] INFO in app: 成功连接服务器！
+[2025-02-16 23:15:38,590] INFO in modeltrain: 收到模型训练请求: {'file_id': '20250216231522007951', 'model': 'GOSS', 'wfcapacity': 453.5}
+[2025-02-16 23:15:38,591] INFO in modeltrain: 训练集id: 20250216231522007951, 模型选择: GOSS, 装机容量: 453.5,类型: <class 'float'>
+[2025-02-16 23:15:38,594] INFO in train_run: 输出结果将保存到: results\20250216_231538
+[2025-02-16 23:15:40,392] INFO in train_run: 数据加载完成!
+[2025-02-16 23:15:40,470] INFO in train_run: 数据预处理完成!
+[2025-02-16 23:15:41,044] INFO in train_run: 特征工程完成!
+[2025-02-16 23:15:41,693] INFO in train_run: 数据标准化完成!
+[2025-02-16 23:15:51,039] INFO in train_run: 时间窗口创建完成!
+[2025-02-16 23:15:51,085] INFO in train_run: 模型参数获取完成!
+[2025-02-16 23:15:51,086] INFO in train_run: {'boosting_type': 'goss', 'objective': 'regression', 'metric': 'rmse', 'num_leaves': 31, 'learning_rate': 0.05, 'feature_fraction': 0.9, 'top_rate': 0.2, 'other_rate': 0.1, 'name': 'GOSS'}
+[2025-02-16 23:15:51,096] INFO in train: 模型和 scaler 将被保存到目录: models\20250216_231551
+[2025-02-16 23:15:51,112] INFO in train: 开始训练 GOSS 模型...
+[2025-02-16 23:20:26,688] INFO in train: GOSS 均方误差: 2120.131498966445
+[2025-02-16 23:20:26,727] INFO in app: 与服务器断开连接！
+[2025-02-16 23:20:26,777] INFO in train: GOSS 模型已保存到 models\20250216_231551\GOSS.joblib
+[2025-02-16 23:20:26,796] INFO in train: Scaler 已保存到 models\20250216_231551\scaler.joblib
+[2025-02-16 23:20:26,797] INFO in train_run: 模型训练与评估完成!
+[2025-02-16 23:20:26,879] INFO in train: 原生预测结果已保存到 results\20250216_231538\GOSS_predicted_vs_actual_power.csv
+[2025-02-16 23:20:26,881] INFO in train_run: 预测结果保存完成!
+[2025-02-16 23:20:27,700] INFO in train_run: 可视化结果完成!
+[2025-02-16 23:20:30,490] INFO in prediction_timestamp: 已经为测试集预测结果匹配时间戳 'results\20250216_231538\GOSS_predicted_vs_actual_power_timestamp.csv'
+[2025-02-16 23:20:30,508] INFO in modeltrain: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_train_test_20250216231522007951_20250216232030.csv
+[2025-02-16 23:20:34,926] INFO in modeltrain: 测试集评估完成。相关结果保存在以下路径：D:\my-vue-project\wind-power-forecast\backend\forecasts\evaluation_train_test_20250216231522007951_20250216232030
+[2025-02-16 23:20:34,928] INFO in modeltrain: 将原生报告复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\report_train_test_20250216231522007951_20250216232030.txt
+[2025-02-16 23:20:34,932] INFO in modeltrain: 预测文件下载url为: /download/forecast_train_test_20250216231522007951_20250216232030.csv
+[2025-02-16 23:20:34,934] INFO in modeltrain: 训练报告下载url为: /download/report_train_test_20250216231522007951_20250216232030.txt
+[2025-02-16 23:20:35,869] INFO in app: 与服务器断开连接！
+[2025-02-16 23:20:35,877] INFO in app: 成功连接服务器！
+[2025-02-16 23:20:35,879] INFO in app: 成功连接服务器！
+[2025-02-16 23:21:23,500] INFO in download: 正在下载以下文件： forecast_train_test_20250216231522007951_20250216232030.csv
+[2025-02-16 23:48:28,859] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 23:48:44,970] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-16 23:48:49,807] INFO in app: 成功连接服务器！
+[2025-02-16 23:48:50,556] INFO in app: 成功连接服务器！
+[2025-02-16 23:50:12,338] INFO in app: 与服务器断开连接！
+[2025-02-16 23:50:12,341] INFO in app: 与服务器断开连接！
+[2025-02-16 23:50:13,681] INFO in app: 成功连接服务器！
+[2025-02-17 00:03:17,567] INFO in app: 与服务器断开连接！
+[2025-02-17 00:03:19,055] INFO in app: 成功连接服务器！
+[2025-02-17 00:03:49,144] INFO in app: 与服务器断开连接！
+[2025-02-17 00:03:49,599] INFO in app: 成功连接服务器！
+[2025-02-17 00:07:46,844] INFO in app: 与服务器断开连接！
+[2025-02-17 00:07:48,696] INFO in app: 成功连接服务器！
+[2025-02-17 00:08:44,441] INFO in app: 与服务器断开连接！
+[2025-02-17 00:08:46,041] INFO in app: 成功连接服务器！
+[2025-02-17 00:09:00,433] INFO in app: 与服务器断开连接！
+[2025-02-17 00:09:00,437] INFO in app: 成功连接服务器！
+[2025-02-17 00:12:41,120] INFO in app: 与服务器断开连接！
+[2025-02-17 00:12:42,935] INFO in app: 成功连接服务器！
+[2025-02-17 00:16:42,235] INFO in app: 与服务器断开连接！
+[2025-02-17 00:16:44,122] INFO in app: 成功连接服务器！
+[2025-02-17 00:18:00,245] INFO in app: 与服务器断开连接！
+[2025-02-17 00:18:00,868] INFO in app: 成功连接服务器！
+[2025-02-17 00:19:50,260] INFO in app: 与服务器断开连接！
+[2025-02-17 00:19:50,943] INFO in app: 成功连接服务器！
+[2025-02-17 00:23:06,759] INFO in app: 与服务器断开连接！
+[2025-02-17 00:23:08,728] INFO in app: 成功连接服务器！
+[2025-02-17 00:25:13,872] INFO in app: 与服务器断开连接！
+[2025-02-17 00:25:14,173] INFO in app: 成功连接服务器！
+[2025-02-17 00:25:42,031] INFO in app: 与服务器断开连接！
+[2025-02-17 00:25:42,241] INFO in app: 成功连接服务器！
+[2025-02-17 00:32:22,541] INFO in app: 与服务器断开连接！
+[2025-02-17 00:32:22,822] INFO in app: 成功连接服务器！
+[2025-02-17 00:34:25,608] INFO in app: 与服务器断开连接！
+[2025-02-17 00:34:26,975] INFO in app: 成功连接服务器！
+[2025-02-17 00:37:50,748] INFO in app: 与服务器断开连接！
+[2025-02-17 00:37:52,846] INFO in app: 成功连接服务器！
+[2025-02-17 00:38:32,207] INFO in app: 与服务器断开连接！
+[2025-02-17 00:38:34,601] INFO in app: 成功连接服务器！
+[2025-02-17 00:40:10,927] INFO in app: 与服务器断开连接！
+[2025-02-17 00:40:12,897] INFO in app: 成功连接服务器！
+[2025-02-17 00:40:34,533] INFO in app: 与服务器断开连接！
+[2025-02-17 00:40:37,564] INFO in app: 成功连接服务器！
+[2025-02-17 00:41:12,742] INFO in app: 与服务器断开连接！
+[2025-02-17 00:41:15,263] INFO in app: 成功连接服务器！
+[2025-02-17 00:42:27,465] INFO in app: 与服务器断开连接！
+[2025-02-17 00:42:29,914] INFO in app: 成功连接服务器！
+[2025-02-17 00:42:50,341] INFO in app: 与服务器断开连接！
+[2025-02-17 00:42:51,428] INFO in app: 成功连接服务器！
+[2025-02-17 00:43:59,102] INFO in app: 与服务器断开连接！
+[2025-02-17 00:43:59,107] INFO in app: 成功连接服务器！
+[2025-02-17 00:44:47,518] INFO in app: 与服务器断开连接！
+[2025-02-17 00:44:47,551] INFO in app: 成功连接服务器！
+[2025-02-17 00:45:00,494] INFO in app: 与服务器断开连接！
+[2025-02-17 00:45:04,275] INFO in app: 成功连接服务器！
+[2025-02-17 00:45:58,113] INFO in app: 与服务器断开连接！
+[2025-02-17 00:46:01,176] INFO in app: 成功连接服务器！
+[2025-02-17 00:47:43,105] INFO in app: 与服务器断开连接！
+[2025-02-17 00:47:45,245] INFO in app: 成功连接服务器！
+[2025-02-17 00:49:19,047] INFO in app: 与服务器断开连接！
+[2025-02-17 00:49:21,809] INFO in app: 成功连接服务器！
+[2025-02-17 00:51:25,228] INFO in app: 与服务器断开连接！
+[2025-02-17 00:51:27,823] INFO in app: 成功连接服务器！
+[2025-02-17 00:52:03,308] INFO in app: 与服务器断开连接！
+[2025-02-17 00:52:05,456] INFO in app: 成功连接服务器！
+[2025-02-17 00:53:47,969] INFO in app: 与服务器断开连接！
+[2025-02-17 00:53:50,019] INFO in app: 成功连接服务器！
+[2025-02-17 00:54:03,435] INFO in app: 与服务器断开连接！
+[2025-02-17 00:54:03,622] INFO in app: 成功连接服务器！
+[2025-02-17 00:55:50,208] INFO in app: 与服务器断开连接！
+[2025-02-17 00:55:50,721] INFO in app: 成功连接服务器！
+[2025-02-17 00:56:06,068] INFO in app: 与服务器断开连接！
+[2025-02-17 00:56:06,377] INFO in app: 成功连接服务器！
+[2025-02-17 00:56:57,704] INFO in app: 与服务器断开连接！
+[2025-02-17 00:56:59,324] INFO in app: 成功连接服务器！
+[2025-02-17 00:57:48,642] INFO in app: 与服务器断开连接！
+[2025-02-17 00:57:50,188] INFO in app: 成功连接服务器！
+[2025-02-17 00:58:30,611] INFO in app: 与服务器断开连接！
+[2025-02-17 00:58:30,998] INFO in app: 成功连接服务器！
+[2025-02-17 00:58:46,339] INFO in app: 与服务器断开连接！
+[2025-02-17 00:58:46,443] INFO in app: 成功连接服务器！
+[2025-02-17 00:59:35,893] INFO in app: 与服务器断开连接！
+[2025-02-17 00:59:37,181] INFO in app: 成功连接服务器！
+[2025-02-17 01:01:05,313] INFO in app: 与服务器断开连接！
+[2025-02-17 01:01:07,349] INFO in app: 成功连接服务器！
+[2025-02-17 01:02:16,042] INFO in app: 与服务器断开连接！
+[2025-02-17 01:02:18,178] INFO in app: 成功连接服务器！
+[2025-02-17 01:03:54,030] INFO in app: 与服务器断开连接！
+[2025-02-17 01:03:56,071] INFO in app: 成功连接服务器！
+[2025-02-17 01:05:11,478] INFO in app: 与服务器断开连接！
+[2025-02-17 01:05:13,941] INFO in app: 成功连接服务器！
+[2025-02-17 01:07:32,855] INFO in app: 与服务器断开连接！
+[2025-02-17 01:07:35,440] INFO in app: 成功连接服务器！
+[2025-02-17 01:11:06,460] INFO in app: 与服务器断开连接！
+[2025-02-17 01:11:07,014] INFO in app: 成功连接服务器！
+[2025-02-17 01:14:02,892] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-17 01:14:11,041] INFO in app: 成功连接服务器！
+[2025-02-17 01:15:42,206] INFO in app: 与服务器断开连接！
+[2025-02-17 01:15:44,340] INFO in app: 成功连接服务器！
+[2025-02-17 01:16:39,377] INFO in app: 与服务器断开连接！
+[2025-02-17 01:16:41,720] INFO in app: 成功连接服务器！
+[2025-02-17 01:17:11,075] INFO in app: 与服务器断开连接！
+[2025-02-17 01:17:12,964] INFO in app: 成功连接服务器！
+[2025-02-17 01:17:30,251] INFO in app: 与服务器断开连接！
+[2025-02-17 01:17:36,533] INFO in app: 成功连接服务器！
+[2025-02-17 01:18:40,469] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-17 01:18:57,548] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-17 01:19:02,366] INFO in app: 成功连接服务器！
+[2025-02-17 01:20:58,911] INFO in app: 与服务器断开连接！
+[2025-02-17 01:21:01,381] INFO in app: 成功连接服务器！
+[2025-02-17 01:23:13,775] INFO in app: 与服务器断开连接！
+[2025-02-17 01:23:15,906] INFO in app: 成功连接服务器！
+[2025-02-17 01:23:30,474] INFO in app: 成功连接服务器！
+[2025-02-17 01:25:16,420] INFO in app: 与服务器断开连接！
+[2025-02-17 01:25:18,377] INFO in app: 成功连接服务器！
+[2025-02-17 01:25:49,909] INFO in app: 与服务器断开连接！
+[2025-02-17 01:25:51,192] INFO in app: 与服务器断开连接！
+[2025-02-17 01:25:54,941] INFO in app: 成功连接服务器！
+[2025-02-17 01:27:18,533] INFO in app: 与服务器断开连接！
+[2025-02-17 01:27:21,205] INFO in app: 成功连接服务器！
+[2025-02-17 01:29:33,364] INFO in app: 与服务器断开连接！
+[2025-02-17 01:29:35,297] INFO in app: 成功连接服务器！
+[2025-02-17 01:31:16,690] INFO in app: 与服务器断开连接！
+[2025-02-17 01:31:20,297] INFO in app: 成功连接服务器！
+[2025-02-17 01:31:20,466] INFO in app: 成功连接服务器！
+[2025-02-17 01:34:40,075] INFO in app: 与服务器断开连接！
+[2025-02-17 01:34:41,388] INFO in app: 成功连接服务器！
+[2025-02-17 01:38:24,073] INFO in app: 与服务器断开连接！
+[2025-02-17 01:38:25,667] INFO in app: 成功连接服务器！
+[2025-02-17 01:38:43,938] INFO in app: 与服务器断开连接！
+[2025-02-17 01:38:49,702] INFO in app: 成功连接服务器！
+[2025-02-17 01:38:51,571] INFO in app: 与服务器断开连接！
+[2025-02-17 01:43:33,389] INFO in app: 与服务器断开连接！
+[2025-02-17 01:43:35,014] INFO in app: 成功连接服务器！
+[2025-02-17 01:45:29,795] INFO in app: 与服务器断开连接！
+[2025-02-17 01:46:15,953] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-17 01:46:31,759] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-17 01:46:45,961] INFO in app: 成功连接服务器！
+[2025-02-17 01:47:05,913] INFO in app: 与服务器断开连接！
+[2025-02-17 01:47:07,497] INFO in app: 成功连接服务器！
+[2025-02-17 01:47:41,371] INFO in app: 与服务器断开连接！

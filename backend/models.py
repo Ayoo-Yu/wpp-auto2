@@ -93,4 +93,57 @@ class EvaluationMetrics(Base):
     created_at = Column(DateTime, default=datetime.now())
     
     model = relationship("Model", back_populates="evaluation_metrics")
-    dataset = relationship("Dataset") 
+    dataset = relationship("Dataset")
+
+class ActualPower(Base):
+    __tablename__ = "actual_power"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    timestamp = Column(DateTime, nullable=False, unique=True, index=True)
+    wp_true = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=datetime.now())
+
+class SupershortlPower(Base):
+    __tablename__ = "supershortl_power"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    timestamp = Column(DateTime, nullable=False, unique=True, index=True)
+    wp_pred = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=datetime.now())
+    pre_order = Column(Integer, nullable=False)
+    pre_num = Column(Integer, nullable=False)
+
+
+class ShortlPower(Base):
+    __tablename__ = "shortl_power"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    timestamp = Column(DateTime, nullable=False, unique=True, index=True)
+    wp_pred = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=datetime.now())
+    pre_at = Column(DateTime, nullable=False)
+    pre_num = Column(Integer, nullable=False)
+
+class MidPower(Base):
+    __tablename__ = "mid_power"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    timestamp = Column(DateTime, nullable=False, unique=True, index=True)
+    wp_pred = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=datetime.now())
+    pre_at = Column(DateTime, nullable=False)
+    pre_num = Column(Integer, nullable=False)
+    
+class DailyMetrics(Base):
+    __tablename__ = "daily_metrics"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(DateTime, nullable=False, index=True)
+    mae = Column(Float)
+    mse = Column(Float)
+    rmse = Column(Float)
+    acc = Column(Float)
+    k = Column(Float)
+    pe = Column(Float)
+    sample_count = Column(Integer)
+    metric_type = Column(String(20))
