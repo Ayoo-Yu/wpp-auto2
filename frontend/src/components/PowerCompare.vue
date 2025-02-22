@@ -11,22 +11,56 @@
     <div class="config-panel">
       <el-card class="time-picker-card">
         <div class="time-range-picker">
-          <span class="label">选择时间范围：</span>
-          <el-date-picker
-            v-model="timeRange"
-            type="datetimerange"
-            range-separator="至"
-            start-placeholder="开始时间"
-            end-placeholder="结束时间"
-            value-format="YYYY-MM-DD HH:mm:ss"
-          />
-          <el-button 
-            type="primary" 
-            @click="fetchComparisonData"
-            :loading="loading"
-          >
-            查询数据
-          </el-button>
+          <div class="time-picker-wrapper">
+            <span class="label">选择时间范围：</span>
+            <el-date-picker
+              v-model="timeRange"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
+              value-format="YYYY-MM-DD HH:mm:ss"
+            />
+          </div>
+          <div class="button-group">
+            <el-button 
+              type="primary" 
+              @click="fetchComparisonData"
+              :loading="loading"
+            >
+              查询数据
+            </el-button>
+            <el-button-group class="download-buttons">
+              <el-button 
+                type="success" 
+                @click="downloadCSV"
+                :disabled="!exportData.comparison"
+              >
+                CSV下载
+              </el-button>
+              <el-button 
+                type="success" 
+                @click="downloadMetricsCSV"
+                :disabled="!exportData.metrics"
+              >
+                指标下载
+              </el-button>
+              <el-button 
+                type="success" 
+                @click="downloadSVG"
+                :disabled="!chartData"
+              >
+                功率图下载
+              </el-button>
+              <el-button 
+                type="success" 
+                @click="downloadMetricSVG"
+                :disabled="!dailyMetrics"
+              >
+                指标图下载
+              </el-button>
+            </el-button-group>
+          </div>
         </div>
       </el-card>
 
@@ -121,7 +155,12 @@ export default {
         '超短期预测': '#4ECDC4',
         '短期预测': '#45B7D1',
         '中期预测': '#96CEB4'
-      }
+      },
+      exportData: {
+        comparison: null,
+        metrics: null
+      },
+      currentMetricsData: null
     }
   },
   methods: {
@@ -321,6 +360,18 @@ export default {
       this.$nextTick(() => {
         this.updateMetricChart()
       })
+
+      // 存储导出数据
+      this.exportData.comparison = {
+        labels: labels,
+        rawTimestamps: sortedTimestamps,
+        datasets: datasets.reduce((acc, dataset) => {
+          acc[dataset.label.split(' ')[0]] = dataset.data
+          return acc
+        }, {})
+      }
+
+      this.exportData.metrics = this.dailyMetrics
     },
 
     calculateMetrics(actual, predicted) {
@@ -642,7 +693,171 @@ export default {
           }
         }).observe(container)
       })
-    }
+    },
+
+    // 修改generateComparisonCSV方法，确保所有行都是数组
+    generateComparisonCSV() {
+        // 添加空值校验
+        if (!this.exportData.comparison || 
+            !this.exportData.comparison.rawTimestamps || 
+            !this.exportData.comparison.datasets) {
+            this.$message.warning('导出数据尚未准备好')
+            return ''
+        }
+
+        const headers = ['时间戳', '实测值(MW)']
+        // 添加类型存在性校验
+        const predictionTypes = (this.selectedTypes || [])
+            .filter(t => t !== '实测值' && this.exportData.comparison.datasets[t])
+
+        predictionTypes.forEach(type => {
+            headers.push(`${type}(MW)`)
+        })
+
+        // 安全访问实测值数据
+        const actualData = this.exportData.comparison.datasets['实测值'] || []
+
+        const dataRows = this.exportData.comparison.rawTimestamps.map((ts, index) => {
+            const row = [ts]
+            row.push(actualData[index] || '')
+            
+            predictionTypes.forEach(type => {
+                const dataSet = this.exportData.comparison.datasets[type] || []
+                row.push(dataSet[index] || '')
+            })
+            
+            return row
+        })
+
+        // 添加指标数据校验
+        const metricsHeader = ['\n评估指标', '预测类型', 'MAE', 'RMSE', 'ACC', 'K值', 'Pe']
+        const metricsRows = (this.chartData?.datasets || [])
+            .filter(d => d?.label?.includes('('))
+            .map(d => {
+                const match = d.label.match(/(.*?) \(MAE: (.*?) \| RMSE: (.*?) \| ACC: (.*?)% \| K: (.*?) \| Pe: (.*?)\)/)
+                return match ? match.slice(1) : []
+            })
+            .filter(row => row.length === 6)
+
+        // 确保所有行都是有效数组
+        const csvData = [
+            headers,
+            ...dataRows,
+            metricsHeader,
+            ...metricsRows
+        ].filter(row => Array.isArray(row)) // 过滤非数组项
+
+        return csvData
+            .map(row => {
+                // 确保每个单元格都是字符串
+                const processedRow = row.map(cell => {
+                    if (Array.isArray(cell)) return cell.join(',') // 处理嵌套数组
+                    return typeof cell === 'string' ? cell : String(cell)
+                })
+                return processedRow.join(',')
+            })
+            .join('\n')
+    },
+
+    // 修复指标数据下载方法
+    downloadMetricsCSV() {
+      if (!this.exportData.metrics) {
+        this.$message.warning('暂无可导出的指标数据')
+        return
+      }
+
+      const headers = ['日期', '预测类型', 'ACC(%)', 'MAE(MW)', 'MSE(MW²)', 'RMSE(MW)', 'K值', 'Pe(MW)']
+      const rows = []
+      
+      Object.entries(this.exportData.metrics).forEach(([type, days]) => {
+        days.forEach(day => {
+          rows.push([
+            day.date,
+            type,
+            (day.acc * 100).toFixed(2),
+            day.mae.toFixed(2),
+            day.mse.toFixed(2),
+            day.rmse.toFixed(2),
+            day.k.toFixed(2),
+            day.pe.toFixed(2)
+          ])
+        })
+      })
+
+      const csvContent = [headers, ...rows]
+        .map(row => row.join(','))
+        .join('\n')
+
+      const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8' })
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = `每日评估指标_${new Date().toLocaleString().replace(/[/\s:]/g, '-')}.csv`
+      link.click()
+    },
+
+    // 新增指标图表下载方法
+    downloadMetricSVG() {
+      const canvas = this.$refs.metricChart
+      if (!canvas) {
+        this.$message.warning('暂无可导出的指标图表')
+        return
+      }
+
+      const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}">
+        <foreignObject width="100%" height="100%">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <img src="${canvas.toDataURL('image/png')}" width="100%" height="100%"/>
+          </div>
+        </foreignObject>
+      </svg>`
+
+      const blob = new Blob([svgContent], { type: 'image/svg+xml' })
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = `指标图表_${new Date().toLocaleString().replace(/[/\s:]/g, '-')}.svg`
+      link.click()
+    },
+
+    // 下载CSV文件（修复正则表达式）
+    downloadCSV() {
+      if (!this.exportData.comparison) {
+        this.$message.warning('暂无可导出的对比数据')
+        return
+      }
+
+      const csvContent = this.generateComparisonCSV()
+      const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8' })
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = `功率对比数据_${new Date().toLocaleString().replace(/[/\s:]/g, '-')}.csv`
+      link.click()
+    },
+
+    // 下载SVG图像（修复正则表达式）
+    downloadSVG() {
+      const canvas = this.$refs.chartCanvas
+      if (!canvas) {
+        this.$message.warning('暂无可导出的图表')
+        return
+      }
+
+      // 生成 SVG 内容
+      const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}">
+          <foreignObject width="100%" height="100%">
+              <div xmlns="http://www.w3.org/1999/xhtml">
+                  <img src="${canvas.toDataURL('image/png')}" width="100%" height="100%"/>
+              </div>
+          </foreignObject>
+      </svg>`
+
+      // 创建 Blob 对象（修复未定义错误）
+      const blob = new Blob([svgContent], { type: 'image/svg+xml' })
+      
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = `功率对比图表_${new Date().toLocaleString().replace(/[/\s:]/g, '-')}.svg`
+      link.click()
+    },
   },
   beforeUnmount() {
     if (this.chartInstance) {
@@ -719,18 +934,27 @@ export default {
   margin-bottom: 24px;
 }
 
-.time-picker-card, .type-select-card {
+.time-picker-card {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
+  padding: 20px;  /* 统一内边距 */
 }
 
 .time-range-picker {
   display: flex;
   align-items: center;
+  justify-content: center;  /* 水平居中 */
   gap: 16px;
-  padding: 16px;
+  width: 100%;
+}
+
+/* 调整标签和时间选择器的容器 */
+.time-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .type-checkbox-group {
@@ -738,9 +962,19 @@ export default {
 }
 
 .label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   color: #333;
   font-weight: 500;
 }
+
+/* .label::after {
+  content: "（北京时间）";
+  color: #666;
+  font-size: 12px;
+  font-weight: normal;
+} */
 
 .chart-container {
   background: rgba(255, 255, 255, 0.95);
@@ -849,11 +1083,104 @@ canvas {
   }
 }
 
-/* 在时间选择器附近添加提示 */
+/* 在时间选择器附近添加提示
 .time-range-picker::after {
   content: "（北京时间）";
   color: #666;
   font-size: 12px;
   margin-left: 8px;
+} */
+
+/* 添加下载按钮样式 */
+.download-buttons {
+  margin-left: 0;
+}
+
+.el-button-group .el-button {
+  padding: 10px 15px;
+}
+
+@media (max-width: 768px) {
+  .time-range-picker {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .download-buttons {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .download-buttons .el-button {
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+
+/* 调整按钮组样式 */
+.button-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;  /* 水平居中 */
+  gap: 12px;
+}
+
+.download-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.download-buttons .el-button {
+  padding: 8px 15px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+/* 调整查询按钮样式 */
+.el-button--primary {
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* 响应式布局调整 */
+@media (max-width: 1200px) {
+  .time-range-picker {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .time-picker-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .button-group {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .download-buttons {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .download-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .el-button--primary,
+  .download-buttons .el-button {
+    width: 100%;
+  }
 }
 </style> 
