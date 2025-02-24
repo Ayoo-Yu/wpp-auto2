@@ -19,7 +19,7 @@ scripts = {
 }
 
 # 定义 PM2 命令路径，便于统一维护
-pm2_cmd = r'C:\Users\HP\AppData\Roaming\npm\pm2.cmd'
+pm2_cmd = r'C:\Users\Administrator\AppData\Roaming\npm\pm2.cmd'
 
 def query_pm2_state(script_path):
     """

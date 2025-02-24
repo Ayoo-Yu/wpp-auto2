@@ -718,7 +718,20 @@ export default {
         const actualData = this.exportData.comparison.datasets['实测值'] || []
 
         const dataRows = this.exportData.comparison.rawTimestamps.map((ts, index) => {
-            const row = [ts]
+            // 将UTC时间转换为北京时间（UTC+8）
+            const date = new Date(ts)
+            const beijingDate = new Date(date.getTime() + 8 * 60 * 60 * 1000)
+            
+            // 格式化为 YYYY-MM-DD HH:mm:ss
+            const formattedDate = 
+                `${beijingDate.getUTCFullYear()}-` +
+                `${(beijingDate.getUTCMonth() + 1).toString().padStart(2, '0')}-` +
+                `${beijingDate.getUTCDate().toString().padStart(2, '0')} ` +
+                `${beijingDate.getUTCHours().toString().padStart(2, '0')}:` +
+                `${beijingDate.getUTCMinutes().toString().padStart(2, '0')}:` +
+                `${beijingDate.getUTCSeconds().toString().padStart(2, '0')}`
+
+            const row = [formattedDate]
             row.push(actualData[index] || '')
             
             predictionTypes.forEach(type => {
@@ -729,15 +742,23 @@ export default {
             return row
         })
 
-        // 添加指标数据校验
-        const metricsHeader = ['\n评估指标', '预测类型', 'MAE', 'RMSE', 'ACC', 'K值', 'Pe']
-        const metricsRows = (this.chartData?.datasets || [])
-            .filter(d => d?.label?.includes('('))
+        // 修改指标数据提取部分
+        const metricsHeader = ['\n评估指标', 'MAE', 'RMSE', 'ACC', 'K值', 'Pe']
+        const metricsRows = (this.chartInstance?.data?.datasets || [])
+            .filter(d => d.label && d.label.includes('('))
             .map(d => {
-                const match = d.label.match(/(.*?) \(MAE: (.*?) \| RMSE: (.*?) \| ACC: (.*?)% \| K: (.*?) \| Pe: (.*?)\)/)
-                return match ? match.slice(1) : []
+                // 调整正则表达式匹配模式
+                const match = d.label.match(/(.*?)\s+\(MAE:\s+([\d.]+)\s+\|\s+RMSE:\s+([\d.]+)\s+\|\s+ACC:\s+([\d.]+)%\s+\|\s+K:\s+([\d.]+)\s+\|\s+Pe:\s+([\d.]+)\)/)
+                return match ? [
+                    match[1],  // 预测类型
+                    match[2],  // MAE
+                    match[3],  // RMSE
+                    match[4],  // ACC
+                    match[5],  // K
+                    match[6]   // Pe
+                ] : null
             })
-            .filter(row => row.length === 6)
+            .filter(row => row) // 过滤无效项
 
         // 确保所有行都是有效数组
         const csvData = [
@@ -745,7 +766,7 @@ export default {
             ...dataRows,
             metricsHeader,
             ...metricsRows
-        ].filter(row => Array.isArray(row)) // 过滤非数组项
+        ].filter(row => Array.isArray(row))
 
         return csvData
             .map(row => {
