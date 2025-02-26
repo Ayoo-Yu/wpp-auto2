@@ -34,7 +34,6 @@ def get_power_data():
                 {"timestamp": a.timestamp.isoformat(), "power": a.wp_true} 
                 for a in actual
             ]
-            print(result['实测值'])
 
         if '超短期预测' in types:
             supershort = db.query(SupershortlPower).filter(

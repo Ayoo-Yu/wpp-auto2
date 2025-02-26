@@ -400,7 +400,7 @@ export default {
 .section-header h2 {
   font-size: 40px;
   font-weight: 600;
-  color: #1d1d1f;
+  color: white;
   margin-bottom: 16px;
   letter-spacing: -0.003em;
 }

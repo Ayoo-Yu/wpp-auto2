@@ -3,24 +3,21 @@ import os
 import time
 from datetime import datetime
 from predict import predict
-
-precsv_folder = 'D:/my-vue-project/wind-power-forecast/backend/auto_scripts/precsv/supershortcsv'
-model_folder = 'D:/my-vue-project/wind-power-forecast/backend/auto_scripts/models/supershortmodel'
-result_folder = 'D:/my-vue-project/wind-power-forecast/backend/auto_scripts/results/supershortresult'
+from config import PREC_SV_FOLDER,MODEL_FOLDER,OUTPUT_DIR_PRE
 
 today_date = datetime.today().strftime('%Y%m%d')
-csv_file = os.path.join(precsv_folder, f'{today_date}.csv')
-model_folder_today = os.path.join(model_folder, today_date)
+csv_file = os.path.join(PREC_SV_FOLDER, f'{today_date}.csv')
+model_folder_today = os.path.join(MODEL_FOLDER, today_date)
 model_file = os.path.join(model_folder_today, 'model.joblib')  # 模型文件名为'model.joblib'
 scaler_file = os.path.join(model_folder_today, 'scaler.joblib')  # 假设缩放器文件名为'scaler.joblib'
 
-flag_file = os.path.join(result_folder, f'{today_date}_done.flag')
+flag_file = os.path.join(OUTPUT_DIR_PRE, f'{today_date}_done.flag')
 
 def check_prediction_done():
     return os.path.exists(flag_file)
 
 def watch_folder():
-    print(f"开始监视 {precsv_folder} 文件夹...")
+    print(f"开始监视 {PREC_SV_FOLDER} 文件夹...")
     while True:
         if check_prediction_done():
             print(f"今天的预测已经执行过，跳过...")

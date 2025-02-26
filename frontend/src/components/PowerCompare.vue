@@ -88,7 +88,7 @@
       </div>
     </div>
 
-    <!-- 在chart-container后添加新的每日指标区域 -->
+    <!-- 每日指标区域 -->
     <div class="daily-metrics-container">
       <el-card class="metrics-card">
         <div class="metrics-header">
@@ -105,6 +105,7 @@
           </div>
         </div>
         <div class="metrics-chart-wrapper">
+          <p v-if="!dailyMetrics" class="empty-text" style="text-align: center;display: flex;flex-direction: column;justify-content: center;align-items: center;color: #909399;">请选择时间范围并查询数据</p>
           <canvas 
             v-show="dailyMetrics" 
             ref="metricChart" 
@@ -143,7 +144,7 @@ export default {
     return {
       backendBaseUrl: 'http://127.0.0.1:5000',
       timeRange: [],
-      selectedTypes: ['实测值', '超短期预测'],
+      selectedTypes: ['实测值', '短期预测'],
       chartData: null,
       chartInstance: null,
       loading: false,
@@ -160,7 +161,6 @@ export default {
         comparison: null,
         metrics: null
       },
-      currentMetricsData: null
     }
   },
   methods: {
@@ -191,12 +191,12 @@ export default {
       console.log('原始数据:', data)
       this.chartData = data
 
-      // 先计算每日指标
+      // 计算每日指标
       console.log('开始计算每日指标')
       this.dailyMetrics = this.calculateDailyMetrics(data)
       console.log('每日指标结果:', this.dailyMetrics)
 
-      // 然后创建主图表
+      // 创建主图表
       const datasets = []
       const colors = {
         '实测值': '#FF6B6B',
@@ -221,7 +221,7 @@ export default {
         return `${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2,'0')}`
       })
 
-      // 首先添加实测值数据集
+      // 添加实测值数据集
       if (data['实测值']) {
         const actualMap = new Map(data['实测值'].map(v => [
           new Date(v.timestamp).toISOString(),
@@ -240,17 +240,15 @@ export default {
       }
 
       // 处理预测值数据集
-      // 只处理存在的预测类型
       const predictionTypes = ['超短期预测', '短期预测', '中期预测'].filter(type => data[type])
       
       predictionTypes.forEach(type => {
-        if (data['实测值']) {  // 确保有实测值用于对比
+        if (data['实测值']) {
           const predictedMap = new Map(data[type].map(v => [
             new Date(v.timestamp).toISOString(),
             v.power
           ]))
 
-          // 计算评估指标
           const predictedValues = []
           const actualValues = []
           
@@ -355,8 +353,7 @@ export default {
         })
       })
 
-      // 最后更新指标图表
-      // 使用 nextTick 确保 DOM 已更新
+      // 更新指标图表
       this.$nextTick(() => {
         this.updateMetricChart()
       })
@@ -442,7 +439,7 @@ export default {
       })
     },
 
-    // 添加计算每日指标的方法
+    // 计算每日指标的方法
     calculateDailyMetrics(data) {
       console.log('计算每日指标的输入数据:', data)
       if (!data['实测值']) {
@@ -460,11 +457,9 @@ export default {
         console.log(`处理预测类型: ${type}`)
         const metricsByDay = {}
         
-        // 按日期分组数据（修复时区问题）
+        // 按日期分组数据
         data[type].forEach(pred => {
-          // 使用本地时间转换
           const dateObj = new Date(pred.timestamp)
-          // 转换为本地日期字符串（格式：YYYY-MM-DD）
           const date = `${dateObj.getFullYear()}-${(dateObj.getMonth()+1).toString().padStart(2,'0')}-${dateObj.getDate().toString().padStart(2,'0')}`
           
           if (!metricsByDay[date]) {
@@ -488,7 +483,6 @@ export default {
         // 计算每日指标
         dailyMetrics[type] = Object.entries(metricsByDay)
           .filter(([dateStr]) => {
-            // 过滤在时间范围外的日期
             const date = new Date(dateStr)
             const startDate = new Date(this.timeRange[0])
             const endDate = new Date(this.timeRange[1])
@@ -511,34 +505,31 @@ export default {
     updateMetricChart() {
       console.log('开始更新指标图表')
       
-      // 先销毁旧图表
+      // 销毁旧图表
       if (this.metricChart) {
         console.log('销毁旧图表')
         this.metricChart.destroy()
         this.metricChart = null
       }
 
-      // 等待 DOM 更新（使用 nextTick 替代 requestAnimationFrame）
+      // 等待 DOM 更新
       this.$nextTick(() => {
-        // 获取 canvas 元素
         const canvas = this.$refs.metricChart
         if (!canvas) {
           console.error('Canvas element not found')
           return
         }
 
-        // 设置 canvas 尺寸（添加容错）
+        // 设置 canvas 尺寸
         const container = canvas.parentElement
         if (!container) return
         
-        // 显式设置 canvas 的宽高（修复模糊问题）
         const dpr = window.devicePixelRatio || 1
         canvas.width = container.clientWidth * dpr
         canvas.height = container.clientHeight * dpr
         canvas.style.width = container.clientWidth + 'px'
         canvas.style.height = container.clientHeight + 'px'
 
-        // 获取 context
         const ctx = canvas.getContext('2d')
         if (!ctx) {
           console.error('Could not get canvas context')
@@ -905,7 +896,6 @@ export default {
   width: 100%;
   height: 100%;
   z-index: -1;
-  overflow: hidden;
 }
 
 /* 添加动画背景样式 */
@@ -989,13 +979,6 @@ export default {
   color: #333;
   font-weight: 500;
 }
-
-/* .label::after {
-  content: "（北京时间）";
-  color: #666;
-  font-size: 12px;
-  font-weight: normal;
-} */
 
 .chart-container {
   background: rgba(255, 255, 255, 0.95);
@@ -1103,14 +1086,6 @@ canvas {
     flex-wrap: wrap;
   }
 }
-
-/* 在时间选择器附近添加提示
-.time-range-picker::after {
-  content: "（北京时间）";
-  color: #666;
-  font-size: 12px;
-  margin-left: 8px;
-} */
 
 /* 添加下载按钮样式 */
 .download-buttons {

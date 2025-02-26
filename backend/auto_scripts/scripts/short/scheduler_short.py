@@ -27,9 +27,21 @@ def run_script():
     if not task_executed:
         logging.info("执行 auto_pre_train.py")
         # 使用 subprocess 以更好地控制子进程
-        exit_code = os.system(
-            "conda activate D:\\my-vue-project\\wind-power-forecast\\backend\\env && python D:\\my-vue-project\\wind-power-forecast\\backend\\auto_scripts\\scripts\\short\\auto_pre_train.py"
+        # 获取当前脚本所在目录
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # 构建 auto_pre_train.py 的绝对路径
+        script_path = os.path.normpath(os.path.join(current_dir, "auto_pre_train.py"))
+        # 构建 conda 环境路径（相对路径）
+        conda_env_path = os.path.normpath(os.path.join(current_dir, "..", "..", "env"))
+        
+        # 跨平台执行命令
+        command = (
+            f"conda run -p {conda_env_path} python {script_path}"
+            if os.name == 'nt'  # Windows
+            else f"conda run -p {conda_env_path.replace(os.sep, '/')} python {script_path.replace(os.sep, '/')}"
         )
+        
+        exit_code = os.system(command)
         if exit_code == 0:
             logging.info("auto_pre_train.py 执行成功")
             task_executed = True  # 标记当天任务已执行
