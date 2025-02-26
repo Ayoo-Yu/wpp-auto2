@@ -10,7 +10,7 @@ POSTGRES_CONFIG = {
     "user": "postgres",
     "password": "yzz0216yh",
     "database": "windpower",
-    "default_db": "postgres"  # 新增默认数据库配置
+    # "default_db": "postgres"  # 新增默认数据库配置
 }
 
 MINIO_CONFIG = {

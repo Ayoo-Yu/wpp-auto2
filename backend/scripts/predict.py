@@ -38,21 +38,6 @@ def preprocess_new_data(file_path, lags):
     
     return X_fe
 
-# def make_predictions(model, scaler, X_new, window_size,LAGS):
-#     """
-#     对新数据进行预测
-#     """
-#     # 标准化
-#     print(X_new.shape)
-#     X_scaled = scaler.transform(X_new)
-#     print(f"已对新数据进行标准化。")
-#     # 创建时间窗口
-#     X_windows = create_time_window_pre(X_scaled, window_size)  # y 无关紧要
-#     print(f"已创建时间窗口。")
-#     # 预测
-
-#     preds = model.predict(X_windows.reshape(X_windows.shape[0], -1))
-#     return preds
 
 def make_predictions(model, scaler, X_new, window_size, LAGS):
     """

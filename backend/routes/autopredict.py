@@ -3,6 +3,7 @@ import subprocess
 import datetime
 from flask import Blueprint, request, jsonify
 import os
+import sys
 
 # 全局状态字典，其他代码依赖这个变量
 prediction_status = {
@@ -11,15 +12,31 @@ prediction_status = {
     'medium': False
 }
 
-# 脚本路径（请根据实际情况调整）
+# 获取当前文件所在目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# 构建项目根目录（假设 autopredict.py 在 backend/routes 目录）
+project_root = os.path.abspath(os.path.join(current_dir, '../../..'))
+
 scripts = {
-    'ultra_short': r'D:\my-vue-project\wind-power-forecast\backend\auto_scripts\scripts\supershort\scheduler_supershort.py',
-    'short': r'D:\my-vue-project\wind-power-forecast\backend\auto_scripts\scripts\short\scheduler_short.py',
-    'medium': r'D:\my-vue-project\wind-power-forecast\backend\auto_scripts\scripts\middle\scheduler_middle.py'
+    'ultra_short': os.path.join(project_root, 'wind-power-forecast', 'backend', 'auto_scripts', 'scripts', 'supershort', 'scheduler_supershort.py'),
+    'short': os.path.join(project_root, 'wind-power-forecast', 'backend', 'auto_scripts', 'scripts', 'short', 'scheduler_short.py'),
+    'medium': os.path.join(project_root, 'wind-power-forecast', 'backend', 'auto_scripts', 'scripts', 'middle', 'scheduler_middle.py')
 }
 
-# 定义 PM2 命令路径，便于统一维护
-pm2_cmd = r'C:\Users\HP\AppData\Roaming\npm\pm2.cmd'
+# 动态设置 PM2 路径
+if sys.platform.startswith('win'):
+    # 适用于所有Windows系统（32/64位）
+    pm2_path = os.path.join(os.environ['APPDATA'],'npm', 'pm2.cmd')
+    print(f"Windows 系统检测到 PM2 路径: {pm2_path}")  # 添加调试信息
+    pm2_cmd = pm2_path
+else:
+    pm2_cmd = '/usr/bin/pm2'  # Linux 下的典型安装路径
+    print(f"Linux 系统使用 PM2 路径: {pm2_cmd}")
+
+# 添加路径存在性检查
+if not os.path.exists(pm2_cmd):
+    raise FileNotFoundError(f"PM2 路径不存在: {pm2_cmd}，请确认安装配置")
 
 def query_pm2_state(script_path):
     """
@@ -41,7 +58,7 @@ def query_pm2_state(script_path):
         processes = json.loads(output)
         for proc in processes:
             pm2_env = proc.get('pm2_env', {})
-            exec_path = pm2_env.get('pm_exec_path', '')
+            exec_path = os.path.normcase(os.path.abspath(pm2_env.get('pm_exec_path', '')))
             status = pm2_env.get('status', '')
             if script_path in exec_path and status == "online":
                 return True
@@ -110,9 +127,13 @@ def stop_prediction():
     if prediction_type not in prediction_status:
         return jsonify({'error': '无效的预测类型'}), 400
 
+    script_path = scripts[prediction_type]
+    # 使用进程名而不是脚本路径
+    process_name = os.path.basename(script_path)
+    
     try:
         subprocess.run(
-            [pm2_cmd, 'stop', scripts[prediction_type]],
+            [pm2_cmd, 'stop', process_name],
             check=True
         )
         prediction_status[prediction_type] = False
@@ -137,9 +158,13 @@ def schedule_restart():
     except ValueError:
         return jsonify({'error': '时间格式错误，要求 HH:mm'}), 400
 
+    script_path = scripts[prediction_type]
+    # 使用 os.path.basename 获取脚本文件名作为进程名称
+    process_name = os.path.basename(script_path)
+    
     try:
         subprocess.run(
-            [pm2_cmd, 'start', scripts[prediction_type], '--cron', f'0 {time_obj.minute} {time_obj.hour} * * *'],
+            [pm2_cmd, 'start', script_path, '--name', process_name, '--cron', f'0 {time_obj.minute} {time_obj.hour} * * *'],
             check=True
         )
         return jsonify({'message': f'为 {prediction_type} 设置了每日 {schedule_time} 的定时重启'})
@@ -156,9 +181,13 @@ def delete_prediction():
     if prediction_type not in prediction_status:
         return jsonify({'error': '无效的预测类型'}), 400
 
+    script_path = scripts[prediction_type]
+    # 使用进程名而不是脚本路径
+    process_name = os.path.basename(script_path)
+    
     try:
         subprocess.run(
-            [pm2_cmd, 'delete', scripts[prediction_type]],
+            [pm2_cmd, 'delete', process_name],
             check=True
         )
         prediction_status[prediction_type] = False
