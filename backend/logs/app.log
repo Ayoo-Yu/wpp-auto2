@@ -3666,3 +3666,124 @@ LINE 1: ...me, output_path, prediction_type, status) VALUES ('202502121...
 [2025-02-26 16:04:32,979] INFO in app: 成功连接服务器！
 [2025-02-26 16:06:04,883] INFO in logging_config: Wind Forecast Backend Startup
 [2025-02-26 16:06:05,961] INFO in app: 成功连接服务器！
+[2025-02-26 16:09:11,739] INFO in app: 与服务器断开连接！
+[2025-02-26 16:09:12,064] INFO in app: 成功连接服务器！
+[2025-02-26 16:09:18,559] INFO in app: 成功连接服务器！
+[2025-02-26 16:11:37,222] INFO in app: 与服务器断开连接！
+[2025-02-26 16:11:37,223] INFO in app: 与服务器断开连接！
+[2025-02-26 16:11:37,518] INFO in app: 成功连接服务器！
+[2025-02-26 16:11:49,890] INFO in app: 成功连接服务器！
+[2025-02-26 16:11:54,979] INFO in app: 与服务器断开连接！
+[2025-02-26 16:12:40,282] INFO in app: 与服务器断开连接！
+[2025-02-26 16:12:40,525] INFO in app: 成功连接服务器！
+[2025-02-26 16:12:48,795] INFO in app: 成功连接服务器！
+[2025-02-26 16:13:12,508] INFO in app: 与服务器断开连接！
+[2025-02-26 16:13:12,510] INFO in app: 与服务器断开连接！
+[2025-02-26 16:13:12,607] INFO in app: 成功连接服务器！
+[2025-02-26 16:13:56,925] INFO in app: 成功连接服务器！
+[2025-02-26 16:15:35,292] INFO in app: 成功连接服务器！
+[2025-02-26 16:16:00,752] INFO in app: 与服务器断开连接！
+[2025-02-26 16:16:00,754] INFO in app: 与服务器断开连接！
+[2025-02-26 16:16:00,755] INFO in app: 与服务器断开连接！
+[2025-02-26 16:16:01,044] INFO in app: 成功连接服务器！
+[2025-02-26 16:17:00,176] INFO in app: 成功连接服务器！
+[2025-02-26 16:17:11,662] INFO in app: 与服务器断开连接！
+[2025-02-26 16:17:11,665] INFO in app: 与服务器断开连接！
+[2025-02-26 16:17:11,953] INFO in app: 成功连接服务器！
+[2025-02-26 16:17:45,101] INFO in app: 成功连接服务器！
+[2025-02-26 16:20:19,879] INFO in app: 与服务器断开连接！
+[2025-02-26 16:20:19,882] INFO in app: 与服务器断开连接！
+[2025-02-26 16:20:20,036] INFO in app: 成功连接服务器！
+[2025-02-26 16:20:58,702] INFO in app: 与服务器断开连接！
+[2025-02-26 16:20:58,857] INFO in app: 成功连接服务器！
+[2025-02-26 16:27:39,286] INFO in app: 成功连接服务器！
+[2025-02-26 16:27:56,266] INFO in app: 与服务器断开连接！
+[2025-02-26 16:27:56,267] INFO in app: 与服务器断开连接！
+[2025-02-26 16:27:56,854] INFO in app: 成功连接服务器！
+[2025-02-26 16:28:37,470] INFO in app: 与服务器断开连接！
+[2025-02-26 16:28:38,043] INFO in app: 成功连接服务器！
+[2025-02-26 16:29:05,530] INFO in app: 成功连接服务器！
+[2025-02-26 16:29:22,317] INFO in app: 与服务器断开连接！
+[2025-02-26 16:29:22,318] INFO in app: 与服务器断开连接！
+[2025-02-26 16:29:22,883] INFO in app: 成功连接服务器！
+[2025-02-26 16:31:53,971] INFO in app: 与服务器断开连接！
+[2025-02-26 16:31:54,259] INFO in app: 成功连接服务器！
+[2025-02-26 16:32:02,839] INFO in app: 成功连接服务器！
+[2025-02-26 16:32:21,561] INFO in modeltrain: 收到模型训练请求: {'file_id': '20250226163208011256', 'model': 'GBDT', 'wfcapacity': 453.5}
+[2025-02-26 16:32:21,562] INFO in modeltrain: 训练集id: 20250226163208011256, 模型选择: GBDT, 装机容量: 453.5,类型: <class 'float'>
+[2025-02-26 16:32:21,564] INFO in train_run: 输出结果将保存到: results\20250226_163221
+[2025-02-26 16:32:21,598] INFO in train_run: 数据加载完成!
+[2025-02-26 16:32:21,606] INFO in train_run: 数据预处理完成!
+[2025-02-26 16:32:21,694] INFO in train_run: 特征工程完成!
+[2025-02-26 16:32:21,718] INFO in train_run: 数据标准化完成!
+[2025-02-26 16:32:21,741] INFO in train_run: 时间窗口创建完成!
+[2025-02-26 16:32:21,741] INFO in train_run: 模型参数获取完成!
+[2025-02-26 16:32:21,742] INFO in train_run: {'boosting_type': 'gbdt', 'objective': 'regression', 'metric': 'rmse', 'num_leaves': 31, 'learning_rate': 0.05, 'feature_fraction': 0.9, 'name': 'GBDT'}
+[2025-02-26 16:32:21,743] INFO in train: 模型和 scaler 将被保存到目录: models\20250226_163221
+[2025-02-26 16:32:21,744] INFO in train: 开始训练 GBDT 模型...
+[2025-02-26 16:32:51,386] INFO in train: GBDT 均方误差: 149.7425066010432
+[2025-02-26 16:32:51,396] INFO in train: GBDT 模型已保存到 models\20250226_163221\GBDT.joblib
+[2025-02-26 16:32:51,398] INFO in train: Scaler 已保存到 models\20250226_163221\scaler.joblib
+[2025-02-26 16:32:51,398] INFO in train_run: 模型训练与评估完成!
+[2025-02-26 16:32:51,402] INFO in train: 原生预测结果已保存到 results\20250226_163221\GBDT_predicted_vs_actual_power.csv
+[2025-02-26 16:32:51,402] INFO in train_run: 预测结果保存完成!
+[2025-02-26 16:32:51,769] INFO in train_run: 可视化结果完成!
+[2025-02-26 16:32:51,816] INFO in prediction_timestamp: 已经为测试集预测结果匹配时间戳 'results\20250226_163221\GBDT_predicted_vs_actual_power_timestamp.csv'
+[2025-02-26 16:32:51,819] INFO in modeltrain: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_test1_20250226163208011256_20250226163251.csv
+[2025-02-26 16:32:54,978] INFO in modeltrain: 测试集评估完成。相关结果保存在以下路径：D:\my-vue-project\wind-power-forecast\backend\forecasts\evaluation_test1_20250226163208011256_20250226163251
+[2025-02-26 16:32:54,979] INFO in modeltrain: 将原生报告复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\report_test1_20250226163208011256_20250226163251.txt
+[2025-02-26 16:32:54,979] INFO in modeltrain: 预测文件下载url为: /download/forecast_test1_20250226163208011256_20250226163251.csv
+[2025-02-26 16:32:54,980] INFO in modeltrain: 训练报告下载url为: /download/report_test1_20250226163208011256_20250226163251.txt
+[2025-02-26 16:32:55,016] INFO in app: 成功连接服务器！
+[2025-02-26 16:32:55,017] INFO in app: 与服务器断开连接！
+[2025-02-26 16:33:51,274] INFO in download: 正在下载以下文件： forecast_test1_20250226163208011256_20250226163251.csv
+[2025-02-26 16:33:52,042] INFO in download: 正在下载以下文件： report_test1_20250226163208011256_20250226163251.txt
+[2025-02-26 16:34:10,169] INFO in app: 成功连接服务器！
+[2025-02-26 16:36:51,112] INFO in app: 与服务器断开连接！
+[2025-02-26 16:36:51,114] INFO in app: 与服务器断开连接！
+[2025-02-26 16:36:51,115] INFO in app: 与服务器断开连接！
+[2025-02-26 16:36:51,402] INFO in app: 成功连接服务器！
+[2025-02-26 18:44:35,894] INFO in app: 与服务器断开连接！
+[2025-02-26 18:44:36,196] INFO in app: 成功连接服务器！
+[2025-02-26 18:45:43,628] INFO in app: 与服务器断开连接！
+[2025-02-26 18:45:43,896] INFO in app: 成功连接服务器！
+[2025-02-27 16:47:12,208] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-27 16:47:15,039] INFO in logging_config: Wind Forecast Backend Startup
+[2025-02-27 16:48:56,205] INFO in app: 成功连接服务器！
+[2025-02-27 16:50:54,147] INFO in app: 成功连接服务器！
+[2025-02-27 16:51:20,839] INFO in modeltrain: 收到模型训练请求: {'file_id': '20250227165057564377', 'model': 'GOSS', 'wfcapacity': 453.5}
+[2025-02-27 16:51:20,841] INFO in modeltrain: 训练集id: 20250227165057564377, 模型选择: GOSS, 装机容量: 453.5,类型: <class 'float'>
+[2025-02-27 16:51:20,843] INFO in train_run: 输出结果将保存到: results\20250227_165120
+[2025-02-27 16:51:22,057] INFO in train_run: 数据加载完成!
+[2025-02-27 16:51:22,116] INFO in train_run: 数据预处理完成!
+[2025-02-27 16:51:22,657] INFO in train_run: 特征工程完成!
+[2025-02-27 16:51:23,286] INFO in train_run: 数据标准化完成!
+[2025-02-27 16:51:24,648] INFO in train_run: 时间窗口创建完成!
+[2025-02-27 16:51:24,649] INFO in train_run: 模型参数获取完成!
+[2025-02-27 16:51:24,650] INFO in train_run: {'boosting_type': 'goss', 'objective': 'regression', 'metric': 'rmse', 'num_leaves': 31, 'learning_rate': 0.05, 'feature_fraction': 0.9, 'top_rate': 0.2, 'other_rate': 0.1, 'name': 'GOSS'}
+[2025-02-27 16:51:24,651] INFO in train: 模型和 scaler 将被保存到目录: models\20250227_165124
+[2025-02-27 16:51:24,652] INFO in train: 开始训练 GOSS 模型...
+[2025-02-27 16:52:50,741] INFO in train: GOSS 均方误差: 2141.0663442557584
+[2025-02-27 16:52:50,754] INFO in train: GOSS 模型已保存到 models\20250227_165124\GOSS.joblib
+[2025-02-27 16:52:50,756] INFO in train: Scaler 已保存到 models\20250227_165124\scaler.joblib
+[2025-02-27 16:52:50,756] INFO in train_run: 模型训练与评估完成!
+[2025-02-27 16:52:50,767] INFO in train: 原生预测结果已保存到 results\20250227_165120\GOSS_predicted_vs_actual_power.csv
+[2025-02-27 16:52:50,768] INFO in train_run: 预测结果保存完成!
+[2025-02-27 16:52:51,047] INFO in train_run: 可视化结果完成!
+[2025-02-27 16:52:52,108] INFO in prediction_timestamp: 已经为测试集预测结果匹配时间戳 'results\20250227_165120\GOSS_predicted_vs_actual_power_timestamp.csv'
+[2025-02-27 16:52:52,111] INFO in modeltrain: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_train_test_20250227165057564377_20250227165252.csv
+[2025-02-27 16:52:54,097] INFO in modeltrain: 测试集评估完成。相关结果保存在以下路径：D:\my-vue-project\wind-power-forecast\backend\forecasts\evaluation_train_test_20250227165057564377_20250227165252
+[2025-02-27 16:52:54,099] INFO in modeltrain: 将原生报告复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\report_train_test_20250227165057564377_20250227165252.txt
+[2025-02-27 16:52:54,099] INFO in modeltrain: 预测文件下载url为: /download/forecast_train_test_20250227165057564377_20250227165252.csv
+[2025-02-27 16:52:54,100] INFO in modeltrain: 训练报告下载url为: /download/report_train_test_20250227165057564377_20250227165252.txt
+[2025-02-27 16:52:54,121] INFO in app: 与服务器断开连接！
+[2025-02-27 16:52:54,122] INFO in app: 与服务器断开连接！
+[2025-02-27 16:52:54,123] INFO in app: 成功连接服务器！
+[2025-02-27 16:52:57,085] INFO in app: 成功连接服务器！
+[2025-02-27 16:54:03,077] INFO in download: 正在下载以下文件： forecast_train_test_20250227165057564377_20250227165252.csv
+[2025-02-27 16:54:18,156] INFO in download: 正在下载以下文件： report_train_test_20250227165057564377_20250227165252.txt
+[2025-02-27 17:50:51,494] INFO in app: 成功连接服务器！
+[2025-02-27 17:50:58,765] INFO in predict: 收到预测请求: {'csvfileId': '20250227175056585566', 'modelfileId': '20250227175057528725', 'scalerfileId': '20250227175058135370'}
+[2025-02-27 17:50:58,765] INFO in predict: 预测数据选择: 20250227175056585566, 预测模型选择: 20250227175057528725, 归一化模型选择: 20250227175058135370
+[2025-02-27 17:50:58,905] INFO in predict: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_test1_-__20250227175056585566_20250227175058.csv
+[2025-02-27 17:50:58,970] INFO in predict: 文件已上传到MinIO: wind-predictions/forecast_test1_-__20250227175056585566_20250227175058.csv

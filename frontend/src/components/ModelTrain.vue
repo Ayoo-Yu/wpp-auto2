@@ -12,7 +12,7 @@
         <div class="left-panel">
           <!-- 数据集上传区域 -->
           <section class="panel-section">
-            <h2>选择训练数据集</h2>
+            <h2>步骤一：选择训练集</h2>
             <FileUploader
               :processing="processing"
               :acceptedFormats="['csv']"
@@ -23,18 +23,19 @@
           </section>
 
           <!-- 文件信息区域 -->
-          <section class="panel-section" v-if="fileInfo">
-            <h2>文件信息</h2>
+          <section class="panel-section">
+            <h2>步骤二：确认文件并上传</h2>
             <FileInfo 
               :fileInfo="fileInfo" 
               @remove-file="removeSelectedFile"
               @start-upload="handleManualUpload"
+              :disabled="!selectedFile"
             />
           </section>
 
           <!-- 模型选择区域 -->
-          <section class="panel-section" v-if="fileInfo">
-            <h2>选择训练模型</h2>
+          <section class="panel-section">
+            <h2>步骤三：设置训练模型</h2>
             <ModelSelector 
               :fileId="fileId" 
               :processing="processing" 
@@ -48,7 +49,7 @@
 
           <!-- 操作面板区域 -->
           <section class="panel-section">
-            <h2>操作面板</h2>
+            <h2>步骤四：启动训练</h2>
             <div v-if="!fileInfo || !selectedModel" class="empty-operation-panel">
               <el-icon class="empty-icon"><InfoFilled /></el-icon>
               <p class="empty-text">请完成文件上传和模型选择</p>
@@ -498,24 +499,24 @@ export default {
 }
 
 .content-area {
-  display: grid;
-  grid-template-columns: minmax(400px, 1fr) minmax(500px, 1.2fr);
+  display: flex;
   gap: 32px;
   margin-bottom: 40px;
-  align-items: start;
   min-height: calc(100vh - 200px);
+  align-items: stretch;
 }
 
 .left-panel, .right-panel {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  height: 100%;
+  flex: 1;
 }
 
 .left-panel {
   display: flex;
   flex-direction: column;
+  min-height: 600px;
 }
 
 .panel-section {
