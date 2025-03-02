@@ -30,3 +30,4 @@ def visualize_results(results_dict, y_val, output_path):
     plt.savefig(output_file)
     plt.close()  # 关闭图表以释放资源
     print(f"图像已保存为 {output_file}")
+          

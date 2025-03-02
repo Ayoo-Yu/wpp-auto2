@@ -3,10 +3,10 @@ from minio import Minio
 from minio.commonconfig import ENABLED
 import json
 
-# 将配置提升到模块级别
+# 从环境变量读取配置，如果不存在则使用默认值
 POSTGRES_CONFIG = {
-    "host": "localhost",
-    "port": "5432",
+    "host": os.environ.get("DB_HOST", "localhost"),
+    "port": os.environ.get("DB_PORT", "5432"),
     "user": "postgres",
     "password": "yzz0216yh",
     "database": "windpower",
@@ -14,7 +14,7 @@ POSTGRES_CONFIG = {
 }
 
 MINIO_CONFIG = {
-    "endpoint": "localhost:9000",
+    "endpoint": os.environ.get("MINIO_ENDPOINT", "localhost") + ":" + os.environ.get("MINIO_PORT", "9000"),
     "access_key": "minioadmin",
     "secret_key": "minioadmin",
     "secure": False,
@@ -47,8 +47,8 @@ class Config:
 
     # 新增数据库配置
     POSTGRES_CONFIG = {
-        "host": "localhost",
-        "port": "5432",
+        "host": os.environ.get("DB_HOST", "localhost"),
+        "port": os.environ.get("DB_PORT", "5432"),
         "user": "postgres",
         "password": "yzz0216yh",
         "database": "windpower",
@@ -56,7 +56,7 @@ class Config:
     }
     
     MINIO_CONFIG = {
-        "endpoint": "localhost:9000",
+        "endpoint": os.environ.get("MINIO_ENDPOINT", "localhost") + ":" + os.environ.get("MINIO_PORT", "9000"),
         "access_key": "minioadmin",
         "secret_key": "minioadmin",
         "secure": False,
@@ -89,18 +89,6 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = "postgresql://postgres:yzz0216yh@localhost:5432/test_wind_power"
     PRESERVE_CONTEXT_ON_EXCEPTION = False
 
-minio_client = Minio(
-    "localhost:9000",
-    access_key="minioadmin",
-    secret_key="minioadmin",
-    secure=False
-)
-print(minio_client.list_buckets())  # 应该返回空列表或已有存储桶
-
-# 在Python交互环境中执行
-required_buckets = list(MINIO_CONFIG["buckets"].values())
-
-# 在创建存储桶后添加策略设置函数
 def set_bucket_policy(client, bucket_name, policy):
     """更精确的策略配置"""
     if policy == "private":
@@ -145,17 +133,3 @@ def set_bucket_policy(client, bucket_name, policy):
             }]
         })
     client.set_bucket_policy(bucket_name, policy_json)
-
-# 先创建存储桶
-for bucket in required_buckets:
-    if not minio_client.bucket_exists(bucket):
-        minio_client.make_bucket(bucket)
-        print(f"✅ 成功创建存储桶: {bucket}")
-
-# 再设置策略（此时存储桶已存在）
-set_bucket_policy(minio_client, "wind-datasets", "private")
-set_bucket_policy(minio_client, "wind-models", "public-read")
-set_bucket_policy(minio_client, "wind-predictions", "private")
-set_bucket_policy(minio_client, "wind-scalers", "private")
-set_bucket_policy(minio_client, "wind-metrics", "public-read")
-set_bucket_policy(minio_client, "wind-logs", "public-read")

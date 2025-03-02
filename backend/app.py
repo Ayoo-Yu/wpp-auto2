@@ -48,23 +48,75 @@ app.register_blueprint(autotask_bp, url_prefix='/')
 app.register_blueprint(actual_power_bp)
 app.register_blueprint(prediction2database_bp)
 app.register_blueprint(power_compare_bp)
+
+# 添加健康检查端点
+@app.route('/health', methods=['GET'])
+def health_check():
+    health_status = {
+        "status": "ok",
+        "database": "unknown",
+        "minio": "unknown"
+    }
+    
+    # 检查数据库连接
+    try:
+        if engine is not None:
+            # 尝试执行简单查询
+            with engine.connect() as connection:
+                connection.execute("SELECT 1")
+            health_status["database"] = "ok"
+        else:
+            health_status["database"] = "unavailable"
+    except Exception as e:
+        health_status["database"] = f"error: {str(e)}"
+    
+    # 检查MinIO连接
+    try:
+        if minio_client is not None:
+            # 尝试列出存储桶
+            minio_client.list_buckets()
+            health_status["minio"] = "ok"
+        else:
+            health_status["minio"] = "unavailable"
+    except Exception as e:
+        health_status["minio"] = f"error: {str(e)}"
+    
+    # 如果任何服务不可用，返回503状态码
+    if "error" in health_status["database"] or "error" in health_status["minio"] or \
+       health_status["database"] == "unavailable" or health_status["minio"] == "unavailable":
+        return jsonify(health_status), 503
+    
+    return jsonify(health_status)
+
 # 初始化数据库和存储桶
 def initialize():
     with app.app_context():
         # 创建数据库表
-        Base.metadata.create_all(bind=engine)
-        print("✅ 数据库表创建完成")
+        if engine is not None:
+            try:
+                Base.metadata.create_all(bind=engine)
+                print("✅ 数据库表创建完成")
+            except Exception as e:
+                print(f"警告: 数据库表创建失败: {e}")
+        else:
+            print("警告: 数据库引擎不可用，跳过表创建")
         
         # 初始化MinIO存储桶（更新为新的配置结构）
-        required_buckets = list(MINIO_CONFIG["buckets"].values())
-        existing_buckets = [b.name for b in minio_client.list_buckets()]
-        
-        for bucket in required_buckets:
-            if bucket not in existing_buckets:
-                minio_client.make_bucket(bucket)
-                print(f"✅ 成功创建存储桶: {bucket}")
-            else:
-                print(f"✅ 存储桶已存在: {bucket}")
+        if minio_client is not None:
+            try:
+                required_buckets = list(MINIO_CONFIG["buckets"].values())
+                existing_buckets = [b.name for b in minio_client.list_buckets()]
+                
+                for bucket in required_buckets:
+                    if bucket not in existing_buckets:
+                        minio_client.make_bucket(bucket)
+                        print(f"✅ 成功创建存储桶: {bucket}")
+                    else:
+                        print(f"✅ 存储桶已存在: {bucket}")
+            except Exception as e:
+                print(f"警告: MinIO存储桶初始化失败: {e}")
+        else:
+            print("警告: MinIO客户端不可用，跳过存储桶创建")
 
 # 执行初始化
 initialize()

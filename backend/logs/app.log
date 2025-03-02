@@ -3787,3 +3787,19 @@ LINE 1: ...me, output_path, prediction_type, status) VALUES ('202502121...
 [2025-02-27 17:50:58,765] INFO in predict: 预测数据选择: 20250227175056585566, 预测模型选择: 20250227175057528725, 归一化模型选择: 20250227175058135370
 [2025-02-27 17:50:58,905] INFO in predict: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_test1_-__20250227175056585566_20250227175058.csv
 [2025-02-27 17:50:58,970] INFO in predict: 文件已上传到MinIO: wind-predictions/forecast_test1_-__20250227175056585566_20250227175058.csv
+[2025-03-02 11:14:13,205] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-02 11:14:15,774] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-02 11:15:09,280] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-02 11:15:11,775] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-02 13:04:05,238] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-02 13:04:07,809] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-02 13:04:17,817] INFO in app: 成功连接服务器！
+[2025-03-02 13:15:45,897] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-02 13:15:48,498] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-02 13:15:49,551] INFO in app: 成功连接服务器！
+[2025-03-02 13:15:52,329] INFO in app: 与服务器断开连接！
+[2025-03-02 13:15:52,711] INFO in app: 成功连接服务器！
+[2025-03-02 14:01:42,568] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-02 14:01:45,046] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-02 14:01:54,103] INFO in app: 成功连接服务器！
+[2025-03-02 14:02:02,180] INFO in app: 与服务器断开连接！
