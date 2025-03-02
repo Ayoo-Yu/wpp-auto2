@@ -1,0 +1,110 @@
+# version: '3.8'
+
+# services:
+#   frontend:
+#     build:
+#       context: ./frontend
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8080:80"
+
+#   backend:
+#     build:
+#       context: ./backend
+#       dockerfile: Dockerfile
+#     ports:
+#       - "5000:5000"
+#     environment:
+#       - FLASK_ENV=development
+# frontend-backend-compose.yml
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      - wind-power-network  # 连接同一网络
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - DB_HOST=postgres       # 使用数据库服务名称
+      - DB_PORT=5432
+      - MINIO_ENDPOINT=minio   # 使用MinIO服务名称
+      - MINIO_PORT=9000
+    networks:
+      - wind-power-network  # 连接同一网络
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: wind-power-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yzz0216yh
+      POSTGRES_DB: windpower
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # 使用命名卷
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - wind-power-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  minio:
+    image: minio/minio
+    container_name: wind-power-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data  # 使用命名卷
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: unless-stopped
+    networks:
+      - wind-power-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 10s
+
+volumes:  # 声明命名卷
+  postgres_data:
+  minio_data:
+
+networks:
+  wind-power-network:
+    driver: bridge

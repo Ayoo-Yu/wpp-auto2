@@ -1,24 +1,3 @@
-<!-- src/App.vue
-<template>
-  <div id="app">
-    <ModelTrain />
-  </div>
-</template>
-
-<script>
-import ModelTrain from './components/ModelTrain.vue'
-
-export default {
-  name: 'App',
-  components: {
-    ModelTrain
-  }
-}
-</script>
-
-<style>
-/* 你可以在这里添加全局样式 */
-</style> -->
 <!-- src/App.vue -->
 <template>
   <div class="app-container">

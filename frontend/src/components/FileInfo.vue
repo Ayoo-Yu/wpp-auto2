@@ -23,11 +23,13 @@
         type="primary" 
         class="action-button" 
         @click="$emit('start-upload')"
+        :disabled="!fileInfo"
       >上传文件</el-button>
       <el-button 
         type="danger" 
         class="action-button" 
         @click="$emit('remove-file')"
+        :disabled="!fileInfo"
       >删除</el-button>
     </div>
   </div>

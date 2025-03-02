@@ -20,6 +20,9 @@ RUN npm run build
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
+# 复制自定义Nginx配置
+COPY nginx.conf /etc/nginx/nginx.conf
+
 # 暴露端口
 EXPOSE 80
 

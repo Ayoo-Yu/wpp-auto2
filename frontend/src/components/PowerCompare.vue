@@ -953,6 +953,13 @@ export default {
   padding: 20px;  /* 统一内边距 */
 }
 
+.type-select-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
 .time-range-picker {
   display: flex;
   align-items: center;

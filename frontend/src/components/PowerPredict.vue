@@ -502,6 +502,8 @@ export default {
   padding: 40px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.03);
+  max-width: 300px;  /* 设置最大宽度 */
+  width: 100%;  /* 确保宽度为100% */
 }
 
 .status-card h3 {

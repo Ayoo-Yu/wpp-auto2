@@ -1,9 +1,11 @@
 import json
 import subprocess
 import datetime
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 import os
 import sys
+import shutil
+import traceback
 
 # 全局状态字典，其他代码依赖这个变量
 prediction_status = {
@@ -15,28 +17,67 @@ prediction_status = {
 # 获取当前文件所在目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# 构建项目根目录（假设 autopredict.py 在 backend/routes 目录）
-project_root = os.path.abspath(os.path.join(current_dir, '../../..'))
+# 在Docker环境中，脚本应该在/app目录下
+if os.path.exists('/app'):
+    # Docker环境
+    base_dir = '/app'
+else:
+    # 本地开发环境
+    base_dir = os.path.abspath(os.path.join(current_dir, '../..'))
 
+# 使用相对于应用根目录的路径
 scripts = {
-    'ultra_short': os.path.join(project_root, 'wind-power-forecast', 'backend', 'auto_scripts', 'scripts', 'supershort', 'scheduler_supershort.py'),
-    'short': os.path.join(project_root, 'wind-power-forecast', 'backend', 'auto_scripts', 'scripts', 'short', 'scheduler_short.py'),
-    'medium': os.path.join(project_root, 'wind-power-forecast', 'backend', 'auto_scripts', 'scripts', 'middle', 'scheduler_middle.py')
+    'ultra_short': os.path.join(base_dir, 'auto_scripts', 'scripts', 'supershort', 'scheduler_supershort.py'),
+    'short': os.path.join(base_dir, 'auto_scripts', 'scripts', 'short', 'scheduler_short.py'),
+    'medium': os.path.join(base_dir, 'auto_scripts', 'scripts', 'middle', 'scheduler_middle.py')
 }
 
-# 动态设置 PM2 路径
-if sys.platform.startswith('win'):
-    # 适用于所有Windows系统（32/64位）
-    pm2_path = os.path.join(os.environ['APPDATA'],'npm', 'pm2.cmd')
-    print(f"Windows 系统检测到 PM2 路径: {pm2_path}")  # 添加调试信息
-    pm2_cmd = pm2_path
-else:
-    pm2_cmd = '/usr/bin/pm2'  # Linux 下的典型安装路径
-    print(f"Linux 系统使用 PM2 路径: {pm2_cmd}")
+# 检查脚本是否存在
+for name, path in scripts.items():
+    if os.path.exists(path):
+        print(f"✅ 脚本存在: {name} -> {path}")
+    else:
+        print(f"❌ 脚本不存在: {name} -> {path}")
+        # 尝试查找可能的位置
+        possible_locations = [
+            os.path.join(base_dir, 'auto_scripts', 'scripts', name, f'scheduler_{name}.py'),
+            os.path.join(base_dir, 'scripts', name, f'scheduler_{name}.py'),
+            os.path.join(base_dir, 'scripts', f'scheduler_{name}.py')
+        ]
+        for loc in possible_locations:
+            if os.path.exists(loc):
+                print(f"✅ 找到替代脚本: {loc}")
+                scripts[name] = loc
+                break
 
-# 添加路径存在性检查
-if not os.path.exists(pm2_cmd):
-    raise FileNotFoundError(f"PM2 路径不存在: {pm2_cmd}，请确认安装配置")
+# 使用shutil.which查找可执行文件路径，这是更可靠的方法
+pm2_cmd = shutil.which('pm2')
+if pm2_cmd:
+    print(f"找到PM2路径: {pm2_cmd}")
+else:
+    # 尝试从环境变量获取
+    pm2_cmd = os.environ.get('PM2_PATH')
+    if pm2_cmd:
+        print(f"从环境变量获取PM2路径: {pm2_cmd}")
+    else:
+        # 尝试常见的安装位置
+        common_paths = [
+            '/usr/local/bin/pm2',
+            '/usr/bin/pm2',
+            '/opt/node/bin/pm2',
+            '/opt/nodejs/bin/pm2',
+            '/opt/conda/bin/pm2'
+        ]
+        for path in common_paths:
+            if os.path.isfile(path) and os.access(path, os.X_OK):
+                pm2_cmd = path
+                print(f"在常见位置找到PM2: {pm2_cmd}")
+                break
+        
+        if not pm2_cmd:
+            # 最后的回退选项
+            pm2_cmd = 'pm2'
+            print(f"未找到PM2路径，使用默认命令: {pm2_cmd}")
 
 def query_pm2_state(script_path):
     """
@@ -106,18 +147,47 @@ def start_prediction():
         return jsonify({'error': '无效的预测类型'}), 400
 
     script_path = scripts[prediction_type]
+    
+    # 检查脚本是否存在
+    if not os.path.exists(script_path):
+        return jsonify({'error': f'脚本文件不存在: {script_path}'}), 400
+    
     # 使用 os.path.basename 得到脚本文件的基本名称作为进程名称
     process_name = os.path.basename(script_path)
+    
     try:
-        subprocess.run(
-            [pm2_cmd, 'start', script_path, '--name', process_name],
+        # 打印详细的调试信息
+        print(f"尝试启动脚本: {script_path}")
+        print(f"使用PM2路径: {pm2_cmd}")
+        print(f"进程名称: {process_name}")
+        
+        # 使用完整路径执行命令
+        cmd = [pm2_cmd, 'start', script_path, '--name', process_name]
+        print(f"执行命令: {' '.join(cmd)}")
+        
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
             check=True
         )
+        
+        # 打印命令输出
+        print(f"命令输出: {result.stdout}")
+        if result.stderr:
+            print(f"命令错误: {result.stderr}")
+        
         # 启动成功后更新状态为 True
         prediction_status[prediction_type] = True
-        return jsonify({'message': f'{prediction_type} 预测任务已启动'})
-    except subprocess.CalledProcessError:
-        return jsonify({'error': '启动任务失败'}), 500
+        return jsonify({'message': f'{prediction_type} 预测任务已启动', 'output': result.stdout})
+    except subprocess.CalledProcessError as e:
+        error_msg = f"启动任务失败: {e}\n输出: {e.stdout}\n错误: {e.stderr}"
+        print(error_msg)
+        return jsonify({'error': error_msg}), 500
+    except Exception as e:
+        error_msg = f"启动任务时发生异常: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg)
+        return jsonify({'error': error_msg}), 500
 
 # 停止指定预测任务
 @autopredict_bp.route('/stop', methods=['POST'])

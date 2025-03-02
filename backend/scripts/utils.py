@@ -18,5 +18,3 @@ def visualize_results(results_dict, y_val, output_path='power_predictions_compar
     plt.savefig(output_path)
     print(f"图像已保存为{output_path}")
     
-    # 显示图像
-    #plt.show()
