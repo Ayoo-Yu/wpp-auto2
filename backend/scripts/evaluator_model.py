@@ -10,7 +10,7 @@ import os
 import pathlib
 
 class ModelEvaluator:
-    def __init__(self, data_path, output_dir=None,wfcapacity=453.5):
+    def __init__(self, data_path, output_dir=None, wfcapacity=453.5):
         """
         初始化模型评估器
         
@@ -20,6 +20,8 @@ class ModelEvaluator:
             模型预测结果CSV文件路径
         output_dir : str, optional
             结果保存目录，如果未提供，将自动创建
+        wfcapacity : float, optional
+            风电场装机容量，默认为453.5 MW
         """
         # 读取数据
         self.data = pd.read_csv(data_path)
@@ -31,6 +33,9 @@ class ModelEvaluator:
         # 添加日期列
         self.data['date'] = self.data['Timestamp'].dt.date
         self.wfcapacity = wfcapacity
+        
+        # 初始化模型信息
+        self.model_info = None
         
         # 创建结果保存目录
         if output_dir:
@@ -301,45 +306,150 @@ class ModelEvaluator:
 
     def generate_report(self, report_name='model_evaluation_report.txt'):
         """
-        生成评估报告
+        生成详细的评估报告，包括模型参数、误差分析和改进建议
         """
         report_path = os.path.join(self.output_dir, report_name)
         overall_metrics = self.calculate_overall_metrics()
         daily_metrics = self.calculate_daily_metrics()
         
+        # 计算误差分析
+        errors = self.data['Actual Power'] - self.data['Predicted Power']
+        error_mean = errors.mean()
+        error_std = errors.std()
+        error_percentiles = np.percentile(errors, [5, 25, 50, 75, 95])
+        
+        # 计算相对误差
+        relative_errors = np.abs(errors) / (self.data['Actual Power'] + 1e-10) * 100
+        relative_error_mean = relative_errors.mean()
+        
         with open(report_path, 'w', encoding='utf-8') as f:
-            f.write("模型评估报告\n")
-            f.write("=" * 50 + "\n\n")
+            # 报告标题
+            f.write(f"{'='*80}\n")
+            f.write(f"{' '*30}风电功率预测详细评估报告\n")
+            f.write(f"{'='*80}\n\n")
             
-            # 写入模型信息
+            # 生成时间和基本信息
+            f.write(f"报告生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write(f"模型名称: {self.model_name}\n")
-            f.write(f"评估时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+            f.write(f"风电场装机容量: {self.wfcapacity} MW\n\n")
             
-            f.write("1. 总体评估指标\n")
-            f.write("-" * 30 + "\n")
-            for metric, value in overall_metrics.items():
-                f.write(f"{metric}: {value:.4f}\n")
+            # 模型信息部分
+            if self.model_info:
+                f.write(f"{'='*80}\n")
+                f.write("模型训练信息\n")
+                f.write(f"{'='*80}\n\n")
+                
+                f.write(f"模型类型: {self.model_info.get('model_type', '未知')}\n")
+                f.write(f"训练集占比: {self.model_info.get('train_ratio', 0.9)}\n")
+                
+                # 如果有自定义参数，添加到报告中
+                custom_params = self.model_info.get('custom_params')
+                if custom_params:
+                    f.write("\n模型超参数:\n")
+                    for param_name, param_value in custom_params.items():
+                        f.write(f"  - {param_name}: {param_value}\n")
+                f.write("\n")
             
-            # 写入每日评估结果概览
-            f.write("\n2. 每日评估指标统计\n")
-            f.write("-" * 30 + "\n")
-            
-            for metric in ['RMSE', 'MAE', 'ACC', 'K']:
-                f.write(f"\n{metric}统计：\n")
-                f.write(f"平均值: {daily_metrics[metric].mean():.4f}\n")
-                f.write(f"最大值: {daily_metrics[metric].max():.4f}\n")
-                f.write(f"最小值: {daily_metrics[metric].min():.4f}\n")
-                f.write(f"标准差: {daily_metrics[metric].std():.4f}\n")
-            
-            # 写入数据基本信息
-            f.write("\n3. 数据基本信息\n")
-            f.write("-" * 30 + "\n")
+            # 数据基本信息
+            f.write(f"{'='*80}\n")
+            f.write("数据基本信息\n")
+            f.write(f"{'='*80}\n\n")
             f.write(f"总样本数: {len(self.data)}\n")
             f.write(f"时间范围: {self.data['Timestamp'].min()} 到 {self.data['Timestamp'].max()}\n")
             f.write(f"实际值范围: {self.data['Actual Power'].min():.2f} 到 {self.data['Actual Power'].max():.2f} MW\n")
             f.write(f"预测值范围: {self.data['Predicted Power'].min():.2f} 到 {self.data['Predicted Power'].max():.2f} MW\n")
+            f.write(f"平均实际功率: {self.data['Actual Power'].mean():.2f} MW\n")
+            f.write(f"平均预测功率: {self.data['Predicted Power'].mean():.2f} MW\n\n")
+            
+            # 总体评估指标
+            f.write(f"{'='*80}\n")
+            f.write("总体评估指标\n")
+            f.write(f"{'='*80}\n\n")
+            
+            f.write(f"均方误差 (MSE): {overall_metrics['MSE']:.6f}\n")
+            f.write(f"均方根误差 (RMSE): {overall_metrics['RMSE']:.6f} MW\n")
+            f.write(f"平均绝对误差 (MAE): {overall_metrics['MAE']:.6f} MW\n")
+            f.write(f"预测精度 (ACC): {overall_metrics['ACC']:.6f}\n")
+            f.write(f"相关系数 (K): {overall_metrics['K']:.6f}\n")
+            f.write(f"日均考核电量 (PE): {overall_metrics['PE']:.6f} MWh\n")
+            f.write(f"平均相对误差: {relative_error_mean:.2f}%\n\n")
+            
+            # 误差分析
+            f.write(f"{'='*80}\n")
+            f.write("误差分析\n")
+            f.write(f"{'='*80}\n\n")
+            
+            f.write(f"误差均值: {error_mean:.6f} MW\n")
+            f.write(f"误差标准差: {error_std:.6f} MW\n")
+            f.write("\n误差分布百分位数:\n")
+            f.write(f"  - 5%分位数: {error_percentiles[0]:.6f} MW\n")
+            f.write(f"  - 25%分位数: {error_percentiles[1]:.6f} MW\n")
+            f.write(f"  - 50%分位数 (中位数): {error_percentiles[2]:.6f} MW\n")
+            f.write(f"  - 75%分位数: {error_percentiles[3]:.6f} MW\n")
+            f.write(f"  - 95%分位数: {error_percentiles[4]:.6f} MW\n\n")
+            
+            # 每日评估指标统计
+            f.write(f"{'='*80}\n")
+            f.write("每日评估指标统计\n")
+            f.write(f"{'='*80}\n\n")
+            
+            for metric in ['RMSE', 'MAE', 'ACC', 'K', 'Pe']:
+                metric_name = metric
+                if metric == 'Pe':
+                    metric_name = 'PE'
+                
+                f.write(f"\n{metric_name}统计：\n")
+                f.write(f"平均值: {daily_metrics[metric].mean():.4f}\n")
+                f.write(f"最大值: {daily_metrics[metric].max():.4f} (日期: {daily_metrics.loc[daily_metrics[metric].idxmax(), 'date']})\n")
+                f.write(f"最小值: {daily_metrics[metric].min():.4f} (日期: {daily_metrics.loc[daily_metrics[metric].idxmin(), 'date']})\n")
+                f.write(f"标准差: {daily_metrics[metric].std():.4f}\n")
+            
+            # 性能评估
+            f.write(f"\n{'='*80}\n")
+            f.write("预测性能评估\n")
+            f.write(f"{'='*80}\n\n")
+            
+            # 根据ACC和K评估模型性能
+            acc = overall_metrics['ACC']
+            k = overall_metrics['K']
+            
+            if acc > 0.9 and k > 0.7:
+                performance = "优秀"
+            elif acc > 0.85 and k > 0.65:
+                performance = "良好"
+            elif acc > 0.83 and k > 0.6:
+                performance = "达标"
+            else:
+                performance = "需要改进"
+            
+            f.write(f"模型整体性能评价: {performance}\n\n")
+            
+            # 提供改进建议
+            f.write("改进建议:\n")
+            if performance == "需要改进":
+                f.write("  - 考虑增加训练数据量，特别是不同天气条件下的数据\n")
+                f.write("  - 尝试更复杂的模型架构或集成多个模型\n")
+                f.write("  - 进行更全面的特征工程，考虑添加更多气象特征\n")
+                f.write("  - 调整模型超参数，尤其是学习率和树的深度\n")
+                f.write("  - 分析预测误差较大的时间段，找出可能的系统性问题\n")
+            elif performance == "达标":
+                f.write("  - 尝试调整学习率和正则化参数以提高精度\n")
+                f.write("  - 考虑添加更多相关特征，如风向变化特征\n")
+                f.write("  - 对误差较大的时间段进行单独分析\n")
+                f.write("  - 考虑使用时间序列特定的模型如LSTM或GRU\n")
+            else:
+                f.write("  - 当前模型表现良好，可以考虑部署到生产环境\n")
+                f.write("  - 定期使用新数据重新训练模型以保持性能\n")
+                f.write("  - 考虑建立模型监控系统，及时发现性能下降\n")
+                f.write("  - 可以尝试进一步优化以提高极端天气条件下的预测准确性\n")
+            
+            # 结束语
+            f.write(f"\n{'='*80}\n")
+            f.write("报告结束\n")
+            f.write(f"{'='*80}\n")
         
-        print(f"报告已保存: {report_path}")
+        print(f"详细评估报告已保存: {report_path}")
+        return report_path
 
     def save_daily_metrics_to_csv(self, filename='daily_metrics.csv'):
         """
@@ -357,6 +467,7 @@ def evaluate_model(
     save_report=True,
     custom_save_dir=None,
     wfcapacity=453.5,
+    model_info=None,
 ):
     """
     评估模型并生成相关报告和图表。
@@ -373,10 +484,18 @@ def evaluate_model(
         是否生成评估报告，默认为True
     custom_save_dir : str, optional
         自定义的结果保存目录，如果不提供则使用默认目录结构
+    wfcapacity : float, optional
+        风电场装机容量，默认为453.5 MW
+    model_info : dict, optional
+        模型相关信息，包括模型类型、训练参数等
     """
-    print("evaluator这一步了")
-    evaluator = ModelEvaluator(data_path, output_dir=custom_save_dir,wfcapacity=wfcapacity)
-    print("evaluator没问题")
+    evaluator = ModelEvaluator(data_path, output_dir=custom_save_dir, wfcapacity=wfcapacity)
+
+    
+    # 设置模型信息
+    if model_info:
+        evaluator.model_info = model_info
+    
     # 绘制并保存实际值 vs 预测值图
     if save_plots:
         evaluator.plot_actual_vs_predicted(save_path='actual_vs_predicted.png')

@@ -7,6 +7,7 @@ from services.predict_service import run_predict
 from werkzeug.utils import secure_filename
 from models import PredictionRecord, Model, Dataset
 from database_config import minio_client, SessionLocal
+import pandas as pd
 
 # 预测蓝图
 predict_bp = Blueprint('predict', __name__)
@@ -58,13 +59,17 @@ def predict():
         current_app.logger.error("预测时没有返回可用的文件路径")
         return jsonify({'error': '预测文件生成失败'}), 500
 
-    # 保存预测结果到 DOWNLOAD_FOLDER
-    forecast_timestamp_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    filename_wo_ext = os.path.splitext(os.path.basename(csvupload_path))[0]
-    output_filename = f"forecast_{filename_wo_ext}_{forecast_timestamp_str}.csv"
-    output_path = os.path.join(current_app.config['DOWNLOAD_FOLDER'], output_filename)
-
+    # 读取预测结果
     try:
+        predictions_df = pd.read_csv(forecast_file_path)
+        predictions_data = predictions_df.to_dict('records')
+        
+        # 保存预测结果到 DOWNLOAD_FOLDER
+        forecast_timestamp_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        filename_wo_ext = os.path.splitext(os.path.basename(csvupload_path))[0]
+        output_filename = f"forecast_{filename_wo_ext}_{forecast_timestamp_str}.csv"
+        output_path = os.path.join(current_app.config['DOWNLOAD_FOLDER'], output_filename)
+
         shutil.copy(forecast_file_path, output_path)
         current_app.logger.info(f"将原生预测文件复制到以下路径： {output_path}")
         
@@ -85,22 +90,23 @@ def predict():
             input_data_id=csvfileId,
             scaler_id=scalerfileId,
             prediction_time=datetime.datetime.now(),
-            output_path=f"s3://{bucket_name}/{object_name}",  # 修改为minio路径
+            output_path=f"s3://{bucket_name}/{object_name}",
             prediction_type='batch',
             status='completed',
         )
         db.add(prediction_record)
         db.commit()
         
+        # 更新返回的下载URL为MinIO路径
+        download_url = f"/download/{secure_filename(output_filename)}"
+        
+        return jsonify({
+            'download_url': download_url,
+            'prediction_id': prediction_record.id,
+            'predictions': predictions_data
+        }), 200
+        
     except Exception as e:
         db.rollback()
-        current_app.logger.error(f"保存记录失败: {e}")
-        return jsonify({'error': '无法保存预测记录', 'details': str(e)}), 500
-
-    # 更新返回的下载URL为MinIO路径
-    download_url = f"/download/{secure_filename(output_filename)}"
-    
-    return jsonify({
-        'download_url': download_url,
-        'prediction_id': prediction_record.id  # 返回新创建的记录ID
-    }), 200
+        current_app.logger.error(f"处理预测结果失败: {e}")
+        return jsonify({'error': '无法处理预测结果', 'details': str(e)}), 500

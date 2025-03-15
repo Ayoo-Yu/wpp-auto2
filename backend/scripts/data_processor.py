@@ -39,7 +39,8 @@ def preprocess_data_pre(data):
     data['Hour'] = data['Timestamp'].dt.hour
     features = [col for col in data.columns if col not in ['Timestamp']]
     X = data[features]
-    return X
+    timestamps = data['Timestamp']  # 保存时间戳
+    return X, timestamps
 
 def split_data(X, y, train_ratio=0.9):
     """

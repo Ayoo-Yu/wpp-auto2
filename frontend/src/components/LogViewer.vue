@@ -29,19 +29,26 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
-  gap: 12px;
+  gap: 8px;
 }
 
 .log-content {
   flex: 1;
   background: #fafafa;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 8px;
+  padding: 10px;
   overflow-y: auto;
   font-family: 'SF Mono', Menlo, monospace;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.4;
   color: #333;
+  max-height: 250px;
+}
+
+.log-content pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .log-actions {
@@ -51,6 +58,8 @@ export default {
 
 .clear-button {
   color: #ff3b30;
+  font-size: 12px;
+  padding: 0;
 }
 
 .clear-button:hover {
