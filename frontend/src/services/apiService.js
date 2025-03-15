@@ -83,11 +83,32 @@ export const upload_scaler = (file, onUploadProgress) => {
   });
 };
 
-export const modeltrain = (fileId, model, wfcapacity) => {
-  return axios.post(`${backendBaseUrl}/modeltrain`, { file_id: fileId, model, wfcapacity});
+export const modeltrain = (fileId, model, wfcapacity, trainRatio, customParams = null) => {
+  const requestData = { file_id: fileId, model, wfcapacity, train_ratio: trainRatio };
+  
+  // 如果是自定义模型，添加自定义参数
+  if (model === 'CUSTOM' && customParams) {
+    requestData.custom_params = customParams;
+  }
+  
+  return axios.post(`${backendBaseUrl}/modeltrain`, requestData);
 };
 
 export const predict = (csvfileId, modelfileId, scalerfileId) => {
   return axios.post(`${backendBaseUrl}/predict`, { csvfileId: csvfileId, modelfileId:modelfileId, scalerfileId:scalerfileId});
+};
+
+export const getActualValues = async (startTime, endTime) => {
+  try {
+    const response = await axios.post(`${backendBaseUrl}/power-compare/data`, {
+      start: startTime,
+      end: endTime,
+      types: ['实测值']
+    });
+    return response;
+  } catch (error) {
+    console.error('获取实测值失败:', error);
+    throw error;
+  }
 };
 

@@ -42,8 +42,12 @@
               :selectedModel="selectedModel" 
               :wfCapacity="wfCapacity"
               :predictionstate="predictionstate"
+              :trainRatio="trainRatio"
               @model-selected="onModelSelected"
               @model_wf_capacity="onWindFarmCapacityChange"
+              @train-ratio-change="onTrainRatioChange"
+              @custom-params-change="onCustomParamsChange"
+              @reset="confirmReset"
             />
           </section>
 
@@ -174,6 +178,8 @@ export default {
       predictionReady: false,
       predictionstate: false,
       wfCapacity: 453.5,
+      trainRatio: 0.9,
+      customParams: null,
       dailyMetrics: null,
       chartData: null,
       chartInstances: [],
@@ -224,8 +230,52 @@ export default {
     onWindFarmCapacityChange(value) {
       this.wfCapacity = value;
     },
+    onTrainRatioChange(value) {
+      this.trainRatio = value;
+    },
+    onCustomParamsChange(params) {
+      this.customParams = params;
+    },
     onPredictionReady(value) {
       this.predictionReady = value;
+    },
+    confirmReset() {
+      this.$confirm('确定要重置所有训练设置吗？这将清除当前的所有设置和结果。', '重置确认', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.resetTraining();
+        this.$message({
+          type: 'success',
+          message: '已重置所有训练设置'
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消重置'
+        });
+      });
+    },
+    resetTraining() {
+      // 重置所有训练相关的状态
+      this.selectedModel = null;
+      this.wfCapacity = 453.5;
+      this.trainRatio = 0.9;
+      this.customParams = null;
+      this.downloadUrl = '';
+      this.reportDownloadUrl = '';
+      this.predictionstate = false;
+      this.chartData = null;
+      
+      // 清空图表实例
+      if (this.chartInstances && this.chartInstances.length > 0) {
+        this.chartInstances.forEach(chart => chart.destroy());
+        this.chartInstances = [];
+      }
+      
+      // 清空日志
+      this.logs = '';
     },
     handleManualUpload() {
       if (!this.selectedFile) {
@@ -253,7 +303,9 @@ export default {
         return;
       }
       this.processing = true;
-      modeltrain(this.fileId, this.selectedModel, this.wfCapacity)
+      
+      // 使用modeltrain函数
+      modeltrain(this.fileId, this.selectedModel, this.wfCapacity, this.trainRatio, this.customParams)
         .then(response => {
           if (response.data.download_url) {
             this.downloadUrl = `${this.backendBaseUrl}${response.data.download_url}`;
@@ -307,6 +359,8 @@ export default {
       this.downloadUrl = '';
       this.reportDownloadUrl = '';
       this.predictionstate = false;
+      this.trainRatio = 0.9;
+      this.customParams = null;
     },
     async fetchDailyMetrics() {
       if (!this.fileId) {
@@ -422,12 +476,16 @@ export default {
         const canvas = this.$refs[`chart${index}`][0];
         if (canvas) {
           const ctx = canvas.getContext('2d');
+          
+          // 计算平均值
+          const meanValue = dataset.data.reduce((a, b) => a + b, 0) / dataset.data.length;
+          
           const chart = new Chart(ctx, {
             type: 'line',
             data: {
               labels: labels,
               datasets: [{
-                label: dataset.label,
+                label: `${dataset.label} (平均值: ${meanValue.toFixed(4)})`,
                 data: dataset.data,
                 borderColor: dataset.borderColor,
                 backgroundColor: dataset.backgroundColor,

@@ -27,9 +27,9 @@ else:
 
 # 使用相对于应用根目录的路径
 scripts = {
-    'ultra_short': os.path.join(base_dir, 'auto_scripts', 'scripts', 'supershort', 'scheduler_supershort.py'),
-    'short': os.path.join(base_dir, 'auto_scripts', 'scripts', 'short', 'scheduler_short.py'),
-    'medium': os.path.join(base_dir, 'auto_scripts', 'scripts', 'middle', 'scheduler_middle.py')
+    'ultra_short': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'supershort', 'scheduler_supershort.py'),
+    'short': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'short', 'scheduler_short.py'),
+    'medium': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'middle', 'scheduler_middle.py')
 }
 
 # 检查脚本是否存在
@@ -40,9 +40,9 @@ for name, path in scripts.items():
         print(f"❌ 脚本不存在: {name} -> {path}")
         # 尝试查找可能的位置
         possible_locations = [
-            os.path.join(base_dir, 'auto_scripts', 'scripts', name, f'scheduler_{name}.py'),
-            os.path.join(base_dir, 'scripts', name, f'scheduler_{name}.py'),
-            os.path.join(base_dir, 'scripts', f'scheduler_{name}.py')
+            os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', name, f'scheduler_{name}.py'),
+            os.path.join(base_dir, 'backend', 'scripts', name, f'scheduler_{name}.py'),
+            os.path.join(base_dir, 'backend', 'scripts', f'scheduler_{name}.py')
         ]
         for loc in possible_locations:
             if os.path.exists(loc):

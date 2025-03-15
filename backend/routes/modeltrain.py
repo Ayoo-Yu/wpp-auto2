@@ -25,7 +25,23 @@ def modeltrain():
     file_id = data['file_id']
     model = data['model']
     wfcapacity = pd.to_numeric(data['wfcapacity'])
-    current_app.logger.info(f"训练集id: {file_id}, 模型选择: {model}, 装机容量: {wfcapacity},类型: {type(wfcapacity)}")
+    
+    # 获取训练集占比参数，默认为0.9
+    train_ratio = 0.9
+    if 'train_ratio' in data:
+        train_ratio = pd.to_numeric(data['train_ratio'])
+        # 确保train_ratio在有效范围内
+        if train_ratio < 0.1 or train_ratio > 0.95:
+            current_app.logger.warning(f"训练集占比超出有效范围: {train_ratio}")
+            return jsonify({'error': "训练集占比必须在0.1到0.95之间"}), 400
+    
+    # 获取自定义参数
+    custom_params = None
+    if model == 'CUSTOM' and 'custom_params' in data:
+        custom_params = data['custom_params']
+        current_app.logger.info(f"收到自定义模型参数: {custom_params}")
+    
+    current_app.logger.info(f"训练集id: {file_id}, 模型选择: {model}, 装机容量: {wfcapacity}, 训练集占比: {train_ratio}, 类型: {type(wfcapacity)}")
 
     upload_path = find_file_by_id(file_id, current_app.config['UPLOAD_FOLDER'])
     if not upload_path:
@@ -34,7 +50,7 @@ def modeltrain():
 
     # 运行预测与后处理
     try:
-        forecast_file_path,model_filepath,scaler_filepath = run_modeltrain(upload_path, model)
+        forecast_file_path,model_filepath,scaler_filepath = run_modeltrain(upload_path, model, train_ratio, custom_params)
     except Exception as e:
         current_app.logger.error(f"预测过程中出错: {e}")
         return jsonify({'error': '预测过程中出错', 'details': str(e)}), 500
@@ -59,7 +75,20 @@ def modeltrain():
     # 评估模型
     try:
         evaluation_output_dir = os.path.join(current_app.config['DOWNLOAD_FOLDER'], f"evaluation_{filename_wo_ext}_{forecast_timestamp_str}")
-        evaluation_result, report_path = run_evaluation(output_path, evaluation_output_dir, wfcapacity=wfcapacity)
+        
+        # 准备模型信息字典，用于增强报告
+        model_info = {
+            'model_type': model,
+            'train_ratio': train_ratio,
+            'custom_params': custom_params
+        }
+        
+        evaluation_result, report_path = run_evaluation(
+            output_path, 
+            evaluation_output_dir, 
+            wfcapacity=wfcapacity,
+            model_info=model_info
+        )
         current_app.logger.info(f"测试集评估完成。相关结果保存在以下路径：{evaluation_output_dir}")
     except Exception as e:
         current_app.logger.error(f"模型评估过程中出错: {e}")
