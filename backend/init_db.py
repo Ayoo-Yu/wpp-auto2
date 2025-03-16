@@ -1,11 +1,10 @@
-from database_config import engine
-from base import Base
-from models import *
+from database_config import Base, engine
+from scripts.init_users import init_users_and_roles
 
-def init_db():
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-    print("数据库已重新初始化")
+# 创建所有表
+Base.metadata.create_all(bind=engine)
 
-if __name__ == "__main__":
-    init_db() 
+# 初始化用户和角色
+init_users_and_roles()
+
+print("数据库初始化完成") 

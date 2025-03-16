@@ -36,24 +36,29 @@
           <template #title>首页</template>
         </el-menu-item>
 
-        <el-menu-item index="/modeltrain">
+        <el-menu-item index="/modeltrain" v-if="hasPermission('train_models')">
           <el-icon><DataAnalysis /></el-icon>
           <template #title>模型训练</template>
         </el-menu-item>
 
-        <el-menu-item index="/powerpredict">
+        <el-menu-item index="/powerpredict" v-if="hasPermission('run_predictions')">
           <el-icon><TrendCharts /></el-icon>
           <template #title>功率预测</template>
         </el-menu-item>
 
-        <el-menu-item index="/autopredict">
+        <el-menu-item index="/autopredict" v-if="hasPermission('run_predictions')">
           <el-icon><Timer /></el-icon>
           <template #title>自动预测</template>
         </el-menu-item>
 
-        <el-menu-item index="/powercompare">
+        <el-menu-item index="/powercompare" v-if="hasPermission('view_all_data')">
           <el-icon><TrendCharts /></el-icon>
           <template #title>功率对比</template>
+        </el-menu-item>
+        
+        <el-menu-item index="/users" v-if="hasPermission('manage_users')">
+          <el-icon><User /></el-icon>
+          <template #title>用户管理</template>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -70,15 +75,15 @@
           <h1 class="header-title">三峡新能源风电功率预测平台</h1>
         </div>
         <div class="header-right">
-          <el-dropdown>
+          <el-dropdown @command="handleCommand">
             <span class="user-profile">
-              <el-avatar :size="32" class="avatar">A</el-avatar>
-              <span class="username">Admin</span>
+              <el-avatar :size="32" class="avatar">{{ userInitial }}</el-avatar>
+              <span class="username">{{ userName }}</span>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>个人设置</el-dropdown-item>
-                <el-dropdown-item divided>退出登录</el-dropdown-item>
+                <el-dropdown-item command="profile">个人设置</el-dropdown-item>
+                <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -90,12 +95,66 @@
         <router-view></router-view>
       </el-main>
     </el-container>
+    
+    <!-- 修改密码对话框 -->
+    <el-dialog
+      v-model="showChangePasswordDialog"
+      title="修改密码"
+      width="400px"
+    >
+      <el-form 
+        ref="passwordForm" 
+        :model="passwordFormData" 
+        :rules="passwordRules" 
+        label-width="100px"
+      >
+        <el-form-item label="当前密码" prop="currentPassword">
+          <el-input
+            v-model="passwordFormData.currentPassword"
+            type="password"
+            placeholder="请输入当前密码"
+            show-password
+          />
+        </el-form-item>
+        
+        <el-form-item label="新密码" prop="newPassword">
+          <el-input
+            v-model="passwordFormData.newPassword"
+            type="password"
+            placeholder="请输入新密码"
+            show-password
+          />
+        </el-form-item>
+        
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input
+            v-model="passwordFormData.confirmPassword"
+            type="password"
+            placeholder="请再次输入新密码"
+            show-password
+          />
+        </el-form-item>
+      </el-form>
+      
+      <template #footer>
+        <el-button @click="showChangePasswordDialog = false">取消</el-button>
+        <el-button 
+          type="primary" 
+          :loading="changingPassword"
+          @click="handleChangePassword"
+        >
+          确认
+        </el-button>
+      </template>
+    </el-dialog>
   </el-container>
 </template>
 
 <script>
-import { ref, computed, provide } from 'vue'
+import { ref, reactive, computed, provide, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { changePassword } from '../api/auth'
 
 // 引入 Element Plus 图标
 import {
@@ -105,6 +164,7 @@ import {
   Expand,
   TrendCharts,
   Timer,
+  User,
 } from '@element-plus/icons-vue'
 
 export default {
@@ -116,12 +176,50 @@ export default {
     Expand,
     TrendCharts,
     Timer,
+    User,
   },
   setup() {
     const isCollapsed = ref(false)
     const isAnimatedBackground = ref(true)
     const router = useRouter()
     const route = useRoute()
+    
+    // 用户信息
+    const currentUser = ref(null)
+    
+    // 修改密码相关
+    const passwordForm = ref(null)
+    const showChangePasswordDialog = ref(false)
+    const changingPassword = ref(false)
+    
+    const passwordFormData = reactive({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    })
+    
+    const passwordRules = {
+      currentPassword: [
+        { required: true, message: '请输入当前密码', trigger: 'blur' }
+      ],
+      newPassword: [
+        { required: true, message: '请输入新密码', trigger: 'blur' },
+        { min: 6, message: '密码长度不能少于6个字符', trigger: 'blur' }
+      ],
+      confirmPassword: [
+        { required: true, message: '请再次输入新密码', trigger: 'blur' },
+        {
+          validator: (rule, value, callback) => {
+            if (value !== passwordFormData.newPassword) {
+              callback(new Error('两次输入的密码不一致'))
+            } else {
+              callback()
+            }
+          },
+          trigger: 'blur'
+        }
+      ]
+    }
 
     // 将 isAnimatedBackground 提供给子组件使用
     provide('isAnimatedBackground', isAnimatedBackground)
@@ -142,6 +240,67 @@ export default {
     }))
 
     const activeMenu = computed(() => (route.path === '/' ? '/' : route.path))
+    
+    // 计算用户名首字母
+    const userInitial = computed(() => {
+      const userStr = localStorage.getItem('user')
+      if (!userStr) return 'U'
+      const user = JSON.parse(userStr)
+      return user.full_name ? user.full_name.charAt(0).toUpperCase() : 
+             user.username.charAt(0).toUpperCase()
+    })
+    
+    // 计算用户显示名称
+    const userName = computed(() => {
+      const userStr = localStorage.getItem('user')
+      if (!userStr) return '用户'
+      const user = JSON.parse(userStr)
+      return user.full_name || user.username
+    })
+    
+    // 获取当前用户信息
+    const fetchCurrentUser = async () => {
+      try {
+        const userStr = localStorage.getItem('user')
+        if (!userStr) {
+          router.push('/login')
+          return
+        }
+        
+        currentUser.value = JSON.parse(userStr)
+      } catch (error) {
+        console.error('获取用户信息失败:', error)
+        // 如果获取用户信息失败，重定向到登录页
+        localStorage.removeItem('user')
+        router.push('/login')
+      }
+    }
+    
+    // 检查权限
+    const hasPermission = (permission) => {
+      // 简化权限检查，只要是管理员就有所有权限
+      if (!currentUser.value) return false
+      
+      // 检查用户的权限列表
+      if (currentUser.value.permissions) {
+        // 处理权限可能是数组或嵌套对象的情况
+        let permissions = currentUser.value.permissions;
+        
+        // 如果权限是对象且有permissions属性
+        if (typeof permissions === 'object' && !Array.isArray(permissions) && permissions.permissions) {
+          permissions = permissions.permissions;
+        }
+        
+        // 如果权限是数组
+        if (Array.isArray(permissions)) {
+          // 如果用户权限中包含所需权限，则返回true
+          return permissions.includes(permission);
+        }
+      }
+      
+      // 向下兼容：系统管理员拥有所有权限
+      return currentUser.value.role === '系统管理员'
+    }
 
     const toggleCollapse = () => {
       isCollapsed.value = !isCollapsed.value
@@ -150,6 +309,84 @@ export default {
     const handleSelect = (index) => {
       router.push(index)
     }
+    
+    // 处理下拉菜单命令
+    const handleCommand = (command) => {
+      if (command === 'logout') {
+        handleLogout()
+      } else if (command === 'profile') {
+        showChangePasswordDialog.value = true
+      }
+    }
+    
+    // 处理退出登录
+    const handleLogout = () => {
+      ElMessageBox.confirm(
+        '确定要退出登录吗？',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
+        // 清除本地存储的令牌和用户信息
+        localStorage.removeItem('user')
+        
+        // 重定向到登录页
+        router.push('/login')
+        
+        ElMessage.success('已退出登录')
+      }).catch(() => {
+        // 取消退出
+      })
+    }
+    
+    // 处理修改密码
+    const handleChangePassword = async () => {
+      if (!passwordForm.value) return
+      
+      await passwordForm.value.validate(async (valid) => {
+        if (!valid) return
+        
+        changingPassword.value = true
+        
+        try {
+          // 获取当前登录的用户名
+          const username = currentUser.value ? currentUser.value.username : ''
+          
+          if (!username) {
+            ElMessage.error('未找到当前用户信息，请重新登录')
+            handleLogout()
+            return
+          }
+          
+          await changePassword(
+            username,
+            passwordFormData.currentPassword,
+            passwordFormData.newPassword
+          )
+          
+          showChangePasswordDialog.value = false
+          ElMessage.success('密码修改成功')
+          
+          // 清空表单
+          passwordFormData.currentPassword = ''
+          passwordFormData.newPassword = ''
+          passwordFormData.confirmPassword = ''
+        } catch (error) {
+          console.error('密码修改失败:', error)
+          ElMessage.error('密码修改失败: ' + (error.response?.data?.message || '服务器错误'))
+        } finally {
+          changingPassword.value = false
+        }
+      })
+    }
+    
+    // 生命周期钩子
+    onMounted(() => {
+      fetchCurrentUser()
+    })
 
     return {
       isCollapsed,
@@ -157,7 +394,18 @@ export default {
       activeMenu,
       toggleCollapse,
       handleSelect,
-      backgroundStyle
+      backgroundStyle,
+      currentUser,
+      userInitial,
+      userName,
+      handleCommand,
+      passwordForm,
+      passwordFormData,
+      passwordRules,
+      showChangePasswordDialog,
+      changingPassword,
+      handleChangePassword,
+      hasPermission
     }
   },
 }
