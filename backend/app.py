@@ -19,14 +19,22 @@ from logging_config import configure_logging
 app = Flask(__name__)
 app.config.from_object(Config)
 
-CORS(app)
+# 配置 CORS，关闭预检请求验证
+CORS(app, resources={r"/*": {
+    "origins": "*",
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "allow_headers": "*",
+    "expose_headers": "*",
+    "supports_credentials": True,
+    "max_age": 86400  # 预检请求结果缓存24小时
+}})
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # 配置日志
 configure_logging(app, socketio)
 
 # 注册蓝图
-# from routes.upload import upload_bp
+from routes.upload import upload_bp
 from routes.modeltrain import modeltrain_bp
 from routes.download import download_bp
 from routes.predict import predict_bp
@@ -37,17 +45,21 @@ from routes.autotask import autotask_bp
 from routes.actual_power_router import actual_power_bp
 from routes.prediction2database import prediction2database_bp
 from routes.power_compare import bp as power_compare_bp
+from routes.auth import auth_bp  # 导入认证蓝图
+from routes.user import user_bp  # 导入用户路由蓝图
 
 # app.register_blueprint(upload_bp, url_prefix='/')
 app.register_blueprint(modeltrain_bp, url_prefix='/')
 app.register_blueprint(download_bp, url_prefix='/')
 app.register_blueprint(predict_bp, url_prefix='/')
-app.register_blueprint(autopredict_bp, url_prefix='/')
+app.register_blueprint(autopredict_bp, url_prefix='/api')
 app.register_blueprint(training_bp, url_prefix='/')
 app.register_blueprint(autotask_bp, url_prefix='/')
 app.register_blueprint(actual_power_bp)
 app.register_blueprint(prediction2database_bp)
 app.register_blueprint(power_compare_bp)
+app.register_blueprint(auth_bp, url_prefix='/api/auth')  # 注册认证蓝图，使用 /api/auth 前缀
+app.register_blueprint(user_bp, url_prefix='/api/user')  # 注册用户路由蓝图，使用 /api/user 前缀
 
 # 添加健康检查端点
 @app.route('/health', methods=['GET'])
@@ -87,6 +99,12 @@ def health_check():
         return jsonify(health_status), 503
     
     return jsonify(health_status)
+
+# 添加全局 OPTIONS 请求处理器
+@app.route('/', defaults={'path': ''}, methods=['OPTIONS'])
+@app.route('/<path:path>', methods=['OPTIONS'])
+def handle_options(path):
+    return '', 200
 
 # 初始化数据库和存储桶
 def initialize():

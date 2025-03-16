@@ -4,9 +4,9 @@ module.exports = {
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:5000',
-        pathRewrite: {
-          '^/api': ''  // 移除 /api 前缀
-        },
+        // pathRewrite: {
+        //   '^/api': ''  // 移除 /api 前缀
+        // },
         ws: true,
         secure: false,
         configure: (proxy, options) => {

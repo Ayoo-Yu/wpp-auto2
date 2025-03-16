@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Float, JSON, ForeignKey, Boolean, Text
+from sqlalchemy import Column, Integer, String, DateTime, Float, JSON, ForeignKey, Boolean, Text, Table
 from sqlalchemy.orm import relationship
 from base import Base
 
@@ -147,3 +147,56 @@ class DailyMetrics(Base):
     pe = Column(Float)
     sample_count = Column(Integer)
     metric_type = Column(String(20))
+
+# 添加用户角色表
+class Role(Base):
+    __tablename__ = "roles"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(50), unique=True, nullable=False)
+    description = Column(String(255))
+    permissions = Column(JSON)  # 存储权限配置的JSON
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    
+    users = relationship("User", back_populates="role")
+    
+    def __repr__(self):
+        return f"<Role {self.name}>"
+
+# 添加用户表
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    password_hash = Column(String(255), nullable=False)
+    email = Column(String(100), unique=True, nullable=True)
+    full_name = Column(String(100))
+    role_id = Column(Integer, ForeignKey("roles.id"))
+    is_active = Column(Boolean, default=True)
+    last_login = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    first_login = Column(Boolean, default=True)  # 标记是否首次登录
+    
+    role = relationship("Role", back_populates="users")
+    
+    def __repr__(self):
+        return f"<User {self.username}>"
+
+# 添加登录历史记录表
+class LoginHistory(Base):
+    __tablename__ = "login_history"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    login_time = Column(DateTime, default=datetime.now)
+    ip_address = Column(String(50))
+    user_agent = Column(String(255))
+    status = Column(String(20))  # 成功/失败
+    
+    user = relationship("User")
+    
+    def __repr__(self):
+        return f"<LoginHistory {self.user_id} at {self.login_time}>"
