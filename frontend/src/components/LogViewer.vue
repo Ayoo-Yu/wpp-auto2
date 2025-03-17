@@ -1,11 +1,9 @@
 <!-- src/components/LogViewer.vue -->
 <template>
   <div class="log-viewer">
-    <div class="log-content">
-      <pre>{{ logs }}</pre>
-    </div>
+    <div class="log-content" v-html="formattedLogs"></div>
     <div class="log-actions">
-      <el-button type="text" @click="$emit('clear-logs')" class="clear-button">
+      <el-button type="text" size="small" @click="$emit('clear-logs')">
         清空日志
       </el-button>
     </div>
@@ -20,49 +18,39 @@ export default {
       type: String,
       default: ''
     }
+  },
+  computed: {
+    formattedLogs() {
+      return this.logs.replace(/\n/g, '<br>');
+    }
   }
 };
 </script>
 
 <style scoped>
 .log-viewer {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  gap: 8px;
 }
 
 .log-content {
   flex: 1;
-  background: #fafafa;
-  border-radius: 8px;
-  padding: 10px;
   overflow-y: auto;
-  font-family: 'SF Mono', Menlo, monospace;
-  font-size: 12px;
-  line-height: 1.4;
-  color: #333;
-  max-height: 250px;
-}
-
-.log-content pre {
-  margin: 0;
+  padding: 8px;
   white-space: pre-wrap;
-  word-break: break-all;
+  word-wrap: break-word;
+  font-family: monospace;
 }
 
 .log-actions {
+  padding: 8px;
   display: flex;
   justify-content: flex-end;
+  border-top: 1px solid #ebeef5;
 }
 
-.clear-button {
-  color: #ff3b30;
-  font-size: 12px;
-  padding: 0;
-}
-
-.clear-button:hover {
-  color: #ff2d55;
+:deep(.log-content) {
+  line-height: 1.6;
 }
 </style>

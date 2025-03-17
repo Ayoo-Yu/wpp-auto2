@@ -1,18 +1,42 @@
 <template>
   <div class="model-train-container">
-    <!-- 页面标题 -->
-    <h1 class="page-title">风电功率预测模型训练</h1>
+    <!-- 页面标题和重置按钮区域 -->
+    <div class="header-section">
+      <h1 class="page-title">风电功率预测模型训练</h1>
+      <el-button 
+        class="reset-all-button" 
+        type="primary" 
+        @click="confirmResetAll"
+        :disabled="!hasAnyData"
+      >
+        <el-icon><Refresh /></el-icon>
+        重新训练
+      </el-button>
+    </div>
 
     <!-- Hero Section 装饰在标题之后 -->
     <div class="hero-section"></div>
 
     <!-- 主体内容区域：左右两栏 -->
-      <div class="content-area">
-        <!-- 左侧：文件上传、模型选择与操作面板 -->
-        <div class="left-panel">
-          <!-- 数据集上传区域 -->
-          <section class="panel-section">
-            <h2>步骤一：选择训练集</h2>
+    <div class="content-area">
+      <!-- 左侧：文件上传、模型选择与操作面板 -->
+      <div class="left-panel">
+        <!-- 数据集上传区域 -->
+        <section class="panel-section" :class="{ 'is-collapsed': isStepCollapsed[0], 'completed': stepCompleted[0] }">
+          <div class="panel-header" @click="toggleStep(0)">
+            <div class="step-status">
+              <h2>步骤一：选择训练集</h2>
+              <span v-if="stepCompleted[0]" class="completed-text">已完成</span>
+              <el-icon v-if="stepCompleted[0]" class="completed-icon"><Check /></el-icon>
+            </div>
+            <el-button type="text" class="toggle-button">
+              {{ isStepCollapsed[0] ? '展开' : '收起' }}
+              <el-icon class="toggle-icon" :class="{ 'is-rotate': !isStepCollapsed[0] }">
+                <arrow-down />
+              </el-icon>
+            </el-button>
+          </div>
+          <div class="panel-content" v-show="!isStepCollapsed[0]">
             <FileUploader
               :processing="processing"
               :acceptedFormats="['csv']"
@@ -20,22 +44,50 @@
               @file-selected="onFileSelected"
             />
             <p class="upload-tip">请上传CSV文件，且不超过200MB</p>
-          </section>
+          </div>
+        </section>
 
-          <!-- 文件信息区域 -->
-          <section class="panel-section">
-            <h2>步骤二：确认文件并上传</h2>
+        <!-- 文件信息区域 -->
+        <section class="panel-section" :class="{ 'is-collapsed': isStepCollapsed[1], 'completed': stepCompleted[1] }">
+          <div class="panel-header" @click="toggleStep(1)">
+            <div class="step-status">
+              <h2>步骤二：确认文件并上传</h2>
+              <span v-if="stepCompleted[1]" class="completed-text">已完成</span>
+              <el-icon v-if="stepCompleted[1]" class="completed-icon"><Check /></el-icon>
+            </div>
+            <el-button type="text" class="toggle-button">
+              {{ isStepCollapsed[1] ? '展开' : '收起' }}
+              <el-icon class="toggle-icon" :class="{ 'is-rotate': !isStepCollapsed[1] }">
+                <arrow-down />
+              </el-icon>
+            </el-button>
+          </div>
+          <div class="panel-content" v-show="!isStepCollapsed[1]">
             <FileInfo 
               :fileInfo="fileInfo" 
               @remove-file="removeSelectedFile"
               @start-upload="handleManualUpload"
               :disabled="!selectedFile"
             />
-          </section>
+          </div>
+        </section>
 
-          <!-- 模型选择区域 -->
-          <section class="panel-section">
-            <h2>步骤三：设置训练模型</h2>
+        <!-- 模型选择区域 -->
+        <section class="panel-section" :class="{ 'is-collapsed': isStepCollapsed[2], 'completed': stepCompleted[2] }">
+          <div class="panel-header" @click="toggleStep(2)">
+            <div class="step-status">
+              <h2>步骤三：设置训练模型</h2>
+              <span v-if="stepCompleted[2]" class="completed-text">已完成</span>
+              <el-icon v-if="stepCompleted[2]" class="completed-icon"><Check /></el-icon>
+            </div>
+            <el-button type="text" class="toggle-button">
+              {{ isStepCollapsed[2] ? '展开' : '收起' }}
+              <el-icon class="toggle-icon" :class="{ 'is-rotate': !isStepCollapsed[2] }">
+                <arrow-down />
+              </el-icon>
+            </el-button>
+          </div>
+          <div class="panel-content" v-show="!isStepCollapsed[2]">
             <ModelSelector 
               :fileId="fileId" 
               :processing="processing" 
@@ -49,11 +101,25 @@
               @custom-params-change="onCustomParamsChange"
               @reset="confirmReset"
             />
-          </section>
+          </div>
+        </section>
 
-          <!-- 操作面板区域 -->
-          <section class="panel-section">
-            <h2>步骤四：启动训练</h2>
+        <!-- 操作面板区域 -->
+        <section class="panel-section" :class="{ 'is-collapsed': isStepCollapsed[3], 'completed': stepCompleted[3] }">
+          <div class="panel-header" @click="toggleStep(3)">
+            <div class="step-status">
+              <h2>步骤四：启动训练</h2>
+              <span v-if="stepCompleted[3]" class="completed-text">已完成</span>
+              <el-icon v-if="stepCompleted[3]" class="completed-icon"><Check /></el-icon>
+            </div>
+            <el-button type="text" class="toggle-button">
+              {{ isStepCollapsed[3] ? '展开' : '收起' }}
+              <el-icon class="toggle-icon" :class="{ 'is-rotate': !isStepCollapsed[3] }">
+                <arrow-down />
+              </el-icon>
+            </el-button>
+          </div>
+          <div class="panel-content" v-show="!isStepCollapsed[3]">
             <div v-if="!fileInfo || !selectedModel" class="empty-operation-panel">
               <el-icon class="empty-icon"><InfoFilled /></el-icon>
               <p class="empty-text">请完成文件上传和模型选择</p>
@@ -71,28 +137,36 @@
               @start-prediction="startPrediction"
               @download-file="downloadFile"
               @fetch-daily-metrics="fetchDailyMetrics"
+              @check-status="forceCheckStatus"
             />
-          </section>
-        </div>
-
-        <!-- 右侧：日志展示区域 -->
-        <div class="right-panel">
-          <!-- 训练日志区域 -->
-          <section class="panel-section log-section">
-            <h2>训练日志</h2>
-            <div v-if="!logs" class="empty-log-panel">
-              <el-icon class="empty-icon"><InfoFilled /></el-icon>
-              <p class="empty-text">暂无日志信息</p>
-            </div>
-            <LogViewer 
-              v-if="logs"
-              :logs="logs" 
-              @clear-logs="clearLogs"
-            />
-          </section>
-        </div>
+          </div>
+        </section>
       </div>
-    
+    </div>
+
+    <!-- 浮动日志面板 -->
+    <div class="log-section" :class="{ 'log-expanded': logVisible }">
+      <div class="log-header" @click="toggleLogVisible">
+        <h3 class="section-title">训练日志</h3>
+        <el-button type="text" class="toggle-button">
+          {{ logVisible ? '收起' : '展开' }}
+          <el-icon class="toggle-icon" :class="{ 'is-rotate': logVisible }">
+            <arrow-down />
+          </el-icon>
+        </el-button>
+      </div>
+      <div v-if="logVisible" class="log-content-wrapper">
+        <div v-if="!logs" class="empty-log-panel">
+          <el-icon class="empty-icon"><InfoFilled /></el-icon>
+          <p class="empty-text">暂无日志信息</p>
+        </div>
+        <LogViewer 
+          v-if="logs"
+          :logs="logs" 
+          @clear-logs="clearLogs"
+        />
+      </div>
+    </div>
 
     <!-- 上传进度与加载提示 -->
     <UploadProgress 
@@ -126,7 +200,7 @@
 </template>
 
 <script>
-import { upload_train_csv, modeltrain } from '@/services/apiService';  
+import { upload_train_csv, modeltrain, checkTrainingStatus } from '@/services/apiService';  
 import { useSocket } from '@/composables/useSocket'; 
 import FileUploader from './FileUploader.vue';
 import FileInfo from './FileInfo.vue';
@@ -135,6 +209,7 @@ import PredictionButtons from './PredictionButtons.vue';
 import LogViewer from './LogViewer.vue';
 import LoadingIndicator from './LoadingIndicator.vue';
 import UploadProgress from './UploadProgress.vue';
+import { InfoFilled, ArrowDown, Check, Refresh } from '@element-plus/icons-vue';
 import Papa from 'papaparse';
 import axios from 'axios';
 import { Chart, CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend, LineController } from 'chart.js';
@@ -159,6 +234,10 @@ export default {
     LogViewer,
     LoadingIndicator,
     UploadProgress,
+    InfoFilled,
+    ArrowDown,
+    Check,
+    Refresh,
   },
   data() {
     return {
@@ -183,7 +262,17 @@ export default {
       dailyMetrics: null,
       chartData: null,
       chartInstances: [],
+      trainingTimeoutCheck: null,
+      statusCheckInterval: null,
+      logVisible: false,
+      isStepCollapsed: [false, false, false, false],
+      stepCompleted: [false, false, false, false],
     };
+  },
+  computed: {
+    hasAnyData() {
+      return !!(this.fileId || this.selectedFile || this.selectedModel || this.fileInfo || this.logs || this.chartData);
+    }
   },
   methods: {
     onFileSelected(file) {
@@ -203,6 +292,13 @@ export default {
       if (response.file_id) {
         this.fileId = response.file_id;
         this.$message.success('文件上传成功！请点击选择模型类型。');
+        this.stepCompleted[0] = true;
+        this.stepCompleted[1] = true;
+        setTimeout(() => {
+          this.isStepCollapsed[0] = true;
+          this.isStepCollapsed[1] = true;
+          this.isStepCollapsed[2] = false;
+        }, 500);
       }
       if (response.download_url) {
         this.downloadUrl = `${this.backendBaseUrl}${response.download_url}`;
@@ -221,11 +317,28 @@ export default {
       this.$message.error(`文件上传失败：${error.message || '未知错误'}`);
     },
     removeSelectedFile() {
-      this.resetState();
-      this.$message.info('已删除选中的文件。');
+      this.$confirm('确定要删除选中的文件吗？此操作不可恢复。', '删除确认', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.resetState();
+        this.$message({
+          type: 'success',
+          message: '文件已删除'
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     },
     onModelSelected(model) {
       this.selectedModel = model;
+      if (model) {
+        this.isStepCollapsed[3] = false;
+      }
     },
     onWindFarmCapacityChange(value) {
       this.wfCapacity = value;
@@ -258,7 +371,6 @@ export default {
       });
     },
     resetTraining() {
-      // 重置所有训练相关的状态
       this.selectedModel = null;
       this.wfCapacity = 453.5;
       this.trainRatio = 0.9;
@@ -268,14 +380,15 @@ export default {
       this.predictionstate = false;
       this.chartData = null;
       
-      // 清空图表实例
       if (this.chartInstances && this.chartInstances.length > 0) {
         this.chartInstances.forEach(chart => chart.destroy());
         this.chartInstances = [];
       }
       
-      // 清空日志
       this.logs = '';
+      this.clearTimers();
+      this.isStepCollapsed = [false, false, false, false];
+      this.stepCompleted = [false, false, false, false];
     },
     handleManualUpload() {
       if (!this.selectedFile) {
@@ -302,11 +415,41 @@ export default {
         this.$message.error('请先选择文件并指定模型！');
         return;
       }
-      this.processing = true;
       
-      // 使用modeltrain函数
+      this.stepCompleted[2] = true;
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.isStepCollapsed[2] = true;
+        }, 300);
+      });
+
+      this.clearTimers();
+      
+      this.processing = true;
+      this.predictionstate = true;
+      
+      this.initializeSocket();
+      
+      this.trainingTimeoutCheck = setTimeout(() => {
+        if (this.processing) {
+          this.logs += `[系统消息] 训练时间较长，正在检查状态...\n`;
+          this.checkTrainingStatus();
+        }
+      }, 120000);
+      
+      this.statusCheckInterval = setInterval(() => {
+        if (this.processing) {
+          console.log('定期检查训练状态...');
+          this.checkTrainingStatus();
+        } else {
+          this.clearTimers();
+        }
+      }, 30000);
+      
       modeltrain(this.fileId, this.selectedModel, this.wfCapacity, this.trainRatio, this.customParams)
         .then(response => {
+          this.clearTimers();
+          
           if (response.data.download_url) {
             this.downloadUrl = `${this.backendBaseUrl}${response.data.download_url}`;
             this.$message.success('预测完成！您可以下载预测结果。');
@@ -319,31 +462,222 @@ export default {
           } else {
             this.$message.error('预测完成，但未返回报告下载链接。');
           }
+          
+          this.processing = false;
         })
         .catch(error => {
-          this.$message.error(`预测失败：${error.response?.data?.error || '未知错误'}`);
-        })
-        .finally(() => {
-          this.processing = false;
+          console.error('训练请求错误:', error);
+          if (error.response && error.response.status === 500) {
+            this.$message.warning('模型训练请求超时，但后端仍在继续处理。训练过程将通过日志区域显示，请耐心等待。');
+          } else {
+            this.$message.error(`预测失败：${error.response?.data?.error || '未知错误'}`);
+            this.processing = false;
+            this.clearTimers();
+          }
         });
-      this.predictionstate = true;
     },
     downloadFile(downloadUrl) {
       window.open(downloadUrl);
     },
     initializeSocket() {
       if (this.socket) return;
+      
       this.socket = useSocket(this.backendBaseUrl, { path: '/socket.io', transports: ['websocket'] });
-      this.socket.on('connect', () => {});
+      
+      this.socket.on('connect', () => {
+        console.log('Socket连接成功');
+        
+        if (this.processing && this.fileId) {
+          this.checkTrainingStatus();
+        }
+      });
+      
       this.socket.on('log', (data) => {
-        this.logs += `${data.message}\n`;
+        const message = data.message;
+        let messageClass = 'log-message';
+        
+        // 根据消息内容判断类型
+        if (message.includes('[系统消息]')) {
+          messageClass = 'system-message';
+        } else if (message.includes('错误') || message.includes('失败')) {
+          messageClass = 'error-message';
+        } else if (message.includes('成功') || message.includes('完成')) {
+          messageClass = 'success-message';
+        } else if (message.includes('警告') || message.includes('注意')) {
+          messageClass = 'warning-message';
+        }
+        
+        this.logs += `<div class="${messageClass}">${message}</div>\n`;
+        
         this.$nextTick(() => {
           const logContent = this.$el.querySelector('.log-content');
           if (logContent) {
             logContent.scrollTop = logContent.scrollHeight;
           }
         });
+        
+        this.checkTrainingCompletionFromLog(message);
       });
+      
+      this.socket.on('error', (error) => {
+        console.error('Socket错误:', error);
+        this.$message.error(`Socket连接错误: ${error}`);
+      });
+      
+      this.socket.on('disconnect', (reason) => {
+        console.log('Socket连接断开:', reason);
+        this.logs += `[系统消息] Socket连接已断开: ${reason}\n`;
+        
+        setTimeout(() => {
+          if (this.processing) {
+            console.log('正在尝试重新连接Socket...');
+            this.socket.connect();
+          }
+        }, 3000);
+      });
+      
+      this.socket.on('reconnect', (attemptNumber) => {
+        console.log(`Socket重新连接成功，尝试次数: ${attemptNumber}`);
+        this.logs += `[系统消息] Socket已重新连接，尝试次数: ${attemptNumber}\n`;
+        
+        if (this.processing && this.fileId) {
+          this.checkTrainingStatus();
+        }
+      });
+    },
+    checkTrainingCompletionFromLog(message) {
+      if (!message) return;
+      
+      const completionKeywords = [
+        '训练完成', 'Training completed', '下载链接', 
+        '预测文件下载url', '训练报告下载url',
+        '测试集评估完成', '总体评估指标', 'MAE:',
+        '将原生报告复制到以下路径'
+      ];
+      
+      const isCompleted = completionKeywords.some(keyword => message.includes(keyword));
+      
+      if (isCompleted) {
+        this.extractDownloadLinks(message);
+        
+        if (this.processing) {
+          console.log('从日志中检测到训练完成信号');
+          this.processing = false;
+          this.$message.success('模型训练已完成！');
+          this.clearTimers();
+          this.stepCompleted[3] = true;
+        }
+      }
+    },
+    extractDownloadLinks(message) {
+      const predictUrlPattern = /预测文件下载url为:\s+([^\s]+)/;
+      const predictMatch = message.match(predictUrlPattern);
+      if (predictMatch && predictMatch[1]) {
+        this.downloadUrl = `${this.backendBaseUrl}${predictMatch[1]}`;
+        console.log('提取到预测文件下载链接:', this.downloadUrl);
+      }
+      
+      const reportUrlPattern = /训练报告下载url为:\s+([^\s]+)/;
+      const reportMatch = message.match(reportUrlPattern);
+      if (reportMatch && reportMatch[1]) {
+        this.reportDownloadUrl = `${this.backendBaseUrl}${reportMatch[1]}`;
+        console.log('提取到报告下载链接:', this.reportDownloadUrl);
+      }
+    },
+    clearTimers() {
+      if (this.trainingTimeoutCheck) {
+        clearTimeout(this.trainingTimeoutCheck);
+        this.trainingTimeoutCheck = null;
+      }
+      
+      if (this.statusCheckInterval) {
+        clearInterval(this.statusCheckInterval);
+        this.statusCheckInterval = null;
+      }
+    },
+    async checkTrainingStatus(forceCheck = false) {
+      if (!this.fileId) return;
+      
+      try {
+        console.log('主动检查训练状态...');
+        if (!forceCheck) {
+          this.logs += `<div class="system-message">[系统消息] 正在检查训练状态...</div>\n`;
+        }
+        
+        const response = await checkTrainingStatus(this.fileId);
+        
+        console.log('训练状态检查结果:', response.data);
+        
+        if (response.data.status === 'completed') {
+          this.processing = false;
+          this.$message.success('模型训练已完成！');
+          
+          if (response.data.download_url) {
+            this.downloadUrl = `${this.backendBaseUrl}${response.data.download_url}`;
+            console.log('已更新下载链接:', this.downloadUrl);
+          }
+          
+          if (response.data.report_download_url) {
+            this.reportDownloadUrl = `${this.backendBaseUrl}${response.data.report_download_url}`;
+            console.log('已更新报告链接:', this.reportDownloadUrl);
+          }
+          
+          this.logs += `<div class="success-message">[系统消息] 训练已完成，可以下载结果。</div>\n`;
+          this.clearTimers();
+        } else if (response.data.status === 'in_progress') {
+          this.logs += `<div class="system-message">[系统消息] 训练仍在进行中，请耐心等待。</div>\n`;
+          
+          if (forceCheck) {
+            this.checkLogForCompletion();
+          }
+        } else {
+          this.logs += `<div class="warning-message">[系统消息] 未能获取清晰的训练状态，正在分析日志...</div>\n`;
+          this.checkLogForCompletion();
+        }
+      } catch (error) {
+        console.error('检查训练状态失败:', error);
+        this.logs += `[系统消息] 检查训练状态失败: ${error.message}\n`;
+        
+        if (forceCheck) {
+          this.checkLogForCompletion();
+        }
+      }
+    },
+    checkLogForCompletion() {
+      if (!this.logs) return;
+      
+      this.logs += `<div class="system-message">[系统消息] 正在分析日志内容...</div>\n`;
+      
+      const logLines = this.logs.split('\n');
+      let foundCompletionSignal = false;
+      
+      for (const line of logLines) {
+        if (line.includes('总体评估指标') || 
+            line.includes('MAE:') ||
+            line.includes('MSE:') ||
+            line.includes('RMSE:') ||
+            line.includes('ACC:') || 
+            line.includes('PE:') ||
+            line.includes('K:')) {
+          foundCompletionSignal = true;
+          console.log('在日志中找到评估指标:', line);
+        }
+        
+        if (line.includes('预测文件下载url为:') || 
+            line.includes('训练报告下载url为:')) {
+          foundCompletionSignal = true;
+          this.extractDownloadLinks(line);
+          console.log('在日志中找到下载链接:', line);
+        }
+      }
+      
+      if (foundCompletionSignal && this.processing) {
+        this.processing = false;
+        this.$message.success('根据日志分析，模型训练已完成！');
+        this.clearTimers();
+        this.logs += `<div class="success-message">[系统消息] 根据日志分析，训练已完成</div>\n`;
+        this.stepCompleted[3] = true;
+      }
     },
     clearLogs() {
       this.logs = '';
@@ -361,6 +695,9 @@ export default {
       this.predictionstate = false;
       this.trainRatio = 0.9;
       this.customParams = null;
+      this.clearTimers();
+      this.isStepCollapsed = [false, false, false, false];
+      this.stepCompleted = [false, false, false, false];
     },
     async fetchDailyMetrics() {
       if (!this.fileId) {
@@ -376,7 +713,6 @@ export default {
           return;
         }
 
-        // 使用 Promise 包装 Papa.parse
         const parseData = new Promise((resolve) => {
           Papa.parse(response.data, {
             complete: (result) => {
@@ -448,11 +784,9 @@ export default {
         return;
       }
 
-      // 先清空之前的图表数据
       this.chartData = null;
       await this.$nextTick();
 
-      // 设置新的图表数据
       this.chartData = [
         { label: '平均绝对误差 MAE', data: maeValues, borderColor: '#4caf50', backgroundColor: 'rgba(76, 175, 80, 0.2)', fill: true },
         { label: '均方误差 MSE', data: mseValues, borderColor: '#ff5722', backgroundColor: 'rgba(255, 87, 34, 0.2)', fill: true },
@@ -466,7 +800,6 @@ export default {
       this.renderCharts(labels);
     },
     renderCharts(labels) {
-      // 确保之前的图表实例被销毁
       if (this.chartInstances) {
         this.chartInstances.forEach(chart => chart.destroy());
       }
@@ -477,7 +810,6 @@ export default {
         if (canvas) {
           const ctx = canvas.getContext('2d');
           
-          // 计算平均值
           const meanValue = dataset.data.reduce((a, b) => a + b, 0) / dataset.data.length;
           
           const chart = new Chart(ctx, {
@@ -516,14 +848,51 @@ export default {
       });
     },
     beforeDestroy() {
+      this.clearTimers();
       if (this.socket) {
         this.socket.disconnect();
         this.socket = null;
       }
-      // 确保组件销毁时清理图表实例
       if (this.chartInstances) {
         this.chartInstances.forEach(chart => chart.destroy());
       }
+    },
+    forceCheckStatus() {
+      if (!this.fileId) {
+        this.$message.warning('没有正在进行的训练任务');
+        return;
+      }
+      
+      this.$message.info('正在检查训练状态...');
+      this.logs += `[系统消息] 用户手动触发状态检查\n`;
+      
+      this.checkTrainingStatus(true);
+    },
+    toggleLogVisible() {
+      this.logVisible = !this.logVisible;
+    },
+    toggleStep(index) {
+      this.isStepCollapsed[index] = !this.isStepCollapsed[index];
+    },
+    confirmResetAll() {
+      this.$confirm('确定要重置所有训练数据吗？这将清除当前的所有设置、日志和结果。', '重置确认', {
+        confirmButtonText: '确定重置',
+        cancelButtonText: '取消',
+        type: 'warning',
+        confirmButtonClass: 'el-button--danger'
+      }).then(() => {
+        this.resetState();
+        this.clearLogs();
+        this.$message({
+          type: 'success',
+          message: '已重置所有训练数据'
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消重置'
+        });
+      });
     },
   },
 };
@@ -532,11 +901,14 @@ export default {
 <style scoped>
 .model-train-container {
   min-height: 100vh;
-  padding: 40px;
+  padding: 20px;
   background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 @keyframes gradient {
@@ -551,148 +923,369 @@ export default {
   }
 }
 
+.header-section {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.reset-all-button {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.reset-all-button:hover {
+  transform: translateY(-50%) translateX(-2px);
+}
+
+.reset-all-button :deep(.el-icon) {
+  font-size: 16px;
+}
+
 .page-title {
   color: white;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.content-area {
-  display: flex;
-  gap: 32px;
-  margin-bottom: 40px;
-  min-height: calc(100vh - 200px);
-  align-items: stretch;
-}
-
-.left-panel, .right-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  font-size: 28px;
+  margin: 0;
+  text-align: center;
   flex: 1;
 }
 
-.left-panel {
+.content-area {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 40px;
   display: flex;
   flex-direction: column;
-  min-height: 600px;
+  gap: 16px;
+}
+
+.left-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
 }
 
 .panel-section {
   background: #ffffff;
-  border: 1px solid #ebeef5;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 24px;
-  padding: 32px;
-  margin-bottom: 24px;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.panel-section:last-child {
-  margin-bottom: 0;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  will-change: max-height;
 }
 
 .panel-section:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--hover-shadow);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  cursor: pointer;
+  background: #ffffff;
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.panel-section.is-collapsed .panel-header {
+  border-bottom-color: transparent;
+}
+
+.panel-section:not(.is-collapsed) .panel-header {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.panel-content {
+  padding: 20px;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.panel-section.is-collapsed .panel-content {
+  opacity: 0;
+  height: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .panel-section h2 {
-  margin: 0 0 24px;
-  font-size: 20px;
+  margin: 0;
+  font-size: 16px;
   font-weight: 600;
   color: #1d1d1f;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.panel-section h3 {
-  margin: 0 0 16px;
-  font-size: 18px;
-  font-weight: 500;
-  color: #1d1d1f;
+.panel-section .toggle-button {
+  color: #606266;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.panel-section .toggle-icon {
+  margin-left: 4px;
+  transition: transform 0.3s ease;
+  font-size: 12px;
+}
+
+.panel-section .toggle-icon.is-rotate {
+  transform: rotate(180deg);
+}
+
+.panel-section.is-collapsed {
+  background: #f8f9fa;
+  max-height: 56px;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: max-height;
+}
+
+.panel-section:not(.is-collapsed) {
+  max-height: 800px;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: max-height;
+}
+
+.panel-section.is-collapsed.completed .panel-header {
+  background: #f0f9ff;
+}
+
+.panel-header .step-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-status .completed-text {
+  color: #0077ED;
+  font-size: 13px;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+}
+
+.panel-section.is-collapsed.completed .step-status .completed-text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.step-status .completed-icon {
+  color: #0077ED;
+  font-size: 16px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s ease;
+}
+
+.panel-section.is-collapsed.completed .step-status .completed-icon {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .upload-tip {
   color: #606266;
-  margin-top: 12px;
-  font-size: 13px;
+  margin-top: 8px;
+  font-size: 12px;
   text-align: center;
 }
 
-.log-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 600px;
-  margin-bottom: 0;
+.hero-section {
+  text-align: center;
+  padding: 20px;
+  position: relative;
+  margin-bottom: 20px;
 }
 
-.log-section .log-content {
-  flex: 1;
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  font-family: 'SF Mono', Menlo, monospace;
-  font-size: 13px;
-  line-height: 1.5;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #909399 #f4f4f5;
-}
-
-.log-section .log-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.log-section .log-content::-webkit-scrollbar-track {
-  background: #f4f4f5;
-  border-radius: 3px;
-}
-
-.log-section .log-content::-webkit-scrollbar-thumb {
-  background: #909399;
-  border-radius: 3px;
-}
-
-.log-section .log-content::-webkit-scrollbar-thumb:hover {
-  background: #606266;
+.hero-section::before,
+.hero-section::after {
+  font-size: 18px;
+  opacity: 0.5;
 }
 
 .charts-section {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
   background: #ffffff;
-  border: 1px solid #ebeef5;
-  padding: 32px;
-  border-radius: 20px;
-  margin-top: 32px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 }
 
 .charts-section h2 {
-  margin: 0 0 24px;
-  font-size: 20px;
+  margin: 0 0 16px;
+  font-size: 16px;
   font-weight: 600;
   color: #1d1d1f;
 }
 
 .chart-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin: 0;
 }
 
 .chart-wrapper {
   aspect-ratio: 16/9;
   background: #fff;
-  border-radius: 12px;
-  padding: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  min-height: 200px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
 }
 
-@media (max-width: 1200px) {
-  .content-area {
-    grid-template-columns: 1fr;
+.empty-operation-panel, .empty-log-panel {
+  padding: 20px;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px dashed #e4e7ed;
+}
+
+.empty-icon {
+  font-size: 20px;
+  color: #909399;
+  margin-bottom: 8px;
+}
+
+.empty-text {
+  color: #909399;
+  font-size: 13px;
+  text-align: center;
+  margin: 0;
+}
+
+/* 日志面板样式优化 */
+.log-section {
+  position: fixed;
+  bottom: 0;
+  right: 16px;
+  width: 360px;
+  background: #ffffff;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1000;
+  max-height: 40px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.log-expanded {
+  max-height: 360px;
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  cursor: pointer;
+  background: linear-gradient(90deg, #0077ED, #00A2FF);
+  border-radius: 8px 8px 0 0;
+  height: 40px;
+}
+
+.log-header .section-title {
+  color: white;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.toggle-button {
+  color: white !important;
+  font-size: 13px;
+  padding: 0;
+}
+
+.toggle-icon {
+  margin-left: 4px;
+  transition: transform 0.3s ease;
+  font-size: 12px;
+}
+
+.toggle-icon.is-rotate {
+  transform: rotate(180deg);
+}
+
+.log-content-wrapper {
+  padding: 12px;
+  max-height: 320px;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1d1d1f;
+  background-color: #ffffff;
+}
+
+/* 为不同类型的日志消息设置不同的颜色 */
+:deep(.log-content) {
+  .system-message {
+    color: #606266;
+    font-style: italic;
   }
   
-  .panel-section {
-    padding: 24px;
+  .error-message {
+    color: #f56c6c;
+  }
+  
+  .success-message {
+    color: #67c23a;
+  }
+  
+  .warning-message {
+    color: #e6a23c;
+  }
+  
+  /* 普通日志消息 */
+  .log-message {
+    color: #1d1d1f;
+  }
+}
+
+@media (max-width: 840px) {
+  .content-area {
+    margin-bottom: 60px;
+  }
+  
+  .content-area,
+  .charts-section {
+    max-width: 100%;
+    padding: 16px;
   }
   
   .chart-grid {
@@ -702,78 +1295,101 @@ export default {
 
 @media (max-width: 768px) {
   .model-train-container {
-    padding: 24px 16px;
+    padding: 16px;
+  }
+  
+  .header-section {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .reset-all-button {
+    position: static;
+    transform: none;
+    width: 100%;
+    justify-content: center;
   }
   
   .page-title {
-    font-size: 28px;
-    margin-bottom: 32px;
+    text-align: center;
+    font-size: 24px;
   }
   
   .panel-section {
-    padding: 20px;
+    padding: 16px;
+  }
+  
+  .log-section {
+    width: calc(100% - 32px);
+    right: 16px;
   }
 }
 
-/* 新增动效 */
-.section-enter-active, .section-leave-active {
-  transition: all 0.3s ease;
-}
-.section-enter, .section-leave-to {
-  opacity: 0;
-  transform: translateY(20px);
+/* 自定义滚动条样式 */
+.log-content-wrapper::-webkit-scrollbar {
+  width: 4px;
 }
 
-.empty-operation-panel, .empty-log-panel {
-  padding: 32px;
-  min-height: 120px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+.log-content-wrapper::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 2px;
 }
 
-.empty-icon {
-  font-size: 24px;
-  color: #909399;
-  margin-bottom: 12px;
+.log-content-wrapper::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 2px;
 }
 
-.empty-text {
-  color: #909399;
-  font-size: 14px;
-  text-align: center;
-  margin: 0;
+.log-content-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
 }
 
-/* 进度条样式 */
-.el-progress-bar__inner {
-  background: var(--primary-gradient) !important;
+/* 统一按钮样式 */
+:deep(.el-button) {
+  --el-button-bg-color: #0077ED !important;
+  --el-button-border-color: transparent !important;
+  --el-button-text-color: #ffffff !important;
+  --el-button-hover-text-color: #ffffff !important;
+  --el-button-hover-bg-color: #1890ff !important;
+  --el-button-hover-border-color: transparent !important;
+  --el-button-active-bg-color: #0062d1 !important;
+  --el-button-active-border-color: transparent !important;
+  --el-button-disabled-bg-color: #a8d4ff !important;
+  --el-button-disabled-border-color: transparent !important;
 }
 
-/* 添加 Hero Section 样式 */
-.hero-section {
-  text-align: center;
-  padding: 60px 20px;
-  position: relative;
+:deep(.el-button--primary),
+:deep(.el-button--success),
+:deep(.el-button--default) {
+  color: #ffffff !important;
+  background-color: #0077ED !important;
+  border-color: transparent !important;
+  outline: none !important;
 }
 
-.hero-section::before {
-  content: "✨";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  font-size: 24px;
-  opacity: 0.7;
+:deep(.el-button--primary:hover),
+:deep(.el-button--success:hover),
+:deep(.el-button--default:hover) {
+  background-color: #1890ff !important;
+  border-color: transparent !important;
+  outline: none !important;
 }
 
-.hero-section::after {
-  content: "✨";
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  font-size: 24px;
-  opacity: 0.7;
+:deep(.el-button--primary:active),
+:deep(.el-button--success:active),
+:deep(.el-button--default:active) {
+  background-color: #0062d1 !important;
+  border-color: transparent !important;
+  outline: none !important;
+}
+
+:deep(.el-button--primary.is-disabled),
+:deep(.el-button--success.is-disabled),
+:deep(.el-button--default.is-disabled) {
+  background-color: #a8d4ff !important;
+  border-color: transparent !important;
+  outline: none !important;
 }
 </style>
 

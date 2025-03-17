@@ -14,8 +14,14 @@ import uuid
 # 预测蓝图
 modeltrain_bp = Blueprint('modeltrain', __name__)
 
+# 增加训练状态存储
+training_status = {}
+
 @modeltrain_bp.route('/modeltrain', methods=['POST'])
-def modeltrain():
+def train_model():
+    """
+    模型训练入口
+    """
     data = request.get_json()
     current_app.logger.info(f"收到模型训练请求: {data}")
     if not data or 'file_id' not in data or 'model' not in data or 'wfcapacity' not in data:
@@ -25,17 +31,13 @@ def modeltrain():
     file_id = data['file_id']
     model = data['model']
     wfcapacity = pd.to_numeric(data['wfcapacity'])
-    
-    # 获取训练集占比参数，默认为0.9
     train_ratio = 0.9
     if 'train_ratio' in data:
         train_ratio = pd.to_numeric(data['train_ratio'])
-        # 确保train_ratio在有效范围内
         if train_ratio < 0.1 or train_ratio > 0.95:
             current_app.logger.warning(f"训练集占比超出有效范围: {train_ratio}")
             return jsonify({'error': "训练集占比必须在0.1到0.95之间"}), 400
     
-    # 获取自定义参数
     custom_params = None
     if model == 'CUSTOM' and 'custom_params' in data:
         custom_params = data['custom_params']
@@ -47,6 +49,13 @@ def modeltrain():
     if not upload_path:
         current_app.logger.warning(f"没有找到对应id的训练集: {file_id}")
         return jsonify({'error': '无效的 file_id'}), 400
+
+    # 初始化状态记录
+    training_status[file_id] = {
+        "status": "in_progress",
+        "message": "训练已开始",
+        "start_time": datetime.datetime.now().isoformat()
+    }
 
     # 运行预测与后处理
     try:
@@ -205,6 +214,31 @@ def modeltrain():
     finally:
         db.close()
 
+    # 在训练成功完成后更新状态
+    def update_success_status(forecast_filename, report_filename=None):
+        status_info = {
+            "status": "completed",
+            "message": "训练已完成",
+            "end_time": datetime.datetime.now().isoformat(),
+            "download_url": f"/download/{forecast_filename}"
+        }
+        
+        if report_filename:
+            status_info["report_download_url"] = f"/download/{report_filename}"
+            
+        training_status[file_id] = status_info
+    
+    # 在训练失败时更新状态
+    def update_failure_status(error_message):
+        training_status[file_id] = {
+            "status": "failed",
+            "message": f"训练失败: {error_message}",
+            "end_time": datetime.datetime.now().isoformat()
+        }
+    
+    # 在返回响应前更新状态信息
+    update_success_status(output_filename, report_output_filename)
+
     return jsonify({
         'download_url': download_url,
         'report_download_url': report_download_url
@@ -236,3 +270,61 @@ def get_daily_metrics():
 
     # 返回 CSV 文件内容给前端
     return send_file(daily_metrics_path, mimetype='text/csv', as_attachment=False)
+
+@modeltrain_bp.route('/check-training-status', methods=['GET'])
+def check_training_status():
+    """检查训练状态的接口
+    
+    根据file_id查询训练状态和结果链接
+    """
+    file_id = request.args.get('file_id')
+    
+    if not file_id:
+        return jsonify({"error": "缺少file_id参数"}), 400
+    
+    # 从状态字典中获取该训练任务的状态
+    status_info = training_status.get(file_id, {})
+    
+    # 如果找不到状态记录，尝试检查文件是否存在
+    if not status_info:
+        # 查找是否有对应的结果文件
+        forecast_pattern = f"forecast_train_test_{file_id}_*.csv"
+        report_pattern = f"report_train_test_{file_id}_*.txt"
+        
+        forecast_files = glob.glob(os.path.join(current_app.config['FORECAST_FOLDER'], forecast_pattern))
+        report_files = glob.glob(os.path.join(current_app.config['FORECAST_FOLDER'], report_pattern))
+        
+        if forecast_files or report_files:
+            # 文件存在，说明训练已完成
+            status_info = {
+                "status": "completed",
+                "message": "训练已完成"
+            }
+            
+            # 提取最新的文件
+            if forecast_files:
+                latest_forecast = max(forecast_files, key=os.path.getctime)
+                forecast_filename = os.path.basename(latest_forecast)
+                status_info["download_url"] = f"/download/{forecast_filename}"
+            
+            if report_files:
+                latest_report = max(report_files, key=os.path.getctime)
+                report_filename = os.path.basename(latest_report)
+                status_info["report_download_url"] = f"/download/{report_filename}"
+                
+            # 更新状态记录
+            training_status[file_id] = status_info
+        else:
+            # 检查是否存在正在进行的训练任务
+            if os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], f"{file_id}.csv")):
+                status_info = {
+                    "status": "in_progress",
+                    "message": "训练正在进行中"
+                }
+            else:
+                status_info = {
+                    "status": "not_found",
+                    "message": "未找到相关训练任务"
+                }
+    
+    return jsonify(status_info)
