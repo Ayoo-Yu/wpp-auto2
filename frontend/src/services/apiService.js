@@ -91,7 +91,15 @@ export const modeltrain = (fileId, model, wfcapacity, trainRatio, customParams =
     requestData.custom_params = customParams;
   }
   
-  return axios.post(`${backendBaseUrl}/modeltrain`, requestData);
+  return axios.post(`${backendBaseUrl}/modeltrain`, requestData, {
+    timeout: 1800000  // 设置3分钟超时，适当增加以适应大模型的初始化时间
+  });
+};
+
+export const checkTrainingStatus = (fileId) => {
+  return axios.get(`${backendBaseUrl}/check-training-status`, {
+    params: { file_id: fileId }
+  });
 };
 
 export const predict = (csvfileId, modelfileId, scalerfileId) => {

@@ -1,11 +1,25 @@
 // src/composables/useSocket.js
 import { io } from 'socket.io-client';
 
-export function useSocket(backendBaseUrl) {
-  const socket = io(backendBaseUrl);
+export function useSocket(backendBaseUrl, options = {}) {
+  // 设置默认选项并与传入的选项合并
+  const defaultOptions = {
+    reconnection: true,
+    reconnectionAttempts: 10,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    timeout: 20000,
+    ...options
+  };
+
+  const socket = io(backendBaseUrl, defaultOptions);
 
   socket.on('connect', () => {
     console.log('Connected to WebSocket server');
+  });
+
+  socket.on('connect_error', (error) => {
+    console.error('Connection error:', error);
   });
 
   socket.on('log', (data) => {
@@ -28,8 +42,25 @@ export function useSocket(backendBaseUrl) {
     console.log(data.message);
   });
 
-  socket.on('disconnect', () => {
-    console.log('Disconnected from WebSocket server');
+  socket.on('disconnect', (reason) => {
+    console.log(`Disconnected from WebSocket server: ${reason}`);
+    
+    // 如果是非客户端主动断开连接，尝试手动重连
+    if (reason === 'io server disconnect' || reason === 'transport close') {
+      socket.connect();
+    }
+  });
+
+  socket.on('reconnect', (attemptNumber) => {
+    console.log(`Reconnected to WebSocket server after ${attemptNumber} attempts`);
+  });
+
+  socket.on('reconnect_attempt', (attemptNumber) => {
+    console.log(`Reconnection attempt: ${attemptNumber}`);
+  });
+
+  socket.on('reconnect_failed', () => {
+    console.error('Failed to reconnect to WebSocket server after maximum attempts');
   });
 
   return socket;

@@ -45,6 +45,16 @@ body {
   height: 40px;
   font-weight: 500;
   letter-spacing: 0.3px;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.el-button span {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
 }
 
 .el-button--primary {
