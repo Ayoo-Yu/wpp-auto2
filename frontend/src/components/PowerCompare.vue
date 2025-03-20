@@ -1186,4 +1186,43 @@ canvas {
     width: 100%;
   }
 }
+
+/* 修复日期选择器底部按钮的样式 */
+:deep(.el-picker-panel) {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:deep(.el-picker-panel__footer) {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 8px 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+:deep(.el-picker-panel__footer .el-button) {
+  margin-left: 8px !important;
+  height: 32px;
+  min-width: 80px;
+  padding: 0 15px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+:deep(.el-picker-panel__footer .el-button--text) {
+  color: #606266;
+}
+
+/* 调整按钮容器 */
+:deep(.el-picker-panel__footer-buttons) {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+/* 覆盖清除按钮的排版 */
+:deep(.el-picker-panel .el-time-panel__btn.confirm) {
+  margin-left: 8px;
+}
 </style> 

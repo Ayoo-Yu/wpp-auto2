@@ -81,6 +81,45 @@ h1.page-title,
   letter-spacing: -0.003em;
 }
 
+/* 日期时间选择器面板底部按钮容器样式 */
+.el-picker-panel__footer,
+.el-time-panel__footer {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  padding: 8px 12px !important;
+  text-align: right !important;
+  border-top: 1px solid #EBEEF5 !important;
+}
+
+/* 底部按钮样式 */
+.el-picker-panel__footer .el-button,
+.el-time-panel__footer .el-button,
+.el-picker-panel__footer button,
+.el-time-panel__footer button,
+.el-picker-panel__link-btn,
+.el-time-panel__btn {
+  display: inline-block !important;
+  float: none !important;
+  margin: 0 0 0 8px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  font-size: 14px !important;
+  padding: 0 15px !important;
+  border-radius: 4px !important;
+  vertical-align: middle !important;
+  width: auto !important;
+  text-align: center !important;
+}
+
+/* 使用更高特异性选择器覆盖元素样式 */
+body .el-date-picker__footer button,
+body .el-date-range-picker__footer button,
+body .el-time-panel__footer button {
+  display: inline-block !important;
+  position: static !important;
+}
+
 .app-container {
   min-height: 100vh;
   background: #ffffff;
