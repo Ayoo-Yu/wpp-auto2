@@ -878,8 +878,7 @@ export default {
       this.$confirm('确定要重置所有训练数据吗？这将清除当前的所有设置、日志和结果。', '重置确认', {
         confirmButtonText: '确定重置',
         cancelButtonText: '取消',
-        type: 'warning',
-        confirmButtonClass: 'el-button--danger'
+        type: 'warning'
       }).then(() => {
         this.resetState();
         this.clearLogs();

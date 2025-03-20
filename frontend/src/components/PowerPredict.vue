@@ -762,9 +762,26 @@ export default {
       if (this.socket) return;
       this.socket = useSocket(this.backendBaseUrl, { path: '/socket.io', transports: ['websocket'] });
       this.socket.on('connect', () => {
+        // 连接成功逻辑
       });
+      
       this.socket.on('log', (data) => {
-        this.logs += `${data.message}\n`;
+        const message = data.message;
+        let messageClass = 'log-message';
+        
+        // 根据消息内容判断类型
+        if (message.includes('[系统消息]')) {
+          messageClass = 'system-message';
+        } else if (message.includes('错误') || message.includes('失败')) {
+          messageClass = 'error-message';
+        } else if (message.includes('成功') || message.includes('完成')) {
+          messageClass = 'success-message';
+        } else if (message.includes('警告') || message.includes('注意')) {
+          messageClass = 'warning-message';
+        }
+        
+        this.logs += `<div class="${messageClass}">${message}</div>\n`;
+        
         this.$nextTick(() => {
           const logContent = this.$el.querySelector('.log-content');
           if (logContent) {
@@ -931,6 +948,14 @@ export default {
   margin: 0 auto;
   padding: 0 40px;
   box-sizing: border-box;
+  padding-bottom: 60px;
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 @keyframes gradient {
@@ -1468,18 +1493,59 @@ export default {
   padding: 15px;
   max-height: 330px;
   overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1d1d1f;
+  background-color: #ffffff;
+}
+
+/* 为不同类型的日志消息设置不同的颜色 */
+:deep(.log-content) {
+  .system-message {
+    color: #606266;
+    font-style: italic;
+  }
+  
+  .error-message {
+    color: #f56c6c;
+  }
+  
+  .success-message {
+    color: #67c23a;
+  }
+  
+  .warning-message {
+    color: #e6a23c;
+  }
+  
+  /* 普通日志消息 */
+  .log-message {
+    color: #1d1d1f;
+  }
+}
+
+/* 自定义滚动条样式 */
+.log-content-wrapper::-webkit-scrollbar {
+  width: 4px;
+}
+
+.log-content-wrapper::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 2px;
+}
+
+.log-content-wrapper::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 2px;
+}
+
+.log-content-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
 }
 
 /* 确保日志查看器不会被其他元素遮挡 */
 .content-wrapper {
   padding-bottom: 60px;
-}
-
-.card-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 /* 优化FileUploader和FileInfo组件的样式 */

@@ -62,8 +62,10 @@
     >
       <p>{{ confirmDialog.message }}</p>
       <template #footer>
-        <el-button @click="confirmDialog.visible = false">取消</el-button>
-        <el-button type="primary" @click="executeConfirmedAction">确定</el-button>
+        <div class="dialog-footer-buttons">
+          <el-button type="primary" @click="executeConfirmedAction">确定</el-button>
+          <el-button @click="confirmDialog.visible = false">取消</el-button>
+        </div>
       </template>
     </el-dialog>
 
@@ -80,8 +82,10 @@
         value-format="HH:mm"
       />
       <template #footer>
-        <el-button @click="scheduleDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="setSchedule">确定</el-button>
+        <div class="dialog-footer-buttons">
+          <el-button type="primary" @click="setSchedule">确定</el-button>
+          <el-button @click="scheduleDialogVisible = false">取消</el-button>
+        </div>
       </template>
     </el-dialog>
 
@@ -93,7 +97,9 @@
     >
       <pre class="info-content">{{ scriptInfo }}</pre>
       <template #footer>
-        <el-button @click="scriptInfoDialogVisible = false">关闭</el-button>
+        <div class="dialog-footer-buttons">
+          <el-button @click="scriptInfoDialogVisible = false">关闭</el-button>
+        </div>
       </template>
     </el-dialog>
 
@@ -105,8 +111,10 @@
     >
       <pre class="logs-content">{{ logsContent }}</pre>
       <template #footer>
-        <el-button @click="logsDialogVisible = false">关闭</el-button>
-        <el-button type="primary" @click="fetchLogs(currentPrediction)">刷新</el-button>
+        <div class="dialog-footer-buttons">
+          <el-button type="primary" @click="fetchLogs(currentPrediction)">刷新</el-button>
+          <el-button @click="logsDialogVisible = false">关闭</el-button>
+        </div>
       </template>
     </el-dialog>
 
@@ -118,7 +126,9 @@
     >
       <pre class="error-content">{{ errorDetails }}</pre>
       <template #footer>
-        <el-button @click="errorDialogVisible = false">关闭</el-button>
+        <div class="dialog-footer-buttons">
+          <el-button @click="errorDialogVisible = false">关闭</el-button>
+        </div>
       </template>
     </el-dialog>
 
@@ -217,7 +227,9 @@
     >
       <pre class="history-detail-content">{{ historyDetailContent }}</pre>
       <template #footer>
-        <el-button @click="historyDetailDialogVisible = false">关闭</el-button>
+        <div class="dialog-footer-buttons">
+          <el-button @click="historyDetailDialogVisible = false">关闭</el-button>
+        </div>
       </template>
     </el-dialog>
   </div>
@@ -966,6 +978,20 @@ const getStatusLabel = (status) => {
 .el-dialog {
   border-radius: 20px;
   overflow: hidden;
+  transform: none !important;
+  margin: 0 auto !important;
+  position: relative;
+  max-width: 90%;
+  /* 确保对话框垂直居中 */
+  top: 50%;
+  margin-top: 0 !important;
+}
+
+:deep(.el-overlay-dialog) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
 }
 
 .el-dialog :deep(.el-dialog__header) {
@@ -978,6 +1004,38 @@ const getStatusLabel = (status) => {
   font-size: 20px;
   font-weight: 500;
   color: #1d1d1f;
+}
+
+.el-dialog :deep(.el-dialog__body) {
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.el-dialog :deep(.el-dialog__body p) {
+  margin: 0;
+  text-align: center;
+  width: 100%;
+}
+
+.el-dialog :deep(.el-dialog__footer) {
+  padding: 16px 24px 24px;
+  text-align: center;
+}
+
+.dialog-footer-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  width: 100%;
+}
+
+.dialog-footer-buttons .el-button {
+  margin-left: 0;
+  flex: 0 0 auto;
+  min-width: 100px;
 }
 
 .info-content, .logs-content, .error-content, .history-detail-content {
