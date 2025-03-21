@@ -7336,3 +7336,25 @@ LINE 1: ...me, output_path, prediction_type, status) VALUES ('202502121...
 [2025-03-20 18:36:53,289] INFO in app: 成功连接服务器！
 [2025-03-21 09:28:11,604] INFO in logging_config: Wind Forecast Backend Startup
 [2025-03-21 09:28:14,976] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-21 09:43:55,579] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-21 09:43:58,492] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-21 11:33:35,290] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-21 11:33:37,810] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-21 11:34:49,689] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-21 11:34:52,157] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-21 16:01:51,258] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-21 16:01:53,617] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-21 16:02:05,784] INFO in app: 成功连接服务器！
+[2025-03-21 16:03:17,839] INFO in app: 成功连接服务器！
+[2025-03-21 16:04:11,845] INFO in predict: 收到预测请求: {'csvfileId': '20250321160410501672', 'modelfileId': '20250321160410908600', 'scalerfileId': '20250321160410982510'}
+[2025-03-21 16:04:11,845] INFO in predict: 预测数据选择: 20250321160410501672, 预测模型选择: 20250321160410908600, 归一化模型选择: 20250321160410982510
+[2025-03-21 16:04:13,975] INFO in predict: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_train_test_-6_-__20250321160410501672_20250321160413.csv
+[2025-03-21 16:04:13,987] INFO in predict: 文件已上传到MinIO: wind-predictions/forecast_train_test_-6_-__20250321160410501672_20250321160413.csv
+[2025-03-21 16:05:38,082] INFO in predict: 收到预测请求: {'csvfileId': '20250321160536862232', 'modelfileId': '20250321160537230150', 'scalerfileId': '20250321160537255610'}
+[2025-03-21 16:05:38,083] INFO in predict: 预测数据选择: 20250321160536862232, 预测模型选择: 20250321160537230150, 归一化模型选择: 20250321160537255610
+[2025-03-21 16:05:40,178] INFO in predict: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_train_test_-6_-__20250321160536862232_20250321160540.csv
+[2025-03-21 16:05:40,220] INFO in predict: 文件已上传到MinIO: wind-predictions/forecast_train_test_-6_-__20250321160536862232_20250321160540.csv
+[2025-03-21 16:06:21,481] INFO in download: 正在下载以下文件： forecast_train_test_-6_-__20250321160536862232_20250321160540.csv
+[2025-03-21 16:06:37,166] INFO in app: 与服务器断开连接！
+[2025-03-21 16:27:32,301] INFO in logging_config: Wind Forecast Backend Startup
+[2025-03-21 16:28:07,238] INFO in logging_config: Wind Forecast Backend Startup
