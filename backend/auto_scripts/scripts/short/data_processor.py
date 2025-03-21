@@ -3,13 +3,40 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from config import LAGS
+import datetime
 lags = LAGS
+
 def load_data(file_path):
     """
     加载数据并处理NaN值
     """
     data = pd.read_csv(file_path)
     data = data.dropna()
+    return data
+
+def filter_data_by_date(data, months_back=None):
+    """
+    根据月份数过滤数据
+    
+    参数:
+    data: 输入的DataFrame，必须包含'Timestamp'列
+    months_back: 往回追溯的月数，如1表示只用最近1个月的数据，None表示使用全部数据
+    
+    返回:
+    过滤后的DataFrame
+    """
+    if months_back is None:
+        return data
+    
+    # 确保Timestamp列是datetime类型
+    if not pd.api.types.is_datetime64_any_dtype(data['Timestamp']):
+        data['Timestamp'] = pd.to_datetime(data['Timestamp'])
+    
+    # 计算截止日期
+    latest_date = data['Timestamp'].max()
+    if months_back > 0:
+        cutoff_date = latest_date - pd.DateOffset(months=months_back)
+        return data[data['Timestamp'] >= cutoff_date]
     return data
 
 def preprocess_data(data):
