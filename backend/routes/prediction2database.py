@@ -62,7 +62,6 @@ def batch_create_supershortl_power():
                         SupershortlPower.timestamp == record['timestamp']
                     ).update({
                         "wp_pred": record['wp_pred'],
-                        "pre_at": record['pre_at'],
                         "pre_order": record['pre_order'],
                         "pre_num": record['pre_num']
                     })
