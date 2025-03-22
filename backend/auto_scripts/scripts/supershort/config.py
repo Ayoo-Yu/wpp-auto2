@@ -28,6 +28,7 @@ PARAM_OPT_WEEKLY = True    # 是否启用每周参数优化
 PARAM_OPT_MIN_IMPROVEMENT = 0.05  # 最小改进阈值（2%）
 PARAM_OPT_LOG_DIR = os.path.join(CURRENT_DIR, 'logs', 'param_optimizer')  # 参数优化日志目录
 
+
 # 确保输出目录存在
 os.makedirs(OUTPUT_DIR_PRE, exist_ok=True)
 os.makedirs(OUTPUT_DIR_TRAIN, exist_ok=True)

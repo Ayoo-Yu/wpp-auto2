@@ -22,7 +22,7 @@ from data_processor import (
 from models import get_lightgbm_params, get_unified_params
 from train import train_and_evaluate, train_multiple_datasets, calculate_model_weights, save_predictions
 from utils import visualize_results
-from config import WINDOW_SIZE, TRAIN_RATIO, LAGS, OUTPUT_DIR_TRAIN, Today, PREC_SV_FOLDER, DATASET_FOLDER, MODEL_FOLDER, OUTPUT_DIR_PRE
+from config import WINDOW_SIZE, TRAIN_RATIO, LAGS, OUTPUT_DIR_TRAIN, Today, PREC_SV_FOLDER, DATASET_FOLDER, MODEL_FOLDER, OUTPUT_DIR_PRE, AUTO_PRE_TRAIN_LOG_DIR
 
 # 创建一个锁用于同步模型文件的访问
 model_lock = Lock()
@@ -31,7 +31,7 @@ model_available = Event()
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 # 确保日志目录存在
-log_dir = "./logs/auto_pre_train"
+log_dir = AUTO_PRE_TRAIN_LOG_DIR
 os.makedirs(log_dir, exist_ok=True)
 # 创建日志文件
 log_file = os.path.join(log_dir, f"{Today}.log")
