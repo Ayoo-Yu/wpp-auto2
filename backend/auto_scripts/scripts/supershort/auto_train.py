@@ -1,15 +1,13 @@
-# merged_auto_script.py
+# auto_train.py
 import os
 import time
 import logging
 import sys
-from threading import Thread, Lock, Event
 import joblib
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
 
-# 导入预测和训练所需的模块
-from predict import predict
+# 导入训练所需的模块
 from data_processor import (
     load_data,
     preprocess_data,
@@ -22,19 +20,19 @@ from data_processor import (
 from models import get_lightgbm_params, get_unified_params
 from train import train_and_evaluate, train_multiple_datasets, calculate_model_weights, save_predictions
 from utils import visualize_results
-from config import WINDOW_SIZE, TRAIN_RATIO, LAGS, OUTPUT_DIR_TRAIN, Today, PREC_SV_FOLDER, DATASET_FOLDER, MODEL_FOLDER, OUTPUT_DIR_PRE
+from config import WINDOW_SIZE, TRAIN_RATIO, LAGS, OUTPUT_DIR_TRAIN, Today, DATASET_FOLDER, MODEL_FOLDER
 
-# 创建一个锁用于同步模型文件的访问
-model_lock = Lock()
-# 创建一个事件用于指示模型是否可用
-model_available = Event()
+# 配置日志
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
 # 确保日志目录存在
-log_dir = "./logs/auto_pre_train"
+log_dir = "./logs/auto_train"
 os.makedirs(log_dir, exist_ok=True)
+
 # 创建日志文件
 log_file = os.path.join(log_dir, f"{Today}.log")
+
 # 创建 FileHandler
 file_handler = logging.FileHandler(log_file, encoding="utf-8")
 file_handler.setLevel(logging.INFO)
@@ -78,25 +76,6 @@ def mark_train_done(date_str):
         f.write(f'Training done for {date_str} on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
     logging.info(f"训练完成，已创建标志文件: {flag_file}")
 
-def get_predict_flag_file(date_str):
-    """获取预测完成标志文件的路径"""
-    return os.path.join(log_dir, f"{date_str}_predict_done.flag")
-
-def is_predict_done(date_str):
-    """检查指定日期的预测是否已完成"""
-    flag_file = get_predict_flag_file(date_str)
-    if os.path.exists(flag_file):
-        logging.info(f"检测到{date_str}的预测已经执行过 (标志文件: {flag_file})")
-        return True
-    return False
-
-def mark_predict_done(date_str):
-    """标记预测已完成"""
-    flag_file = get_predict_flag_file(date_str)
-    with open(flag_file, 'w') as f:
-        f.write(f'Prediction done for {date_str} on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
-    logging.info(f"预测完成，已创建标志文件: {flag_file}")
-
 def print_section(title):
     """打印带分隔符的标题"""
     separator = "=" * 80
@@ -106,40 +85,6 @@ def print_section(title):
     logging.info(f"\n{separator}")
     logging.info(f">>> {title} <<<")
     logging.info(f"{separator}\n")
-
-def is_model_available(model_folder_today):
-    """检查最佳模型是否可用"""
-    print(f"检查模型目录: {model_folder_today}")
-    logging.info(f"检查模型目录: {model_folder_today}")
-    best_models_dir = os.path.join(model_folder_today, 'best_models')
-    
-    if os.path.exists(best_models_dir):
-        print(f"发现best_models目录: {best_models_dir}")
-        logging.info(f"发现best_models目录: {best_models_dir}")
-        # 检查是否至少有一个算法类型的模型可用
-        for algo_type in ['GBDT', 'DART', 'GOSS']:
-            model_file = os.path.join(best_models_dir, f'{algo_type}.joblib')
-            if os.path.exists(model_file):
-                print(f"✅ 发现{algo_type}模型文件: {model_file}")
-                logging.info(f"发现{algo_type}模型文件: {model_file}")
-                return True
-            else:
-                print(f"❌ 未找到{algo_type}模型文件")
-                logging.info(f"未找到{algo_type}模型文件")
-    else:
-        print(f"未找到best_models目录，检查传统模型文件")
-        logging.info(f"未找到best_models目录，检查传统模型文件")
-    
-    # 检查传统模型文件
-    model_file = os.path.join(model_folder_today, 'model.joblib')
-    exists = os.path.exists(model_file)
-    if exists:
-        print(f"✅ 发现传统模型文件: {model_file}")
-        logging.info(f"发现传统模型文件: {model_file}")
-    else:
-        print(f"❌ 未找到任何可用模型文件")
-        logging.info(f"未找到任何可用模型文件")
-    return exists
 
 def train_model(data_file_path, model_folder_today):
     """执行模型训练和评估"""
@@ -364,118 +309,38 @@ def monitor_training(today_date):
         if is_train_done(today_date):
             print(f"⚠️ 检测到今天的训练已经执行过，跳过...")
             logging.info(f"⚠️ 检测到今天的训练已经执行过，跳过...")
-            if is_model_available(model_folder_today):
-                model_available.set()
-                print(f"✅ 模型已设置为可用状态")
-                logging.info(f"✅ 模型已设置为可用状态")
             break
 
         if os.path.exists(csv_file):
             print(f"✅ 发现新的训练文件：{csv_file}，执行训练...")
             logging.info(f"✅ 发现新的训练文件：{csv_file}，执行训练...")
-            with model_lock:
-                train_model(csv_file, model_folder_today)
+            train_model(csv_file, model_folder_today)
             
             # 标记训练已完成
             mark_train_done(today_date)
             print(f"✅ 训练完成，已创建标志文件")
             logging.info(f"✅ 训练完成，已创建标志文件")
-            
-            # 验证模型是否可用
-            if is_model_available(model_folder_today):
-                model_available.set()
-                print(f"✅ 模型已成功保存到 {model_folder_today}，模型可用。")
-                logging.info(f"✅ 模型已成功保存到 {model_folder_today}，模型可用。")
-            else:
-                print(f"❌ 模型文件未找到在 {model_folder_today}，模型不可用。")
-                logging.info(f"❌ 模型文件未找到在 {model_folder_today}，模型不可用。")
             break
 
         print(f"❌ 未找到训练 CSV 文件: {csv_file}，等待 30 秒后重试...")
         logging.info(f"❌ 未找到训练 CSV 文件: {csv_file}，等待 30 秒后重试...")
         time.sleep(30)  # 每30秒检查一次
 
-def monitor_prediction(today_date):
-    """监视预测文件夹并执行预测"""
-    print_section("启动预测监视线程")
-    logging.info("启动预测监视线程")
-    csv_file = os.path.join(PREC_SV_FOLDER, f'{today_date}.csv')
-    model_folder_today = os.path.join(MODEL_FOLDER, today_date)
-    
-    # 确保输出目录存在
-    output_dir = os.path.join(OUTPUT_DIR_PRE, today_date)
-    os.makedirs(output_dir, exist_ok=True)
-
-    print(f"预测数据文件路径: {csv_file}")
-    print(f"模型目录: {model_folder_today}")
-    print(f"预测完成标志文件: {get_predict_flag_file(today_date)}")
-    print(f"开始监视 {PREC_SV_FOLDER} 文件夹以进行预测...")
-    logging.info(f"预测数据文件路径: {csv_file}")
-    logging.info(f"模型目录: {model_folder_today}")
-    logging.info(f"预测完成标志文件: {get_predict_flag_file(today_date)}")
-    logging.info(f"开始监视 {PREC_SV_FOLDER} 文件夹以进行预测...")
-
-    while True:
-        if is_predict_done(today_date):
-            print(f"⚠️ 检测到今天的预测已经执行过，跳过...")
-            logging.info(f"⚠️ 检测到今天的预测已经执行过，跳过...")
-            break
-
-        # 等待模型可用
-        if not (model_available.is_set() or is_model_available(model_folder_today)):
-            print(f"⏳ 未有可用模型，等待模型训练完成...")
-            logging.info(f"⏳ 未有可用模型，等待模型训练完成...")
-            time.sleep(30)
-            continue
-
-        if os.path.exists(csv_file):
-            print(f"✅ 发现新的预测文件：{csv_file}，执行预测...")
-            logging.info(f"✅ 发现新的预测文件：{csv_file}，执行预测...")
-            with model_lock:
-                predict(csv_file, model_folder_today)
-            
-            # 标记预测已完成
-            mark_predict_done(today_date)
-            print(f"✅ 预测执行完成")
-            logging.info(f"✅ 预测执行完成")
-            break
-
-        print(f"❌ 未找到预测 CSV 文件: {csv_file}，等待 30 秒后重试...")
-        logging.info(f"❌ 未找到预测 CSV 文件: {csv_file}，等待 30 秒后重试...")
-        time.sleep(30)  # 每30秒检查一次
-
 def main():
-    """主函数，启动训练和预测的监视线程"""
-    print_section("自动训练预测系统启动")
-    logging.info("自动训练预测系统启动")
+    """主函数，执行训练任务"""
+    print_section("自动训练系统启动")
+    logging.info("自动训练系统启动")
     today_date = Today
     print(f"今天的日期是: {today_date}")
     logging.info(f"今天的日期是: {today_date}")
 
-    # 创建训练和预测的监视线程
-    print(f"创建监视线程...")
-    logging.info(f"创建监视线程...")
-    train_thread = Thread(target=monitor_training, args=(today_date,), name="TrainThread")
-    predict_thread = Thread(target=monitor_prediction, args=(today_date,), name="PredictThread")
+    # 执行训练监视任务
+    monitor_training(today_date)
 
-    # 启动线程
-    print(f"启动训练线程...")
-    logging.info(f"启动训练线程...")
-    train_thread.start()
-    print(f"启动预测线程...")
-    logging.info(f"启动预测线程...")
-    predict_thread.start()
-
-    # 等待线程完成
-    print(f"等待线程完成...")
-    logging.info(f"等待线程完成...")
-    train_thread.join()
-    predict_thread.join()
-
-    print_section("系统任务完成")
-    logging.info("系统任务完成")
-    print("今天的训练和预测任务已完成。")
-    logging.info("今天的训练和预测任务已完成。")
+    print_section("训练任务完成")
+    logging.info("训练任务完成")
+    print("今天的训练任务已完成。")
+    logging.info("今天的训练任务已完成。")
 
 if __name__ == '__main__':
-    main()
+    main() 

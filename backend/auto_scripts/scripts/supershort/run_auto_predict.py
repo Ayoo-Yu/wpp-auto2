@@ -5,6 +5,8 @@ from datetime import datetime
 from predict import predict
 from config import PREC_SV_FOLDER,MODEL_FOLDER,OUTPUT_DIR_PRE
 
+
+
 today_date = datetime.today().strftime('%Y%m%d')
 csv_file = os.path.join(PREC_SV_FOLDER, f'{today_date}.csv')
 model_folder_today = os.path.join(MODEL_FOLDER, today_date)

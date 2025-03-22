@@ -41,6 +41,7 @@ def train_model(DATA_FILE_PATH,MODEL_FOLDER_TODAY):
     
     # 可视化结果
     visualize_results(results_dict, y_val_windows, output_dir)
+
 # 获取今天的日期
 today_date = Today
 csv_file = os.path.join(PREC_SV_FOLDER, f'{today_date}.csv')
