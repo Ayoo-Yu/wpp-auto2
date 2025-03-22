@@ -454,25 +454,17 @@ def calculate_model_weights(best_models_info, validation_data, lags, window_size
         # 训练线性回归模型
         print("训练线性回归模型计算最优权重...")
         logger.info("训练线性回归模型计算最优权重...")
-        lr = LinearRegression(fit_intercept=False, positive=True)  # 确保权重为正
+        lr = LinearRegression(fit_intercept=True, positive=True)  # 修改为包含偏置项
         lr.fit(X_lr, y_lr)
         
         # 获取权重
         weights = dict(zip(models.keys(), lr.coef_))
-        print(f"线性回归得到的原始权重: {weights}")
-        logger.info(f"线性回归得到的原始权重: {weights}")
+        # 添加偏置项到权重字典中
+        weights['INTERCEPT'] = lr.intercept_
+        print(f"线性回归得到的权重: {weights}")
+        logger.info(f"线性回归得到的权重: {weights}")
         
-        # 归一化权重
-        weight_sum = sum(weights.values())
-        if weight_sum > 0:
-            weights = {k: v/weight_sum for k, v in weights.items()}
-            print(f"归一化后的权重: {weights}")
-            logger.info(f"归一化后的权重: {weights}")
-        else:
-            print("❌ 权重和为0，使用默认权重")
-            logger.info("❌ 权重和为0，使用默认权重")
-            weights = default_weights
-        
+        # 不再进行归一化，保留原始权重
         # 确保所有算法类型都有权重
         for algo_type in ['GBDT', 'DART', 'GOSS']:
             if algo_type not in weights:

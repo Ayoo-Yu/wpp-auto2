@@ -8,8 +8,6 @@ from data_processor import preprocess_data_pre, feature_engineering, create_time
 from config import LAGS, OUTPUT_DIR_PRE,Today
 import requests
 
-flag_file = os.path.join(OUTPUT_DIR_PRE, Today,f'{Today}_predict_done.flag')
-
 # 获取logger
 logger = logging.getLogger()
 
@@ -197,15 +195,6 @@ def make_weighted_predictions(models, scalers, X_new, window_size, LAGS, weights
         print(f"使用自定义权重: {weights}")
         logger.info(f"使用自定义权重: {weights}")
     
-    # 确保所有权重和为1
-    weight_sum = sum(weights.values())
-    if weight_sum != 1.0:
-        print(f"权重总和为 {weight_sum}，进行归一化...")
-        logger.info(f"权重总和为 {weight_sum}，进行归一化...")
-        weights = {k: v/weight_sum for k, v in weights.items()}
-        print(f"归一化后的权重: {weights}")
-        logger.info(f"归一化后的权重: {weights}")
-    
     all_predictions = {}
     
     # 使用每个模型进行预测
@@ -258,12 +247,19 @@ def make_weighted_predictions(models, scalers, X_new, window_size, LAGS, weights
     # 加权求和
     print(f"开始计算加权平均预测结果...")
     logger.info(f"开始计算加权平均预测结果...")
-    weighted_preds = np.zeros(min_length)
+    # 初始化为偏置项（如果存在）
+    intercept = weights.get('INTERCEPT', 0)
+    weighted_preds = np.ones(min_length) * intercept
+    
     for algo_type, preds in all_predictions.items():
         if weights.get(algo_type, 0) > 0:
             weighted_preds += preds[-min_length:] * weights[algo_type]
             print(f"  加入 {algo_type} 模型贡献 (权重: {weights[algo_type]:.4f})")
             logger.info(f"  加入 {algo_type} 模型贡献 (权重: {weights[algo_type]:.4f})")
+    
+    if 'INTERCEPT' in weights and weights['INTERCEPT'] != 0:
+        print(f"  加入常数偏置项 (值: {weights['INTERCEPT']:.4f})")
+        logger.info(f"  加入常数偏置项 (值: {weights['INTERCEPT']:.4f})")
     
     print(f"加权平均预测完成，生成了 {len(weighted_preds)} 个预测值")
     logger.info(f"加权平均预测完成，生成了 {len(weighted_preds)} 个预测值")
@@ -409,12 +405,6 @@ def predict(CSV_FILE_PATH, MODEL_Folder, WINDOW_SIZE=16):
     csv_file = save_predictions_to_csv(predictions, timestamp)
     print(f"✅ 预测结果已保存到: {csv_file}")
     logger.info(f"✅ 预测结果已保存到: {csv_file}")
-    
-    # 创建标志文件
-    with open(flag_file, 'w') as f:
-        f.write(f'Prediction done for {Today}\n')
-    print(f"✅ 创建预测完成标志文件: {flag_file}")
-    logger.info(f"✅ 创建预测完成标志文件: {flag_file}")
     
     print_separator("风电功率预测完成")
     logger.info("风电功率预测完成")
