@@ -59,6 +59,44 @@ if sys.platform == 'win32':
     # 确保stderr也使用utf-8编码
     sys.stderr.reconfigure(encoding='utf-8')
 
+def get_train_flag_file(date_str):
+    """获取训练完成标志文件的路径"""
+    return os.path.join(log_dir, f"{date_str}_train_done.flag")
+
+def is_train_done(date_str):
+    """检查指定日期的训练是否已完成"""
+    flag_file = get_train_flag_file(date_str)
+    if os.path.exists(flag_file):
+        logging.info(f"检测到{date_str}的训练已经执行过 (标志文件: {flag_file})")
+        return True
+    return False
+
+def mark_train_done(date_str):
+    """标记训练已完成"""
+    flag_file = get_train_flag_file(date_str)
+    with open(flag_file, 'w') as f:
+        f.write(f'Training done for {date_str} on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
+    logging.info(f"训练完成，已创建标志文件: {flag_file}")
+
+def get_predict_flag_file(date_str):
+    """获取预测完成标志文件的路径"""
+    return os.path.join(log_dir, f"{date_str}_predict_done.flag")
+
+def is_predict_done(date_str):
+    """检查指定日期的预测是否已完成"""
+    flag_file = get_predict_flag_file(date_str)
+    if os.path.exists(flag_file):
+        logging.info(f"检测到{date_str}的预测已经执行过 (标志文件: {flag_file})")
+        return True
+    return False
+
+def mark_predict_done(date_str):
+    """标记预测已完成"""
+    flag_file = get_predict_flag_file(date_str)
+    with open(flag_file, 'w') as f:
+        f.write(f'Prediction done for {date_str} on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n')
+    logging.info(f"预测完成，已创建标志文件: {flag_file}")
+
 def print_section(title):
     """打印带分隔符的标题"""
     separator = "=" * 80
@@ -309,19 +347,21 @@ def monitor_training(today_date):
     logging.info("启动训练监视线程")
     csv_file = os.path.join(DATASET_FOLDER, f'{today_date}.csv')
     model_folder_today = os.path.join(MODEL_FOLDER, today_date)
-    flag_file = os.path.join(MODEL_FOLDER, today_date,f'{today_date}_train_done.flag')
+    
+    # 确保模型文件夹存在
+    os.makedirs(model_folder_today, exist_ok=True)
 
     print(f"训练文件路径: {csv_file}")
     print(f"模型存储目录: {model_folder_today}")
-    print(f"训练完成标志文件: {flag_file}")
+    print(f"训练完成标志文件: {get_train_flag_file(today_date)}")
     print(f"开始监视 {DATASET_FOLDER} 文件夹以进行训练...")
     logging.info(f"训练文件路径: {csv_file}")
     logging.info(f"模型存储目录: {model_folder_today}")
-    logging.info(f"训练完成标志文件: {flag_file}")
+    logging.info(f"训练完成标志文件: {get_train_flag_file(today_date)}")
     logging.info(f"开始监视 {DATASET_FOLDER} 文件夹以进行训练...")
 
     while True:
-        if os.path.exists(flag_file):
+        if is_train_done(today_date):
             print(f"⚠️ 检测到今天的训练已经执行过，跳过...")
             logging.info(f"⚠️ 检测到今天的训练已经执行过，跳过...")
             if is_model_available(model_folder_today):
@@ -335,10 +375,11 @@ def monitor_training(today_date):
             logging.info(f"✅ 发现新的训练文件：{csv_file}，执行训练...")
             with model_lock:
                 train_model(csv_file, model_folder_today)
-            with open(flag_file, 'w') as f:
-                f.write(f'Training done for {today_date}\n')
-            print(f"✅ 训练完成，已创建标志文件: {flag_file}")
-            logging.info(f"✅ 训练完成，已创建标志文件: {flag_file}")
+            
+            # 标记训练已完成
+            mark_train_done(today_date)
+            print(f"✅ 训练完成，已创建标志文件")
+            logging.info(f"✅ 训练完成，已创建标志文件")
             
             # 验证模型是否可用
             if is_model_available(model_folder_today):
@@ -360,19 +401,22 @@ def monitor_prediction(today_date):
     logging.info("启动预测监视线程")
     csv_file = os.path.join(PREC_SV_FOLDER, f'{today_date}.csv')
     model_folder_today = os.path.join(MODEL_FOLDER, today_date)
-    flag_file = os.path.join(OUTPUT_DIR_PRE, Today, f'{today_date}_predict_done.flag')
+    
+    # 确保输出目录存在
+    output_dir = os.path.join(OUTPUT_DIR_PRE, today_date)
+    os.makedirs(output_dir, exist_ok=True)
 
     print(f"预测数据文件路径: {csv_file}")
     print(f"模型目录: {model_folder_today}")
-    print(f"预测完成标志文件: {flag_file}")
+    print(f"预测完成标志文件: {get_predict_flag_file(today_date)}")
     print(f"开始监视 {PREC_SV_FOLDER} 文件夹以进行预测...")
     logging.info(f"预测数据文件路径: {csv_file}")
     logging.info(f"模型目录: {model_folder_today}")
-    logging.info(f"预测完成标志文件: {flag_file}")
+    logging.info(f"预测完成标志文件: {get_predict_flag_file(today_date)}")
     logging.info(f"开始监视 {PREC_SV_FOLDER} 文件夹以进行预测...")
 
     while True:
-        if os.path.exists(flag_file):
+        if is_predict_done(today_date):
             print(f"⚠️ 检测到今天的预测已经执行过，跳过...")
             logging.info(f"⚠️ 检测到今天的预测已经执行过，跳过...")
             break
@@ -389,6 +433,9 @@ def monitor_prediction(today_date):
             logging.info(f"✅ 发现新的预测文件：{csv_file}，执行预测...")
             with model_lock:
                 predict(csv_file, model_folder_today)
+            
+            # 标记预测已完成
+            mark_predict_done(today_date)
             print(f"✅ 预测执行完成")
             logging.info(f"✅ 预测执行完成")
             break
