@@ -46,6 +46,18 @@ ENV PATH /opt/conda/envs/wind-power-env/bin:$PATH
 # 复制项目代码
 COPY . .
 
+# 创建符号链接，使脚本文件能在预期路径被找到
+RUN mkdir -p /app/backend/auto_scripts/scripts/supershort /app/backend/auto_scripts/scripts/short /app/backend/auto_scripts/scripts/middle
+RUN if [ -d "/app/auto_scripts/scripts/supershort" ]; then \
+        ln -sf /app/auto_scripts/scripts/supershort/scheduler_supershort.py /app/backend/auto_scripts/scripts/supershort/scheduler_supershort.py; \
+    fi && \
+    if [ -d "/app/auto_scripts/scripts/short" ]; then \
+        ln -sf /app/auto_scripts/scripts/short/scheduler_short.py /app/backend/auto_scripts/scripts/short/scheduler_short.py; \
+    fi && \
+    if [ -d "/app/auto_scripts/scripts/middle" ]; then \
+        ln -sf /app/auto_scripts/scripts/middle/scheduler_middle.py /app/backend/auto_scripts/scripts/middle/scheduler_middle.py; \
+    fi
+
 # 创建PM2配置文件
 RUN echo "module.exports = { apps: [{\
   name: 'python-app',\
