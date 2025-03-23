@@ -21,13 +21,24 @@
               <span>{{ item.title }}</span>
             </template>
             <div class="button-group">
-              <el-button 
-                :type="item.status ? 'success' : 'primary'" 
-                @click="showConfirmDialog('startTask', '启用预测任务', `确定要启用${item.title}吗？`, item.name)"
-                :disabled="item.status"
-              >
-                {{ item.status ? '运行中' : '启用' }}
-              </el-button>
+              <template v-if="item.name === 'ultra_short'">
+                <el-button 
+                  :type="item.status ? 'success' : 'primary'" 
+                  @click="showUltraStartDialog()"
+                  :disabled="item.status"
+                >
+                  {{ item.status ? '运行中' : '启用' }}
+                </el-button>
+              </template>
+              <template v-else>
+                <el-button 
+                  :type="item.status ? 'success' : 'primary'" 
+                  @click="showConfirmDialog('startTask', '启用预测任务', `确定要启用${item.title}吗？`, item.name)"
+                  :disabled="item.status"
+                >
+                  {{ item.status ? '运行中' : '启用' }}
+                </el-button>
+              </template>
               
               <el-button 
                 type="danger" 
@@ -53,6 +64,29 @@
         </el-col>
       </el-row>
     </div>
+
+    <!-- 超短期预测启动对话框 -->
+    <el-dialog 
+      title="启动超短期预测" 
+      v-model="ultraStartDialogVisible" 
+      width="30%"
+    >
+      <div class="ultra-start-options">
+        <p>超短期预测包含两个独立的脚本，您可以选择启动的脚本：</p>
+        <el-checkbox v-model="ultraStartOptions.training" label="训练脚本 (scheduler_supershort.py)">
+          负责每日模型训练和每周参数优化
+        </el-checkbox>
+        <el-checkbox v-model="ultraStartOptions.prediction" label="预测脚本 (scheduler_predict.py)">
+          负责每15分钟执行一次预测
+        </el-checkbox>
+      </div>
+      <template #footer>
+        <div class="dialog-footer-buttons">
+          <el-button type="primary" @click="startUltraShortTask" :disabled="!canStartUltraShort">确定</el-button>
+          <el-button @click="ultraStartDialogVisible = false">取消</el-button>
+        </div>
+      </template>
+    </el-dialog>
 
     <!-- 操作确认对话框 -->
     <el-dialog 
@@ -91,13 +125,93 @@
 
     <!-- 脚本详情对话框 -->
     <el-dialog 
-      title="脚本详情" 
+      title="任务详情" 
       v-model="scriptInfoDialogVisible" 
       width="80%"
     >
-      <pre class="info-content">{{ scriptInfo }}</pre>
+      <div class="task-info-container">
+        <div class="task-date-selector">
+          <el-form :inline="true">
+            <el-form-item label="查询日期">
+              <el-date-picker
+                v-model="taskDateInfo.selectedDate"
+                type="date"
+                placeholder="选择日期"
+                format="YYYY-MM-DD"
+                value-format="YYYYMMDD"
+                style="min-width: 180px;"
+                @change="fetchTaskStatusByDate"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="fetchTaskStatusByDate">查询</el-button>
+              <el-button @click="resetTaskDateInfo">今天</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+        
+        <h3 class="task-info-title">{{ getTaskTitle(currentPrediction) }}任务状态 ({{ taskDateInfo.displayDate }})</h3>
+        
+        <div class="task-status-cards">
+          <el-card class="task-status-card">
+            <template #header>
+              <div class="task-card-header">
+                <span>每日训练任务</span>
+                <el-tag :type="taskStatus.training ? 'success' : 'danger'">
+                  {{ taskStatus.training ? '已完成' : '未完成' }}
+                </el-tag>
+              </div>
+            </template>
+            <div class="task-card-content">
+              <p>执行时间: 每天 02:00</p>
+              <p v-if="taskStatus.trainingTime">上次完成: {{ taskStatus.trainingTime }}</p>
+            </div>
+          </el-card>
+          
+          <el-card class="task-status-card">
+            <template #header>
+              <div class="task-card-header">
+                <span>预测任务</span>
+                <el-tag :type="taskStatus.prediction ? 'success' : 'danger'">
+                  {{ taskStatus.prediction ? '运行中' : '未运行' }}
+                </el-tag>
+              </div>
+            </template>
+            <div class="task-card-content">
+              <div v-if="currentPrediction === 'ultra_short'">
+                <p>执行频率: 每15分钟一次 (共96次/天)</p>
+                <p>今日完成: {{ taskStatus.predictionCount || 0 }}/96</p>
+              </div>
+              <p v-else>执行频率: 每天一次</p>
+              <p v-if="taskStatus.predictionTime">上次执行: {{ taskStatus.predictionTime }}</p>
+            </div>
+          </el-card>
+          
+          <el-card class="task-status-card">
+            <template #header>
+              <div class="task-card-header">
+                <span>参数优化任务</span>
+                <el-tag :type="taskStatus.paramOpt ? 'success' : 'danger'">
+                  {{ taskStatus.paramOpt ? '已完成' : '未完成' }}
+                </el-tag>
+              </div>
+            </template>
+            <div class="task-card-content">
+              <p>执行时间: {{ getParamOptWeekday(currentPrediction) }} 01:00</p>
+              <p v-if="taskStatus.paramOptTime">上次完成: {{ taskStatus.paramOptTime }}</p>
+            </div>
+          </el-card>
+        </div>
+        
+        <div class="script-info-section">
+          <h4>脚本详情</h4>
+          <pre class="info-content">{{ scriptInfo }}</pre>
+        </div>
+      </div>
+      
       <template #footer>
         <div class="dialog-footer-buttons">
+          <el-button type="primary" @click="refreshTaskStatus">刷新状态</el-button>
           <el-button @click="scriptInfoDialogVisible = false">关闭</el-button>
         </div>
       </template>
@@ -109,10 +223,33 @@
       v-model="logsDialogVisible" 
       width="80%"
     >
+      <div class="logs-filters">
+        <el-form :inline="true">
+          <el-form-item label="日志类型">
+            <el-select v-model="logsFilters.logType" placeholder="选择日志类型" @change="handleLogTypeChange" style="min-width: 180px;">
+              <el-option v-for="option in getLogTypeOptions()" :key="option.value" :label="option.label" :value="option.value"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="日期">
+            <el-date-picker
+              v-model="logsFilters.date"
+              type="date"
+              placeholder="选择日期"
+              format="YYYY-MM-DD"
+              value-format="YYYYMMDD"
+              style="min-width: 180px;"
+            ></el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="fetchLogsByFilter">查询</el-button>
+            <el-button @click="resetLogsFilters">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
       <pre class="logs-content">{{ logsContent }}</pre>
       <template #footer>
         <div class="dialog-footer-buttons">
-          <el-button type="primary" @click="fetchLogs(currentPrediction)">刷新</el-button>
+          <el-button type="primary" @click="fetchLogsByFilter">刷新</el-button>
           <el-button @click="logsDialogVisible = false">关闭</el-button>
         </div>
       </template>
@@ -141,7 +278,7 @@
       <div class="history-filters">
         <el-form :inline="true">
           <el-form-item label="任务类型">
-            <el-select v-model="historyFilters.taskType" placeholder="选择任务类型" clearable>
+            <el-select v-model="historyFilters.taskType" placeholder="选择任务类型" clearable style="min-width: 180px;">
               <el-option label="超短期" value="ultra_short"></el-option>
               <el-option label="短期" value="short"></el-option>
               <el-option label="中期" value="medium"></el-option>
@@ -149,7 +286,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="操作类型">
-            <el-select v-model="historyFilters.action" placeholder="选择操作类型" clearable>
+            <el-select v-model="historyFilters.action" placeholder="选择操作类型" clearable style="min-width: 180px;">
               <el-option label="启动" value="start"></el-option>
               <el-option label="停止" value="stop"></el-option>
               <el-option label="删除" value="delete"></el-option>
@@ -236,7 +373,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, inject, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, inject, onMounted, onUnmounted, computed } from 'vue'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
@@ -273,6 +410,10 @@ const scriptInfoDialogVisible = ref(false)
 const scriptInfo = ref('')
 const logsDialogVisible = ref(false)
 const logsContent = ref('')
+const logsFilters = reactive({
+  logType: '',
+  date: ''
+})
 
 // 错误处理相关变量
 const errorDialogVisible = ref(false)
@@ -303,9 +444,37 @@ const historyPagination = reactive({
 const historyDetailDialogVisible = ref(false)
 const historyDetailContent = ref('')
 
+// 详情相关变量
+const taskStatus = reactive({
+  training: false,
+  prediction: false,
+  paramOpt: false,
+  trainingTime: '',
+  predictionTime: '',
+  paramOptTime: '',
+  predictionCount: 0
+})
+
+const taskDateInfo = reactive({
+  selectedDate: new Date().toISOString().slice(0, 10).replace(/-/g, ''),
+  displayDate: '今天'
+})
+
 // 轮询间隔(毫秒)
 const POLLING_INTERVAL = 60000
 let intervalId = null
+
+// 超短期预测启动相关
+const ultraStartDialogVisible = ref(false)
+const ultraStartOptions = reactive({
+  training: true,
+  prediction: true
+})
+
+// 计算属性：是否可以启动超短期预测
+const canStartUltraShort = computed(() => {
+  return ultraStartOptions.training || ultraStartOptions.prediction
+})
 
 onMounted(() => {
   fetchStatus()
@@ -575,6 +744,7 @@ const clearSavedConfig = async () => {
 
 // 查询脚本详情
 const fetchScriptInfo = async (name) => {
+  currentPrediction = name
   loading.value = true
   try {
     const res = await apiClient.get('/api/script_info', { params: { type: name }})
@@ -585,6 +755,14 @@ const fetchScriptInfo = async (name) => {
     }
     
     scriptInfo.value = res.data.info || '暂无详情信息'
+    
+    // 获取任务状态
+    await fetchTaskStatus(name)
+    
+    // 设置当前日期显示
+    taskDateInfo.selectedDate = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    taskDateInfo.displayDate = '今天'
+    
     scriptInfoDialogVisible.value = true
   } catch (error) {
     console.error('查询脚本详情失败:', error)
@@ -599,14 +777,118 @@ const fetchScriptInfo = async (name) => {
   }
 }
 
+// 获取任务状态
+const fetchTaskStatus = async (name) => {
+  try {
+    const params = {
+      type: name,
+      date: taskDateInfo.selectedDate
+    }
+    
+    const res = await apiClient.get('/api/task_status', { params })
+    
+    // 更新任务状态
+    if (res.data.status) {
+      taskStatus.training = res.data.status.training || false
+      taskStatus.prediction = res.data.status.prediction || false
+      taskStatus.paramOpt = res.data.status.paramOpt || false
+      taskStatus.trainingTime = res.data.status.trainingTime || ''
+      taskStatus.predictionTime = res.data.status.predictionTime || ''
+      taskStatus.paramOptTime = res.data.status.paramOptTime || ''
+      taskStatus.predictionCount = res.data.status.predictionCount || 0
+    }
+  } catch (error) {
+    console.error('获取任务状态失败:', error)
+    ElMessage.warning('获取任务状态失败，请检查后端服务')
+  }
+}
+
+// 刷新任务状态
+const refreshTaskStatus = async () => {
+  loading.value = true
+  try {
+    await fetchTaskStatus(currentPrediction)
+    ElMessage.success('任务状态已刷新')
+  } catch (error) {
+    console.error('刷新任务状态失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 按日期查询任务状态
+const fetchTaskStatusByDate = async () => {
+  loading.value = true
+  try {
+    if (!taskDateInfo.selectedDate) {
+      taskDateInfo.selectedDate = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    }
+    
+    // 设置显示日期
+    const selectedDate = taskDateInfo.selectedDate
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10).replace(/-/g, '')
+    
+    if (selectedDate === today) {
+      taskDateInfo.displayDate = '今天'
+    } else if (selectedDate === yesterday) {
+      taskDateInfo.displayDate = '昨天'
+    } else {
+      // 格式化为 YYYY-MM-DD
+      taskDateInfo.displayDate = `${selectedDate.slice(0, 4)}-${selectedDate.slice(4, 6)}-${selectedDate.slice(6, 8)}`
+    }
+    
+    await fetchTaskStatus(currentPrediction)
+    ElMessage.success(`已查询${taskDateInfo.displayDate}的任务状态`)
+  } catch (error) {
+    console.error('按日期查询任务状态失败:', error)
+    ElMessage.warning('查询失败，请重试')
+  } finally {
+    loading.value = false
+  }
+}
+
+// 重置任务日期信息
+const resetTaskDateInfo = () => {
+  taskDateInfo.selectedDate = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+  taskDateInfo.displayDate = '今天'
+  fetchTaskStatus(currentPrediction)
+}
+
+// 获取任务标题
+const getTaskTitle = (taskType) => {
+  const titleMap = {
+    'ultra_short': '超短期',
+    'short': '短期',
+    'medium': '中期'
+  }
+  return titleMap[taskType] || taskType
+}
+
 // 获取脚本日志
 const fetchLogs = async (name) => {
   currentPrediction = name
+  logsDialogVisible.value = true
+  // 初始化日志过滤条件
+  logsFilters.logType = 'main'
+  logsFilters.date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+  // 加载日志
+  fetchLogsByFilter()
+}
+
+// 根据过滤条件获取日志
+const fetchLogsByFilter = async () => {
   loading.value = true
   try {
-    const res = await apiClient.get('/api/logs', { params: { type: name, lines: 100 } })
+    const params = {
+      type: currentPrediction,
+      logType: logsFilters.logType || 'main',
+      date: logsFilters.date || new Date().toISOString().slice(0, 10).replace(/-/g, ''),
+      lines: 500
+    }
+    
+    const res = await apiClient.get('/api/logs', { params })
     logsContent.value = res.data.logs || '暂无日志信息'
-    logsDialogVisible.value = true
   } catch (error) {
     console.error('获取日志失败:', error)
     if (error.response && error.response.data) {
@@ -618,6 +900,36 @@ const fetchLogs = async (name) => {
   } finally {
     loading.value = false
   }
+}
+
+// 重置日志过滤条件
+const resetLogsFilters = () => {
+  logsFilters.logType = 'main'
+  logsFilters.date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+  fetchLogsByFilter()
+}
+
+// 根据预测类型获取日志类型选项
+const getLogTypeOptions = () => {
+  // 超短期预测有4种日志类型
+  if (currentPrediction === 'ultra_short') {
+    return [
+      { label: '主日志', value: 'main' },
+      { label: '训练日志', value: 'train' },
+      { label: '预测日志', value: 'predict' },
+      { label: '参数优化日志', value: 'param' }
+    ]
+  }
+  // 短期和中期预测只有2种日志类型
+  return [
+    { label: '训练日志', value: 'train' },
+    { label: '参数优化日志', value: 'param' }
+  ]
+}
+
+// 日志类型变更处理
+const handleLogTypeChange = () => {
+  fetchLogsByFilter()
 }
 
 // 打开历史记录对话框
@@ -758,6 +1070,55 @@ const getStatusLabel = (status) => {
     'warning': '警告'
   }
   return labelMap[status] || status
+}
+
+// 显示超短期启动对话框
+const showUltraStartDialog = () => {
+  // 重置选项
+  ultraStartOptions.training = true
+  ultraStartOptions.prediction = true
+  ultraStartDialogVisible.value = true
+}
+
+// 启动超短期预测任务
+const startUltraShortTask = async () => {
+  ultraStartDialogVisible.value = false
+  loading.value = true
+  
+  try {
+    const params = {
+      type: 'ultra_short',
+      options: ultraStartOptions
+    }
+    
+    const res = await apiClient.post('/api/start_ultra', params)
+    
+    ElMessage.success(res.data.message || '超短期预测任务启动成功')
+    
+    // 刷新状态
+    setTimeout(async () => {
+      await fetchStatus()
+    }, 1000)
+  } catch (error) {
+    if (error.response && error.response.data) {
+      showErrorDialog(
+        '启动超短期预测失败', 
+        error.response.data.details || error.response.data.error || error.message
+      )
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+// 获取参数优化执行的星期
+const getParamOptWeekday = (taskType) => {
+  const weekdayMap = {
+    'ultra_short': '每周六',
+    'short': '每周五',
+    'medium': '每周四'
+  }
+  return weekdayMap[taskType] || '每周六'
 }
 </script>
 
@@ -1090,5 +1451,100 @@ const getStatusLabel = (status) => {
     align-items: center;
     gap: 8px;
   }
+}
+
+.logs-filters {
+  margin-bottom: 20px;
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.task-info-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.task-info-title {
+  font-size: 20px;
+  margin-bottom: 24px;
+  color: #303133;
+  text-align: center;
+}
+
+.task-status-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.task-status-card {
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+
+.task-status-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.task-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-card-content {
+  padding: 10px 0;
+}
+
+.task-card-content p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #606266;
+}
+
+.script-info-section {
+  margin-top: 20px;
+}
+
+.script-info-section h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #303133;
+}
+
+.ultra-start-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 20px 0;
+  text-align: left;
+}
+
+.ultra-start-options p {
+  margin-bottom: 10px;
+}
+
+.ultra-start-options .el-checkbox {
+  display: flex;
+  margin-left: 20px;
+  height: auto;
+  align-items: flex-start;
+}
+
+.ultra-start-options .el-checkbox :deep(.el-checkbox__label) {
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.task-date-selector {
+  margin-bottom: 20px;
+  text-align: center;
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
 }
 </style>

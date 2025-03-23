@@ -1,6 +1,7 @@
 import json
 import subprocess
 import datetime
+import glob
 from flask import Blueprint, request, jsonify, current_app
 import os
 import sys
@@ -50,6 +51,12 @@ scripts = {
     'medium': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'middle', 'scheduler_middle.py')
 }
 
+# 额外定义超短期预测的两个脚本路径
+ultra_short_scripts = {
+    'training': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'supershort', 'scheduler_supershort.py'),
+    'prediction': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'supershort', 'scheduler_predict.py')
+}
+
 # 检查脚本是否存在
 for name, path in scripts.items():
     if os.path.exists(path):
@@ -67,6 +74,31 @@ for name, path in scripts.items():
                 print(f"✅ 找到替代脚本: {loc}")
                 scripts[name] = loc
                 break
+
+# 定义日志目录路径
+log_dirs = {
+    'ultra_short': {
+        'base': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'supershort', 'logs'),
+        'train': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'supershort', 'logs', 'auto_train'),
+        'predict': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'supershort', 'logs', 'scheduler_predict'),
+        'param': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'supershort', 'logs', 'param_optimizer')
+    },
+    'short': {
+        'base': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'short', 'logs'),
+        'train': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'short', 'logs', 'auto_train'),
+        'param': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'short', 'logs', 'param_optimizer')
+    },
+    'medium': {
+        'base': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'middle', 'logs'),
+        'train': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'middle', 'logs', 'auto_train'),
+        'param': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'middle', 'logs', 'param_optimizer')
+    }
+}
+
+# 确保所有日志目录都存在
+for type_dirs in log_dirs.values():
+    for dir_path in type_dirs.values():
+        os.makedirs(dir_path, exist_ok=True)
 
 # 改进PM2路径检测
 def find_pm2_path():
@@ -340,43 +372,96 @@ def start_prediction():
         record_task_history(prediction_type, 'start', 'failed', error_msg)
         return jsonify({'error': error_msg}), 500
 
-# 停止指定预测任务
+# 停止预测任务
 @autopredict_bp.route('/stop', methods=['POST'])
 def stop_prediction():
-    data = request.get_json() or {}
+    data = request.json
     prediction_type = data.get('type')
-    if prediction_type not in prediction_status:
+    
+    if not prediction_type or prediction_type not in prediction_status:
         return jsonify({'error': '无效的预测类型'}), 400
-
-    script_path = scripts[prediction_type]
-    # 使用进程名而不是脚本路径
-    process_name = os.path.basename(script_path)
     
-    success, result = safe_pm2_command(['stop', process_name])
-    
-    if success:
-        prediction_status[prediction_type] = False
-        record_task_history(prediction_type, 'stop', 'success', f'进程已停止: {process_name}')
-        return jsonify({'message': f'{prediction_type} 预测任务已停止'})
-    else:
-        # 尝试通过脚本完整路径停止
-        alt_success, alt_result = safe_pm2_command(['stop', script_path])
-        if alt_success:
-            prediction_status[prediction_type] = False
-            record_task_history(prediction_type, 'stop', 'success', f'通过完整路径停止进程: {script_path}')
-            return jsonify({'message': f'{prediction_type} 预测任务已停止'})
+    try:
+        if prediction_type == 'ultra_short':
+            # 停止超短期预测的两个脚本
+            results = []
+            
+            # 停止训练脚本
+            training_script = ultra_short_scripts['training']
+            training_name = os.path.basename(training_script)
+            training_success, training_result = safe_pm2_command(['stop', training_name])
+            
+            if training_success:
+                results.append(f'训练脚本({training_name})停止成功')
+            else:
+                results.append(f'训练脚本停止失败: {training_result}')
+            
+            # 停止预测脚本
+            prediction_script = ultra_short_scripts['prediction']
+            prediction_name = os.path.basename(prediction_script)
+            prediction_success, prediction_result = safe_pm2_command(['stop', prediction_name])
+            
+            if prediction_success:
+                results.append(f'预测脚本({prediction_name})停止成功')
+            else:
+                results.append(f'预测脚本停止失败: {prediction_result}')
+            
+            # 只要有一个成功停止，就更新状态
+            if training_success or prediction_success:
+                prediction_status[prediction_type] = False
+                # 更新全局状态
+                _update_prediction_status()
+                
+                message = ' & '.join(results)
+                record_task_history(prediction_type, 'stop', 'success', message)
+                
+                return jsonify({
+                    'message': '超短期预测任务已停止',
+                    'details': message
+                })
+            else:
+                # 两个都失败
+                error_msg = ' & '.join(results)
+                record_task_history(prediction_type, 'stop', 'failed', error_msg)
+                
+                return jsonify({
+                    'error': '停止超短期预测任务失败',
+                    'details': error_msg
+                }), 500
         else:
-            error_msg = '停止任务失败'
-            details = {
-                'details': str(result),
-                'alt_details': str(alt_result) if 'alt_result' in locals() else '未尝试替代方法'
-            }
-            record_task_history(prediction_type, 'stop', 'failed', json.dumps(details))
-            return jsonify({
-                'error': error_msg, 
-                'details': str(result),
-                'alt_details': str(alt_result) if 'alt_result' in locals() else '未尝试替代方法'
-            }), 500
+            # 正常停止单个脚本
+            script_path = scripts[prediction_type]
+            script_name = os.path.basename(script_path)
+            
+            success, result = safe_pm2_command(['stop', script_name])
+            
+            if success:
+                prediction_status[prediction_type] = False
+                # 更新全局状态
+                _update_prediction_status()
+                
+                message = f'{script_name} 已停止'
+                record_task_history(prediction_type, 'stop', 'success', message)
+                
+                return jsonify({
+                    'message': f'{prediction_type}预测任务已停止'
+                })
+            else:
+                error_msg = f'停止任务失败: {result}'
+                record_task_history(prediction_type, 'stop', 'failed', error_msg)
+                
+                return jsonify({
+                    'error': '停止预测任务失败',
+                    'details': str(result)
+                }), 500
+    except Exception as e:
+        error_msg = f'停止预测任务异常: {str(e)}'
+        record_task_history(prediction_type, 'stop', 'failed', error_msg)
+        
+        return jsonify({
+            'error': '停止预测任务失败',
+            'details': str(e)
+        }), 500
 
 # 设置定时重启任务
 @autopredict_bp.route('/schedule', methods=['POST'])
@@ -424,45 +509,95 @@ def schedule_restart():
         record_task_history(prediction_type, 'schedule', 'failed', error_msg)
         return jsonify({'error': error_msg}), 500
 
-# ---------------- 新增接口 ----------------
-
-# 删除指定预测任务（从 pm2 列表中删除）
+# 从 PM2 中删除任务
 @autopredict_bp.route('/delete', methods=['POST'])
 def delete_prediction():
-    data = request.get_json() or {}
+    data = request.json
     prediction_type = data.get('type')
-    if prediction_type not in prediction_status:
+    if not prediction_type or prediction_type not in prediction_status:
         return jsonify({'error': '无效的预测类型'}), 400
-
-    script_path = scripts[prediction_type]
-    # 使用进程名而不是脚本路径
-    process_name = os.path.basename(script_path)
     
-    success, result = safe_pm2_command(['delete', process_name])
-    
-    if success:
-        prediction_status[prediction_type] = False
-        record_task_history(prediction_type, 'delete', 'success', f'删除进程: {process_name}')
-        return jsonify({'message': f'{prediction_type} 预测任务已删除'})
-    else:
-        # 尝试通过脚本完整路径删除
-        alt_success, alt_result = safe_pm2_command(['delete', script_path])
-        if alt_success:
-            prediction_status[prediction_type] = False
-            record_task_history(prediction_type, 'delete', 'success', f'通过完整路径删除进程: {script_path}')
-            return jsonify({'message': f'{prediction_type} 预测任务已删除'})
+    try:
+        if prediction_type == 'ultra_short':
+            # 删除超短期预测的两个脚本
+            results = []
+            
+            # 删除训练脚本
+            training_script = ultra_short_scripts['training']
+            training_name = os.path.basename(training_script)
+            training_success, training_result = safe_pm2_command(['delete', training_name])
+            
+            if training_success:
+                results.append(f'训练脚本({training_name})已从PM2删除')
+            else:
+                results.append(f'训练脚本删除失败: {training_result}')
+            
+            # 删除预测脚本
+            prediction_script = ultra_short_scripts['prediction']
+            prediction_name = os.path.basename(prediction_script)
+            prediction_success, prediction_result = safe_pm2_command(['delete', prediction_name])
+            
+            if prediction_success:
+                results.append(f'预测脚本({prediction_name})已从PM2删除')
+            else:
+                results.append(f'预测脚本删除失败: {prediction_result}')
+            
+            # 只要有一个成功删除，就更新状态
+            if training_success or prediction_success:
+                prediction_status[prediction_type] = False
+                # 更新全局状态
+                _update_prediction_status()
+                
+                message = ' & '.join(results)
+                record_task_history(prediction_type, 'delete', 'success', message)
+                
+                return jsonify({
+                    'message': '超短期预测任务已从PM2删除',
+                    'details': message
+                })
+            else:
+                # 两个都失败
+                error_msg = ' & '.join(results)
+                record_task_history(prediction_type, 'delete', 'failed', error_msg)
+                
+                return jsonify({
+                    'error': '从PM2删除超短期预测任务失败',
+                    'details': error_msg
+                }), 500
         else:
-            error_msg = '删除任务失败'
-            details = {
-                'details': str(result),
-                'alt_details': str(alt_result) if 'alt_result' in locals() else '未尝试替代方法'
-            }
-            record_task_history(prediction_type, 'delete', 'failed', json.dumps(details))
-            return jsonify({
-                'error': error_msg, 
-                'details': str(result),
-                'alt_details': str(alt_result) if 'alt_result' in locals() else '未尝试替代方法'
-            }), 500
+            # 正常删除单个脚本
+            script_path = scripts[prediction_type]
+            script_name = os.path.basename(script_path)
+            
+            success, result = safe_pm2_command(['delete', script_name])
+            
+            if success:
+                prediction_status[prediction_type] = False
+                # 更新全局状态
+                _update_prediction_status()
+                
+                message = f'{script_name} 已从PM2删除'
+                record_task_history(prediction_type, 'delete', 'success', message)
+                
+                return jsonify({
+                    'message': f'{prediction_type}预测任务已从PM2删除'
+                })
+            else:
+                error_msg = f'删除任务失败: {result}'
+                record_task_history(prediction_type, 'delete', 'failed', error_msg)
+                
+                return jsonify({
+                    'error': '从PM2删除预测任务失败',
+                    'details': str(result)
+                }), 500
+    except Exception as e:
+        error_msg = f'删除预测任务异常: {str(e)}'
+        record_task_history(prediction_type, 'delete', 'failed', error_msg)
+        
+        return jsonify({
+            'error': '从PM2删除预测任务失败',
+            'details': str(e)
+        }), 500
 
 # 保存当前 PM2 任务配置
 @autopredict_bp.route('/save', methods=['POST'])
@@ -578,39 +713,128 @@ def get_script_info():
 @autopredict_bp.route('/logs', methods=['GET'])
 def get_logs():
     prediction_type = request.args.get('type')
-    lines = request.args.get('lines', 100, type=int)
+    log_type = request.args.get('logType', 'main') # main, train, predict, param
+    date_str = request.args.get('date', datetime.datetime.now().strftime('%Y%m%d'))
+    lines = request.args.get('lines', 500, type=int)
+    
     if not prediction_type or prediction_type not in prediction_status:
         return jsonify({'error': '无效的预测类型'}), 400
-        
-    script_path = scripts[prediction_type]
-    process_name = os.path.basename(script_path)
     
-    success, result = safe_pm2_command(['logs', '--nostream', '--lines', str(lines), process_name])
-    
-    if success:
-        record_task_history(prediction_type, 'logs', 'success', f'获取日志 ({lines} 行)')
-        return jsonify({'logs': result.stdout if hasattr(result, 'stdout') else '没有日志输出'})
-    else:
-        # 尝试只获取错误日志
-        error_success, error_result = safe_pm2_command(['logs', '--nostream', '--err', '--lines', str(lines), process_name])
-        if error_success:
-            warning_msg = '无法获取完整日志，仅显示错误日志'
-            record_task_history(prediction_type, 'logs', 'warning', warning_msg)
-            return jsonify({
-                'logs': f"警告: {warning_msg}:\n{error_result.stdout if hasattr(error_result, 'stdout') else '没有错误日志'}"
-            })
+    try:
+        # 如果是通过PM2查询主日志
+        if log_type == 'main':
+            script_path = scripts[prediction_type]
+            process_name = os.path.basename(script_path)
+            
+            success, result = safe_pm2_command(['logs', '--nostream', '--lines', str(lines), process_name])
+            
+            if success:
+                record_task_history(prediction_type, 'logs', 'success', f'获取主日志 ({lines} 行)')
+                return jsonify({'logs': result.stdout if hasattr(result, 'stdout') else '没有日志输出'})
+            else:
+                # 尝试只获取错误日志
+                error_success, error_result = safe_pm2_command(['logs', '--nostream', '--err', '--lines', str(lines), process_name])
+                if error_success:
+                    warning_msg = '无法获取完整日志，仅显示错误日志'
+                    record_task_history(prediction_type, 'logs', 'warning', warning_msg)
+                    return jsonify({
+                        'logs': f"警告: {warning_msg}:\n{error_result.stdout if hasattr(error_result, 'stdout') else '没有错误日志'}"
+                    })
+                else:
+                    error_msg = '获取日志失败'
+                    details = {
+                        'details': str(result),
+                        'error_log_details': str(error_result) if 'error_result' in locals() else '未尝试获取错误日志'
+                    }
+                    record_task_history(prediction_type, 'logs', 'failed', json.dumps(details))
+                    return jsonify({
+                        'error': error_msg, 
+                        'details': str(result),
+                        'error_log_details': str(error_result) if 'error_result' in locals() else '未尝试获取错误日志'
+                    }), 500
         else:
-            error_msg = '获取日志失败'
-            details = {
-                'details': str(result),
-                'error_log_details': str(error_result) if 'error_result' in locals() else '未尝试获取错误日志'
-            }
-            record_task_history(prediction_type, 'logs', 'failed', json.dumps(details))
-            return jsonify({
-                'error': error_msg, 
-                'details': str(result),
-                'error_log_details': str(error_result) if 'error_result' in locals() else '未尝试获取错误日志'
-            }), 500
+            # 从对应的日志目录读取文件
+            log_dir = log_dirs[prediction_type].get(log_type)
+            if not log_dir:
+                return jsonify({'error': f'无效的日志类型: {log_type}'}), 400
+            
+            # 查找日志文件
+            log_files = []
+            if log_type == 'train':
+                # 训练日志格式可能是 YYYYMMDD.log 或包含日期的其他格式
+                log_files = glob.glob(os.path.join(log_dir, f"{date_str}*.log"))
+                train_flag_path = os.path.join(log_dir, f"{date_str}_train_done.flag")
+                
+                # 如果找不到日志但有完成标志文件，则尝试查找最近的可能相关日志
+                if not log_files and os.path.exists(train_flag_path):
+                    # 尝试用更宽松的模式查找日期相近的日志
+                    year_month = date_str[:6]  # 提取年月
+                    month_logs = glob.glob(os.path.join(log_dir, f"{year_month}*.log"))
+                    if month_logs:
+                        # 找到最接近但不超过所选日期的日志文件
+                        filtered_logs = [log for log in month_logs 
+                                        if os.path.basename(log).split('_')[0] <= date_str]
+                        if filtered_logs:
+                            log_files = [max(filtered_logs, key=lambda x: os.path.basename(x).split('_')[0])]
+            elif log_type == 'predict':
+                # 预测日志格式
+                log_files = glob.glob(os.path.join(log_dir, f"{date_str}*.log"))
+            elif log_type == 'param':
+                # 参数优化日志 - 查找对应周的日志
+                try:
+                    # 解析所选日期
+                    selected_date = datetime.datetime.strptime(date_str, '%Y%m%d')
+                    # 计算所在周的周一
+                    monday = selected_date - datetime.timedelta(days=selected_date.weekday())
+                    monday_str = monday.strftime('%Y%m%d')
+                    
+                    # 查找该周的参数优化标志文件
+                    param_flag_path = os.path.join(log_dir, f"{monday_str}_param_opt_done.flag")
+                    
+                    if os.path.exists(param_flag_path):
+                        # 存在标志文件，查找最接近的日志
+                        week_logs = glob.glob(os.path.join(log_dir, f"{monday_str}*.log"))
+                        if not week_logs:
+                            # 尝试查找该月的所有参数优化日志
+                            year_month = monday_str[:6]  # 提取年月
+                            month_logs = glob.glob(os.path.join(log_dir, f"{year_month}*.log"))
+                            
+                            if month_logs:
+                                # 选择最近的一个日志
+                                log_files = [max(month_logs, key=os.path.getmtime)]
+                        else:
+                            log_files = week_logs
+                except ValueError:
+                    # 日期格式错误，返回错误信息
+                    record_task_history(prediction_type, 'logs', 'failed', f'日期格式无效: {date_str}')
+                    return jsonify({'error': f'日期格式无效: {date_str}'}), 400
+            
+            if not log_files:
+                record_task_history(prediction_type, 'logs', 'failed', f'未找到{date_str}的{log_type}类型日志文件')
+                return jsonify({'logs': f'未找到{date_str}的{log_type}日志文件'})
+            
+            # 读取最新的日志文件
+            latest_log = max(log_files, key=os.path.getmtime)
+            try:
+                with open(latest_log, 'r', encoding='utf-8', errors='replace') as f:
+                    # 如果文件太大，只读取最后N行
+                    all_lines = f.readlines()
+                    log_content = ''.join(all_lines[-lines:]) if len(all_lines) > lines else ''.join(all_lines)
+                
+                # 添加日志文件信息到内容中
+                file_info = f"文件: {os.path.basename(latest_log)}\n日期: {datetime.datetime.fromtimestamp(os.path.getmtime(latest_log)).strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                log_content = file_info + log_content
+                
+                record_task_history(prediction_type, 'logs', 'success', f'获取{log_type}日志 ({lines} 行)')
+                return jsonify({'logs': log_content})
+            except Exception as e:
+                error_msg = f'读取日志文件失败: {str(e)}'
+                record_task_history(prediction_type, 'logs', 'failed', error_msg)
+                return jsonify({'error': error_msg}), 500
+    except Exception as e:
+        error_msg = f'获取日志失败: {str(e)}'
+        record_task_history(prediction_type, 'logs', 'failed', error_msg)
+        return jsonify({'error': error_msg}), 500
 
 # 加载已保存的 PM2 配置（基于 pm2 resurrect）
 @autopredict_bp.route('/resurrect', methods=['POST'])
@@ -716,4 +940,150 @@ def get_task_history():
     finally:
         if 'db' in locals():
             db.close()
+
+# 查询任务状态（训练、预测、参数优化）
+@autopredict_bp.route('/task_status', methods=['GET'])
+def get_task_status():
+    prediction_type = request.args.get('type')
+    date_str = request.args.get('date', datetime.datetime.now().strftime('%Y%m%d'))
+    
+    if not prediction_type or prediction_type not in prediction_status:
+        return jsonify({'error': '无效的预测类型'}), 400
+    
+    # 初始化状态对象
+    status = {
+        'training': False,
+        'prediction': False,
+        'paramOpt': False,
+        'trainingTime': '',
+        'predictionTime': '',
+        'paramOptTime': '',
+        'predictionCount': 0
+    }
+    
+    try:
+        # 解析日期
+        try:
+            selected_date = datetime.datetime.strptime(date_str, '%Y%m%d')
+        except ValueError:
+            return jsonify({'error': '日期格式无效，请使用YYYYMMDD格式'}), 400
+        
+        is_today = selected_date.date() == datetime.datetime.now().date()
+        is_current_week = (datetime.datetime.now() - selected_date).days < 7
+        
+        # 检查训练任务状态（通过flag文件）
+        train_flag_path = os.path.join(log_dirs[prediction_type]['train'], f"{date_str}_train_done.flag")
+        if os.path.exists(train_flag_path):
+            status['training'] = True
+            status['trainingTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(train_flag_path)).strftime('%Y-%m-%d %H:%M:%S')
+        
+        # 检查参数优化任务状态
+        # 计算所选日期所在周的周一
+        selected_monday = selected_date - datetime.timedelta(days=selected_date.weekday())
+        monday_str = selected_monday.strftime('%Y%m%d')
+        param_flag_path = os.path.join(log_dirs[prediction_type]['param'], f"{monday_str}_param_opt_done.flag")
+        
+        if os.path.exists(param_flag_path):
+            status['paramOpt'] = True
+            status['paramOptTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(param_flag_path)).strftime('%Y-%m-%d %H:%M:%S')
+        
+        # 检查预测任务状态
+        if prediction_type == 'ultra_short':
+            # 超短期预测需要检查预测日志
+            predict_log_dir = log_dirs[prediction_type]['predict']
+            
+            # 查找指定日期的所有日志文件
+            date_logs = glob.glob(os.path.join(predict_log_dir, f"{date_str}*.log"))
+            
+            # 计算当天预测完成次数
+            status['predictionCount'] = len(date_logs)
+            
+            if date_logs:
+                status['prediction'] = True
+                latest_log = max(date_logs, key=os.path.getmtime)
+                status['predictionTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(latest_log)).strftime('%Y-%m-%d %H:%M:%S')
+            
+            # 只有当天才检查进程状态
+            if is_today:
+                predict_script = ultra_short_scripts['prediction']
+                predict_online = query_pm2_state(predict_script)
+                status['prediction'] = predict_online or status['prediction']
+        else:
+            # 短期和中期预测查找日志文件
+            predict_logs_dir = os.path.join(log_dirs[prediction_type]['base'], 'predictions')
+            date_logs = glob.glob(os.path.join(predict_logs_dir, f"{date_str}*.log"))
+            
+            if date_logs:
+                status['prediction'] = True
+                latest_log = max(date_logs, key=os.path.getmtime)
+                status['predictionTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(latest_log)).strftime('%Y-%m-%d %H:%M:%S')
+            
+            # 只有当天才检查进程状态
+            if is_today:
+                script_online = query_pm2_state(scripts[prediction_type])
+                status['prediction'] = script_online or status['prediction']
+        
+        return jsonify({'status': status})
+    except Exception as e:
+        print(f"获取任务状态失败: {str(e)}")
+        return jsonify({'error': '获取任务状态失败', 'details': str(e)}), 500
+
+# 添加启动超短期预测的特殊接口
+@autopredict_bp.route('/start_ultra', methods=['POST'])
+def start_ultra_short():
+    try:
+        data = request.json
+        options = data.get('options', {})
+        
+        # 检查选项
+        start_training = options.get('training', True)
+        start_prediction = options.get('prediction', True)
+        
+        if not start_training and not start_prediction:
+            return jsonify({'error': '至少需要选择一个脚本启动'}), 400
+        
+        results = []
+        
+        # 启动训练脚本
+        if start_training:
+            training_script = ultra_short_scripts['training']
+            success, result = safe_pm2_command([
+                'start', 
+                training_script, 
+                '--name', os.path.basename(training_script)
+            ])
+            
+            if success:
+                results.append('训练脚本启动成功')
+                prediction_status['ultra_short'] = True
+            else:
+                results.append(f'训练脚本启动失败: {result}')
+        
+        # 启动预测脚本
+        if start_prediction:
+            prediction_script = ultra_short_scripts['prediction']
+            success, result = safe_pm2_command([
+                'start', 
+                prediction_script, 
+                '--name', os.path.basename(prediction_script)
+            ])
+            
+            if success:
+                results.append('预测脚本启动成功')
+                prediction_status['ultra_short'] = True
+            else:
+                results.append(f'预测脚本启动失败: {result}')
+        
+        # 记录操作历史
+        message = ' & '.join(results)
+        record_task_history('ultra_short', 'start', 'success', message)
+        
+        return jsonify({
+            'message': '超短期预测任务启动成功',
+            'details': message
+        })
+    except Exception as e:
+        error_msg = f'启动超短期预测失败: {str(e)}'
+        record_task_history('ultra_short', 'start', 'failed', error_msg)
+        return jsonify({'error': error_msg}), 500
 

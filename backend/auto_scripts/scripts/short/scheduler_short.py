@@ -160,10 +160,10 @@ def run_param_optimizer():
 # 每天 2:00 执行训练预测任务
 schedule.every().day.at("02:00").do(run_script)
 
-# 每周六 1:00 执行参数优化任务
-schedule.every().saturday.at("01:00").do(run_param_optimizer)
+# 每周五 1:00 执行参数优化任务
+schedule.every().friday.at("01:00").do(run_param_optimizer)
 
-logging.info("定时任务启动成功，每周六 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py")
+logging.info("定时任务启动成功，每周五 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py")
 
 # 记录当前时间和状态
 now = datetime.now()
@@ -205,9 +205,9 @@ while True:
             logging.info(f"当前任务状态: 训练预测任务已执行={is_train_done(today_date)}, 参数优化任务已执行={is_param_opt_done()}")
 
         # 处理参数优化任务的运行监控（对周六进行监控）
-        if current_weekday == 5 and current_hour >= 1: 
+        if current_weekday == 4 and current_hour >= 1: 
             if not param_opt_executed and not is_param_opt_done():
-                logging.warning("检测到周六 1:00 参数优化未执行，立即补救运行")
+                logging.warning("检测到周五 1:00 参数优化未执行，立即补救运行")
                 run_param_optimizer()
             elif not param_opt_executed and is_param_opt_done():
                 logging.info("发现本周参数优化已执行过，更新任务状态")
@@ -231,7 +231,7 @@ while True:
                 task_executed = True
 
         # 到了周日凌晨，重置参数优化任务状态（为下周做准备）
-        if current_weekday == 6 and current_hour == 0 and current_minute == 0:
+        if current_weekday == 5 and current_hour == 0 and current_minute == 0:
             param_opt_executed = False
             logging.info("重置每周参数优化任务状态")
 
