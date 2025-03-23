@@ -1,118 +1,138 @@
-2025-03-22 10:32:02,631 - 
+2025-03-22 20:20:34,615 - 
 ================================================================================
-2025-03-22 10:32:02,631 - >>> 开始参数优化 <<<
-2025-03-22 10:32:02,631 - ================================================================================
+2025-03-22 20:20:34,616 - >>> 开始参数优化 <<<
+2025-03-22 20:20:34,616 - ================================================================================
 
-2025-03-22 10:32:02,631 - 开始LightGBM参数优化流程
-2025-03-22 10:32:02,632 - 没有找到CSV数据文件
-2025-03-22 10:32:02,632 - 无法继续参数优化，未找到数据文件
-2025-03-22 10:37:33,954 - 
+2025-03-22 20:20:34,616 - 开始LightGBM参数优化流程
+2025-03-22 20:20:34,616 - 找到最新的数据文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle\20250322.csv
+2025-03-22 20:20:34,616 - 加载数据: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle\20250322.csv
+2025-03-22 20:20:34,716 - 数据加载完成，共 2973 条记录
+2025-03-22 20:20:34,725 - 数据集划分完成，训练集: (2675, 304), 验证集: (298, 304)
+2025-03-22 20:20:34,849 - 特征工程完成，训练特征: (2672, 859), 验证特征: (295, 859)
+2025-03-22 20:20:34,900 - 数据标准化完成
+2025-03-22 20:20:34,974 - 时间窗口创建完成，训练窗口: (2657, 16, 859), 验证窗口: (280, 16, 859)
+2025-03-22 20:20:34,975 - 调整时间戳长度与验证集窗口匹配: 280
+2025-03-22 20:20:34,975 - 当前参数版本: 20250321
+2025-03-22 20:20:34,975 - 
 ================================================================================
-2025-03-22 10:37:33,954 - >>> 开始参数优化 <<<
-2025-03-22 10:37:33,954 - ================================================================================
+2025-03-22 20:20:34,975 - >>> 优化 GBDT 算法参数 <<<
+2025-03-22 20:20:34,975 - ================================================================================
 
-2025-03-22 10:37:33,954 - 开始LightGBM参数优化流程
-2025-03-22 10:37:33,954 - 找到最新的数据文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle\20250322.csv
-2025-03-22 10:37:33,954 - 加载数据: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle\20250322.csv
-2025-03-22 10:37:34,658 - 数据加载完成，共 38079 条记录
-2025-03-22 10:37:34,691 - 数据集划分完成，训练集: (34271, 304), 验证集: (3808, 304)
-2025-03-22 10:37:34,955 - 特征工程完成，训练特征: (34268, 859), 验证特征: (3805, 859)
-2025-03-22 10:37:35,259 - 数据标准化完成
-2025-03-22 10:37:35,895 - 时间窗口创建完成，训练窗口: (34253, 16, 859), 验证窗口: (3790, 16, 859)
-2025-03-22 10:37:35,895 - 调整时间戳长度与验证集窗口匹配: 3790
-2025-03-22 10:37:35,895 - 当前参数版本: 20250321
-2025-03-22 10:37:35,896 - 
+2025-03-22 20:20:34,975 - 开始优化 GBDT 算法参数
+2025-03-22 20:20:34,975 - 使用当前参数训练 GBDT 模型作为基准
+2025-03-22 20:21:29,959 - 当前 GBDT 参数基准分数: score=0.6513, rmse=67.1426, k=0.4608
+2025-03-22 20:21:29,959 - 开始 GBDT 的参数随机搜索
+2025-03-22 20:21:30,042 - 开始为 GBDT 进行随机参数搜索 (10 次迭代)
+2025-03-22 20:22:51,754 - [GBDT] 迭代 1/10: score=0.8072, rmse=55.1830, k=0.7361, 用时=81.71秒
+2025-03-22 20:22:51,755 - [GBDT] 新的最佳分数: 0.8072, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'gbdt', 'name': 'GBDT', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(40), 'learning_rate': np.float64(0.01), 'feature_fraction': np.float64(0.6), 'max_depth': np.int64(8), 'n_estimators': np.int64(150)}
+2025-03-22 20:23:07,973 - [GBDT] 迭代 2/10: score=0.8182, rmse=51.1650, k=0.7493, 用时=16.22秒
+2025-03-22 20:23:07,977 - [GBDT] 新的最佳分数: 0.8182, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'gbdt', 'name': 'GBDT', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(20), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.6), 'max_depth': np.int64(9), 'n_estimators': np.int64(170)}
+2025-03-22 20:23:25,949 - [GBDT] 迭代 3/10: score=0.8151, rmse=51.1274, k=0.7430, 用时=17.97秒
+2025-03-22 20:25:12,298 - [GBDT] 迭代 4/10: score=0.8114, rmse=53.8727, k=0.7415, 用时=106.35秒
+2025-03-22 20:26:35,009 - [GBDT] 迭代 5/10: score=0.8210, rmse=50.5556, k=0.7535, 用时=82.71秒
+2025-03-22 20:26:35,012 - [GBDT] 新的最佳分数: 0.8210, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'gbdt', 'name': 'GBDT', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(60), 'learning_rate': np.float64(0.05), 'feature_fraction': np.float64(0.9), 'max_depth': np.int64(8), 'n_estimators': np.int64(130)}
+2025-03-22 20:27:36,683 - [GBDT] 迭代 6/10: score=0.8198, rmse=51.0624, k=0.7522, 用时=61.67秒
+2025-03-22 20:27:45,180 - [GBDT] 迭代 7/10: score=0.8210, rmse=47.6640, k=0.7470, 用时=8.50秒
+2025-03-22 20:27:55,574 - [GBDT] 迭代 8/10: score=0.8246, rmse=47.1918, k=0.7533, 用时=10.39秒
+2025-03-22 20:27:55,577 - [GBDT] 新的最佳分数: 0.8246, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'gbdt', 'name': 'GBDT', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(20), 'learning_rate': np.float64(0.1), 'feature_fraction': np.float64(0.8), 'max_depth': np.int64(4), 'n_estimators': np.int64(110)}
+2025-03-22 20:28:20,490 - [GBDT] 迭代 9/10: score=0.8236, rmse=49.0068, k=0.7552, 用时=24.91秒
+2025-03-22 20:28:38,188 - [GBDT] 迭代 10/10: score=0.8271, rmse=47.5189, k=0.7590, 用时=17.70秒
+2025-03-22 20:28:38,192 - [GBDT] 新的最佳分数: 0.8271, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'gbdt', 'name': 'GBDT', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(90), 'learning_rate': np.float64(0.1), 'feature_fraction': np.float64(0.8), 'max_depth': np.int64(5), 'n_estimators': np.int64(150)}
+2025-03-22 20:28:38,192 - 发现更好的模型类型: GBDT, 分数: 0.8271
+2025-03-22 20:28:38,198 - 找到 GBDT 的最佳参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'gbdt', 'name': 'GBDT', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(90), 'learning_rate': np.float64(0.1), 'feature_fraction': np.float64(0.8), 'max_depth': np.int64(5), 'n_estimators': np.int64(150)}
+2025-03-22 20:29:08,702 - 新 GBDT 参数评分: score=0.6488, rmse=67.7178, k=0.4568
+2025-03-22 20:29:08,702 - 
 ================================================================================
-2025-03-22 10:37:35,896 - >>> 优化 GBDT 算法参数 <<<
-2025-03-22 10:37:35,896 - ================================================================================
+2025-03-22 20:29:08,702 - >>> 优化 DART 算法参数 <<<
+2025-03-22 20:29:08,702 - ================================================================================
 
-2025-03-22 10:37:35,896 - 开始优化 GBDT 算法参数
-2025-03-22 10:37:35,896 - 使用当前参数训练 GBDT 模型作为基准
-2025-03-22 10:38:22,699 - 当前 GBDT 参数基准分数: score=0.8084, rmse=44.0932, k=0.7130
-2025-03-22 10:38:22,699 - 开始 GBDT 的参数随机搜索
-2025-03-22 10:38:23,083 - 开始为 GBDT 进行随机参数搜索 (10 次迭代)
-2025-03-22 10:38:55,176 - [GBDT] 迭代 1/10: score=0.7039, rmse=91.7717, k=0.6102, 用时=32.09秒
-2025-03-22 10:38:55,176 - [GBDT] 新的最佳分数: 0.7039, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'gbdt', 'name': 'GBDT', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(50), 'learning_rate': np.float64(0.01), 'feature_fraction': np.float64(0.6), 'max_depth': np.int64(4), 'n_estimators': np.int64(110)}
-2025-03-22 10:39:32,552 - [GBDT] 迭代 2/10: score=0.7710, rmse=62.4096, k=0.6797, 用时=37.37秒
-2025-03-22 10:39:32,554 - [GBDT] 新的最佳分数: 0.7710, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'gbdt', 'name': 'GBDT', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(30), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.7), 'max_depth': np.int64(9), 'n_estimators': np.int64(50)}
-2025-03-22 10:40:14,029 - [GBDT] 迭代 3/10: score=0.7567, rmse=70.4289, k=0.6687, 用时=41.48秒
-2025-03-22 10:41:04,372 - [GBDT] 迭代 4/10: score=0.6955, rmse=94.0256, k=0.5984, 用时=50.34秒
-2025-03-22 10:42:00,299 - [GBDT] 迭代 5/10: score=0.7544, rmse=70.4868, k=0.6642, 用时=55.93秒
-2025-03-22 10:42:51,508 - [GBDT] 迭代 6/10: score=0.6423, rmse=111.8945, k=0.5313, 用时=51.21秒
-2025-03-22 10:44:50,924 - [GBDT] 迭代 7/10: score=0.7462, rmse=74.4772, k=0.6566, 用时=119.42秒
-2025-03-22 10:46:03,115 - [GBDT] 迭代 8/10: score=0.7041, rmse=91.3171, k=0.6096, 用时=72.19秒
-2025-03-22 10:47:17,187 - [GBDT] 迭代 9/10: score=0.7357, rmse=80.1015, k=0.6479, 用时=74.07秒
-2025-03-22 10:48:30,042 - [GBDT] 迭代 10/10: score=0.7467, rmse=71.3308, k=0.6506, 用时=72.85秒
-2025-03-22 10:48:30,042 - 发现更好的模型类型: GBDT, 分数: 0.7710
-2025-03-22 10:48:30,172 - 找到 GBDT 的最佳参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'gbdt', 'name': 'GBDT', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(30), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.7), 'max_depth': np.int64(9), 'n_estimators': np.int64(50)}
-2025-03-22 10:49:50,090 - 新 GBDT 参数评分: score=0.8015, rmse=45.9710, k=0.7036
-2025-03-22 10:49:50,090 - 
+2025-03-22 20:29:08,702 - 开始优化 DART 算法参数
+2025-03-22 20:29:08,702 - 使用当前参数训练 DART 模型作为基准
+2025-03-22 20:30:04,076 - 当前 DART 参数基准分数: score=0.7416, rmse=62.3280, k=0.6255
+2025-03-22 20:30:04,076 - 开始 DART 的参数随机搜索
+2025-03-22 20:30:04,125 - 开始为 DART 进行随机参数搜索 (10 次迭代)
+2025-03-22 20:30:18,952 - [DART] 迭代 1/10: score=0.8073, rmse=55.0658, k=0.7360, 用时=14.83秒
+2025-03-22 20:30:18,952 - [DART] 新的最佳分数: 0.8073, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'dart', 'name': 'DART', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(90), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.7), 'max_depth': np.int64(3), 'n_estimators': np.int64(150), 'drop_rate': np.float64(0.3), 'skip_drop': np.float64(0.3)}
+2025-03-22 20:31:12,708 - [DART] 迭代 2/10: score=0.8168, rmse=52.0408, k=0.7484, 用时=53.76秒
+2025-03-22 20:31:12,709 - [DART] 新的最佳分数: 0.8168, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'dart', 'name': 'DART', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(70), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.8), 'max_depth': np.int64(5), 'n_estimators': np.int64(190), 'drop_rate': np.float64(0.4), 'skip_drop': np.float64(0.5)}
+2025-03-22 20:31:31,124 - [DART] 迭代 3/10: score=0.5662, rmse=142.6358, k=0.4469, 用时=18.42秒
+2025-03-22 20:33:02,928 - [DART] 迭代 4/10: score=0.8249, rmse=50.7929, k=0.7618, 用时=91.80秒
+2025-03-22 20:33:02,930 - [DART] 新的最佳分数: 0.8249, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'dart', 'name': 'DART', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(60), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.6), 'max_depth': np.int64(7), 'n_estimators': np.int64(150), 'drop_rate': np.float64(0.4), 'skip_drop': np.float64(0.7)}
+2025-03-22 20:33:36,122 - [DART] 迭代 5/10: score=0.6863, rmse=103.6802, k=0.6013, 用时=33.19秒
+2025-03-22 20:33:45,191 - [DART] 迭代 6/10: score=0.6662, rmse=110.5489, k=0.5763, 用时=9.07秒
+2025-03-22 20:35:00,070 - [DART] 迭代 7/10: score=0.8106, rmse=57.0948, k=0.7471, 用时=74.88秒
+2025-03-22 20:35:24,568 - [DART] 迭代 8/10: score=0.3964, rmse=193.8417, k=0.2202, 用时=24.50秒
+2025-03-22 20:36:01,250 - [DART] 迭代 9/10: score=0.4560, rmse=175.6790, k=0.2993, 用时=36.68秒
+2025-03-22 20:36:27,362 - [DART] 迭代 10/10: score=0.3972, rmse=193.5504, k=0.2212, 用时=26.11秒
+2025-03-22 20:36:27,362 - 发现更好的模型类型: DART, 分数: 0.8249
+2025-03-22 20:36:27,372 - 找到 DART 的最佳参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'dart', 'name': 'DART', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(60), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.6), 'max_depth': np.int64(7), 'n_estimators': np.int64(150), 'drop_rate': np.float64(0.4), 'skip_drop': np.float64(0.7)}
+2025-03-22 20:36:54,869 - 新 DART 参数评分: score=0.6606, rmse=65.9146, k=0.4762
+2025-03-22 20:36:54,869 - 
 ================================================================================
-2025-03-22 10:49:50,090 - >>> 优化 DART 算法参数 <<<
-2025-03-22 10:49:50,090 - ================================================================================
+2025-03-22 20:36:54,869 - >>> 优化 GOSS 算法参数 <<<
+2025-03-22 20:36:54,869 - ================================================================================
 
-2025-03-22 10:49:50,090 - 开始优化 DART 算法参数
-2025-03-22 10:49:50,090 - 使用当前参数训练 DART 模型作为基准
-2025-03-22 10:51:31,864 - 当前 DART 参数基准分数: score=0.7960, rmse=58.7057, k=0.7212
-2025-03-22 10:51:31,864 - 开始 DART 的参数随机搜索
-2025-03-22 10:51:32,246 - 开始为 DART 进行随机参数搜索 (10 次迭代)
-2025-03-22 10:52:53,589 - [DART] 迭代 1/10: score=0.6132, rmse=124.8194, k=0.5016, 用时=81.34秒
-2025-03-22 10:52:53,589 - [DART] 新的最佳分数: 0.6132, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'dart', 'name': 'DART', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(80), 'learning_rate': np.float64(0.01), 'feature_fraction': np.float64(0.6), 'max_depth': np.int64(4), 'n_estimators': np.int64(170), 'drop_rate': np.float64(0.2), 'skip_drop': np.float64(0.7)}
-2025-03-22 10:54:20,966 - [DART] 迭代 2/10: score=0.5718, rmse=139.2537, k=0.4507, 用时=87.38秒
-2025-03-22 10:55:59,496 - [DART] 迭代 3/10: score=0.4934, rmse=165.0145, k=0.3506, 用时=98.53秒
-2025-03-22 10:58:09,186 - [DART] 迭代 4/10: score=0.4325, rmse=182.5430, k=0.2676, 用时=129.69秒
-2025-03-22 11:00:12,446 - [DART] 迭代 5/10: score=0.6883, rmse=98.7423, k=0.5944, 用时=123.26秒
-2025-03-22 11:00:12,458 - [DART] 新的最佳分数: 0.6883, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'dart', 'name': 'DART', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(30), 'learning_rate': np.float64(0.05), 'feature_fraction': np.float64(0.6), 'max_depth': np.int64(3), 'n_estimators': np.int64(70), 'drop_rate': np.float64(0.2), 'skip_drop': np.float64(0.7)}
-2025-03-22 11:04:09,245 - [DART] 迭代 6/10: score=0.7448, rmse=74.2678, k=0.6534, 用时=236.79秒
-2025-03-22 11:04:09,265 - [DART] 新的最佳分数: 0.7448, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'dart', 'name': 'DART', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(40), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.8), 'max_depth': np.int64(8), 'n_estimators': np.int64(150), 'drop_rate': np.float64(0.4), 'skip_drop': np.float64(0.5)}
-2025-03-22 11:07:59,330 - [DART] 迭代 7/10: score=0.7332, rmse=80.4044, k=0.6437, 用时=230.06秒
-2025-03-22 11:12:31,515 - [DART] 迭代 8/10: score=0.5344, rmse=149.4522, k=0.3983, 用时=272.18秒
-2025-03-22 11:16:31,406 - [DART] 迭代 9/10: score=0.7195, rmse=85.6141, k=0.6278, 用时=239.89秒
-2025-03-22 11:20:45,112 - [DART] 迭代 10/10: score=0.7449, rmse=75.2473, k=0.6558, 用时=253.71秒
-2025-03-22 11:20:45,163 - [DART] 新的最佳分数: 0.7449, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'dart', 'name': 'DART', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(60), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.8), 'max_depth': np.int64(5), 'n_estimators': np.int64(150), 'drop_rate': np.float64(0.4), 'skip_drop': np.float64(0.5)}
-2025-03-22 11:20:45,163 - 发现更好的模型类型: DART, 分数: 0.7449
-2025-03-22 11:20:45,340 - 找到 DART 的最佳参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'dart', 'name': 'DART', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(60), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.8), 'max_depth': np.int64(5), 'n_estimators': np.int64(150), 'drop_rate': np.float64(0.4), 'skip_drop': np.float64(0.5)}
-2025-03-22 11:25:10,928 - 新 DART 参数评分: score=0.8110, rmse=43.8294, k=0.7177
-2025-03-22 11:25:10,928 - 
+2025-03-22 20:36:54,869 - 开始优化 GOSS 算法参数
+2025-03-22 20:36:54,869 - 使用当前参数训练 GOSS 模型作为基准
+2025-03-22 20:37:08,563 - 当前 GOSS 参数基准分数: score=0.6442, rmse=68.3105, k=0.4494
+2025-03-22 20:37:08,563 - 开始 GOSS 的参数随机搜索
+2025-03-22 20:37:08,593 - 开始为 GOSS 进行随机参数搜索 (10 次迭代)
+2025-03-22 20:37:12,811 - [GOSS] 迭代 1/10: score=0.8017, rmse=55.3299, k=0.7254, 用时=4.22秒
+2025-03-22 20:37:12,811 - [GOSS] 新的最佳分数: 0.8017, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'goss', 'name': 'GOSS', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(30), 'learning_rate': np.float64(0.01), 'feature_fraction': np.float64(0.7), 'max_depth': np.int64(3), 'n_estimators': np.int64(90), 'top_rate': np.float64(0.2), 'other_rate': np.float64(0.2)}
+2025-03-22 20:37:19,109 - [GOSS] 迭代 2/10: score=0.8012, rmse=56.3355, k=0.7267, 用时=6.30秒
+2025-03-22 20:37:25,021 - [GOSS] 迭代 3/10: score=0.8156, rmse=49.6709, k=0.7408, 用时=5.91秒
+2025-03-22 20:37:25,024 - [GOSS] 新的最佳分数: 0.8156, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'goss', 'name': 'GOSS', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(80), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.8), 'max_depth': np.int64(6), 'n_estimators': np.int64(190), 'top_rate': np.float64(0.3), 'other_rate': np.float64(0.2)}
+2025-03-22 20:37:47,670 - [GOSS] 迭代 4/10: score=0.8147, rmse=53.1832, k=0.7466, 用时=22.65秒
+2025-03-22 20:38:02,246 - [GOSS] 迭代 5/10: score=0.8141, rmse=51.5113, k=0.7419, 用时=14.58秒
+2025-03-22 20:38:10,985 - [GOSS] 迭代 6/10: score=0.8086, rmse=53.3556, k=0.7349, 用时=8.74秒
+2025-03-22 20:38:16,056 - [GOSS] 迭代 7/10: score=0.8287, rmse=47.0714, k=0.7612, 用时=5.07秒
+2025-03-22 20:38:16,057 - [GOSS] 新的最佳分数: 0.8287, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'goss', 'name': 'GOSS', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(40), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.7), 'max_depth': np.int64(3), 'n_estimators': np.int64(50), 'top_rate': np.float64(0.2), 'other_rate': np.float64(0.1)}
+2025-03-22 20:38:28,541 - [GOSS] 迭代 8/10: score=0.7804, rmse=64.1827, k=0.7024, 用时=12.48秒
+2025-03-22 20:38:40,026 - [GOSS] 迭代 9/10: score=0.8179, rmse=50.1338, k=0.7463, 用时=11.48秒
+2025-03-22 20:38:57,508 - [GOSS] 迭代 10/10: score=0.8239, rmse=48.4619, k=0.7547, 用时=17.48秒
+2025-03-22 20:38:57,508 - 发现更好的模型类型: GOSS, 分数: 0.8287
+2025-03-22 20:38:57,513 - 找到 GOSS 的最佳参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'goss', 'name': 'GOSS', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(40), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.7), 'max_depth': np.int64(3), 'n_estimators': np.int64(50), 'top_rate': np.float64(0.2), 'other_rate': np.float64(0.1)}
+2025-03-22 20:39:05,508 - 新 GOSS 参数评分: score=0.6570, rmse=66.6282, k=0.4705
+2025-03-22 20:39:05,508 - GBDT 参数改进: False (新分数: 0.6488, 旧分数: 0.6513, 改进: -0.38%)
+2025-03-22 20:39:05,508 - GBDT 改进是否显著: False (最小阈值: 5.0%)
+2025-03-22 20:39:05,508 - DART 参数改进: False (新分数: 0.6606, 旧分数: 0.7416, 改进: -10.92%)
+2025-03-22 20:39:05,508 - DART 改进是否显著: False (最小阈值: 5.0%)
+2025-03-22 20:39:05,508 - GOSS 参数改进: True (新分数: 0.6570, 旧分数: 0.6442, 改进: 2.00%)
+2025-03-22 20:39:05,508 - GOSS 改进是否显著: False (最小阈值: 5.0%)
+2025-03-22 20:39:05,509 - 
 ================================================================================
-2025-03-22 11:25:10,928 - >>> 优化 GOSS 算法参数 <<<
-2025-03-22 11:25:10,928 - ================================================================================
+2025-03-22 20:39:05,509 - >>> 更新部分算法参数 <<<
+2025-03-22 20:39:05,509 - ================================================================================
 
-2025-03-22 11:25:10,928 - 开始优化 GOSS 算法参数
-2025-03-22 11:25:10,928 - 使用当前参数训练 GOSS 模型作为基准
-2025-03-22 11:29:52,828 - 当前 GOSS 参数基准分数: score=0.8118, rmse=43.5141, k=0.7185
-2025-03-22 11:29:52,828 - 开始 GOSS 的参数随机搜索
-2025-03-22 11:29:53,513 - 开始为 GOSS 进行随机参数搜索 (10 次迭代)
-2025-03-22 11:34:18,219 - [GOSS] 迭代 1/10: score=0.7584, rmse=66.4509, k=0.6632, 用时=264.71秒
-2025-03-22 11:34:18,219 - [GOSS] 新的最佳分数: 0.7584, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'goss', 'name': 'GOSS', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(50), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.6), 'max_depth': np.int64(9), 'n_estimators': np.int64(110), 'top_rate': np.float64(0.2), 'other_rate': np.float64(0.1)}
-2025-03-22 11:38:24,642 - [GOSS] 迭代 2/10: score=0.7538, rmse=68.7655, k=0.6593, 用时=246.42秒
-2025-03-22 11:45:07,248 - [GOSS] 迭代 3/10: score=0.7239, rmse=84.0812, k=0.6332, 用时=402.60秒
-2025-03-22 11:50:06,486 - [GOSS] 迭代 4/10: score=0.7669, rmse=65.3125, k=0.6777, 用时=299.24秒
-2025-03-22 11:50:06,537 - [GOSS] 新的最佳分数: 0.7669, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'goss', 'name': 'GOSS', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(30), 'learning_rate': np.float64(0.05), 'feature_fraction': np.float64(0.9), 'max_depth': np.int64(5), 'n_estimators': np.int64(150), 'top_rate': np.float64(0.2), 'other_rate': np.float64(0.3)}
-2025-03-22 11:54:53,195 - [GOSS] 迭代 5/10: score=0.7481, rmse=73.7979, k=0.6589, 用时=286.66秒
-2025-03-22 11:59:28,097 - [GOSS] 迭代 6/10: score=0.7582, rmse=70.9275, k=0.6729, 用时=274.90秒
-2025-03-22 12:04:05,392 - [GOSS] 迭代 7/10: score=0.7676, rmse=63.5063, k=0.6752, 用时=277.30秒
-2025-03-22 12:04:05,452 - [GOSS] 新的最佳分数: 0.7676, 参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'goss', 'name': 'GOSS', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(90), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.6), 'max_depth': np.int64(4), 'n_estimators': np.int64(90), 'top_rate': np.float64(0.3), 'other_rate': np.float64(0.2)}
-2025-03-22 12:09:33,372 - [GOSS] 迭代 8/10: score=0.7426, rmse=77.3359, k=0.6556, 用时=327.92秒
-2025-03-22 12:16:21,402 - [GOSS] 迭代 9/10: score=0.7246, rmse=83.8370, k=0.6340, 用时=408.03秒
-2025-03-22 12:21:02,218 - [GOSS] 迭代 10/10: score=0.7654, rmse=67.7569, k=0.6803, 用时=280.82秒
-2025-03-22 12:21:02,218 - 发现更好的模型类型: GOSS, 分数: 0.7676
-2025-03-22 12:21:02,374 - 找到 GOSS 的最佳参数: {'objective': 'regression', 'metric': 'rmse', 'random_state': 42, 'verbose': -1, 'boosting_type': 'goss', 'name': 'GOSS', 'device': 'gpu', 'gpu_platform_id': 0, 'gpu_device_id': 0, 'gpu_use_dp': False, 'num_leaves': np.int64(90), 'learning_rate': np.float64(0.2), 'feature_fraction': np.float64(0.6), 'max_depth': np.int64(4), 'n_estimators': np.int64(90), 'top_rate': np.float64(0.3), 'other_rate': np.float64(0.2)}
-2025-03-22 12:26:25,528 - 新 GOSS 参数评分: score=0.7881, rmse=48.3180, k=0.6818
-2025-03-22 12:26:25,529 - GBDT 参数改进: False (新分数: 0.8015, 旧分数: 0.8084, 改进: -0.85%)
-2025-03-22 12:26:25,529 - GBDT 改进是否显著: False (最小阈值: 5.0%)
-2025-03-22 12:26:25,529 - DART 参数改进: True (新分数: 0.8110, 旧分数: 0.7960, 改进: 1.88%)
-2025-03-22 12:26:25,529 - DART 改进是否显著: False (最小阈值: 5.0%)
-2025-03-22 12:26:25,529 - GOSS 参数改进: False (新分数: 0.7881, 旧分数: 0.8118, 改进: -2.92%)
-2025-03-22 12:26:25,529 - GOSS 改进是否显著: False (最小阈值: 5.0%)
-2025-03-22 12:26:25,529 - 
+2025-03-22 20:39:05,509 - 不是所有算法都有显著改进，分别检查更新
+2025-03-22 20:39:05,509 - GBDT 参数没有显著改进，保持当前参数不变
+2025-03-22 20:39:05,509 - DART 参数没有显著改进，保持当前参数不变
+2025-03-22 20:39:05,509 - GOSS 参数没有显著改进，保持当前参数不变
+2025-03-22 20:39:05,509 - 没有任何算法参数达到显著改进标准，保持当前参数不变
+2025-03-22 20:39:05,510 - 参数优化完成，已创建标志文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\scripts\middle\logs\param_optimizer\20250317_param_opt_done.flag
+2025-03-22 20:49:09,026 - 
 ================================================================================
-2025-03-22 12:26:25,529 - >>> 更新部分算法参数 <<<
-2025-03-22 12:26:25,529 - ================================================================================
+2025-03-22 20:49:09,027 - >>> 开始参数优化 <<<
+2025-03-22 20:49:09,027 - ================================================================================
 
-2025-03-22 12:26:25,529 - 不是所有算法都有显著改进，分别检查更新
-2025-03-22 12:26:25,529 - GBDT 参数没有显著改进，保持当前参数不变
-2025-03-22 12:26:25,529 - DART 参数没有显著改进，保持当前参数不变
-2025-03-22 12:26:25,529 - GOSS 参数没有显著改进，保持当前参数不变
-2025-03-22 12:26:25,529 - 没有任何算法参数达到显著改进标准，保持当前参数不变
-2025-03-22 12:26:25,530 - 参数优化完成，已创建标志文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\scripts\middle\logs\param_optimizer\20250317_param_opt_done.flag
+2025-03-22 20:49:09,027 - 开始LightGBM参数优化流程
+2025-03-22 20:49:09,027 - 检测到本周参数优化已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\scripts\middle\logs\param_optimizer\20250317_param_opt_done.flag)
+2025-03-22 20:49:09,027 - 
+================================================================================
+2025-03-22 20:49:09,027 - >>> 参数优化已执行 <<<
+2025-03-22 20:49:09,027 - ================================================================================
+
+2025-03-22 20:49:09,027 - 本周已经执行过参数优化，跳过此次运行
+2025-03-22 20:53:30,098 - 
+================================================================================
+2025-03-22 20:53:30,099 - >>> 开始参数优化 <<<
+2025-03-22 20:53:30,099 - ================================================================================
+
+2025-03-22 20:53:30,099 - 开始LightGBM参数优化流程
+2025-03-22 20:53:30,099 - 检测到本周参数优化已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\scripts\middle\logs\param_optimizer\20250317_param_opt_done.flag)
+2025-03-22 20:53:30,099 - 
+================================================================================
+2025-03-22 20:53:30,099 - >>> 参数优化已执行 <<<
+2025-03-22 20:53:30,099 - ================================================================================
+
+2025-03-22 20:53:30,099 - 本周已经执行过参数优化，跳过此次运行
