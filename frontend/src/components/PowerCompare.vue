@@ -243,12 +243,14 @@ export default {
       const predictionTypes = ['超短期预测', '短期预测', '中期预测'].filter(type => data[type])
       
       predictionTypes.forEach(type => {
-        if (data['实测值']) {
-          const predictedMap = new Map(data[type].map(v => [
-            new Date(v.timestamp).toISOString(),
-            v.power
-          ]))
+        const predictedMap = new Map(data[type].map(v => [
+          new Date(v.timestamp).toISOString(),
+          v.power
+        ]))
 
+        // 如果有实测值，计算评估指标
+        let metricsText = type;
+        if (data['实测值']) {
           const predictedValues = []
           const actualValues = []
           
@@ -265,19 +267,19 @@ export default {
 
           if (predictedValues.length > 0) {
             const metrics = this.calculateMetrics(actualValues, predictedValues)
-            const metricsText = `${type} (MAE: ${metrics.mae.toFixed(1)} | RMSE: ${metrics.rmse.toFixed(1)} | ACC: ${(metrics.acc * 100).toFixed(1)}% | K: ${metrics.k.toFixed(2)} | Pe: ${metrics.pe.toFixed(1)})`
-            
-            datasets.push({
-              label: metricsText,
-              data: sortedTimestamps.map(ts => predictedMap.get(ts) || null),
-              borderColor: colors[type],
-              backgroundColor: `${colors[type]}33`,
-              tension: 0.3,
-              pointRadius: 3,
-              spanGaps: true
-            })
+            metricsText = `${type} (MAE: ${metrics.mae.toFixed(1)} | RMSE: ${metrics.rmse.toFixed(1)} | ACC: ${(metrics.acc * 100).toFixed(1)}% | K: ${metrics.k.toFixed(2)} | Pe: ${metrics.pe.toFixed(1)})`
           }
         }
+        
+        datasets.push({
+          label: metricsText,
+          data: sortedTimestamps.map(ts => predictedMap.get(ts) || null),
+          borderColor: colors[type],
+          backgroundColor: `${colors[type]}33`,
+          tension: 0.3,
+          pointRadius: 3,
+          spanGaps: true
+        })
       })
 
       // 更新图表
@@ -442,8 +444,9 @@ export default {
     // 计算每日指标的方法
     calculateDailyMetrics(data) {
       console.log('计算每日指标的输入数据:', data)
+      // 如果没有实测值数据，则无法计算评估指标
       if (!data['实测值']) {
-        console.warn('没有实测值数据')
+        console.warn('没有实测值数据，无法计算评估指标')
         return null
       }
 
