@@ -27,7 +27,9 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # 确保日志目录存在
-log_dir = "./logs/auto_train"
+# 获取当前脚本所在目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+log_dir = os.path.join(current_dir, "logs", "auto_train")
 os.makedirs(log_dir, exist_ok=True)
 
 # 创建日志文件

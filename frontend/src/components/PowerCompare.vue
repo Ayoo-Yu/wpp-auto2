@@ -78,18 +78,14 @@
     </div>
 
     <!-- 图表展示区域 -->
-    <div class="chart-container">
+    <div class="chart-container" v-if="chartData">
       <div class="chart-wrapper">
-        <div v-if="!chartData" class="empty-chart">
-          <el-icon class="empty-icon"><PieChart /></el-icon>
-          <p class="empty-text">请选择时间范围并查询数据</p>
-        </div>
-        <canvas v-show="chartData" ref="chartCanvas" style="height: 70vh !important;"></canvas>
+        <canvas ref="chartCanvas" style="height: 70vh !important;"></canvas>
       </div>
     </div>
 
     <!-- 每日指标区域 -->
-    <div class="daily-metrics-container">
+    <div class="daily-metrics-container" v-if="dailyMetrics">
       <el-card class="metrics-card">
         <div class="metrics-header">
           <h3>每日评估指标</h3>
@@ -105,12 +101,47 @@
           </div>
         </div>
         <div class="metrics-chart-wrapper">
-          <p v-if="!dailyMetrics" class="empty-text" style="text-align: center;display: flex;flex-direction: column;justify-content: center;align-items: center;color: #909399;">请选择时间范围并查询数据</p>
           <canvas 
-            v-show="dailyMetrics" 
             ref="metricChart" 
             style="width: 100%; height: 100%; display: block;"
           ></canvas>
+        </div>
+      </el-card>
+    </div>
+
+    <!-- 数据提示区域 -->
+    <div class="empty-data-container" v-if="!chartData">
+      <el-card class="empty-data-card">
+        <div class="empty-data-content">
+          <el-icon class="empty-icon"><PieChart /></el-icon>
+          <h3>暂无数据</h3>
+          <p class="empty-text">请选择时间范围并点击查询数据按钮</p>
+        </div>
+      </el-card>
+    </div>
+
+    <!-- 合格率分析区域 -->
+    <div class="qualification-container" v-if="showQualificationCard">
+      <el-card class="qualification-card">
+        <div class="qualification-header">
+          <h3>预测合格率分析</h3>
+        </div>
+        <div class="qualification-content">
+          <div v-for="(data, type) in qualificationRates" :key="type" class="qualification-item">
+            <div class="qualification-type">
+              <span class="type-label">{{ type }}</span>
+              <span class="threshold-label">合格标准: K值 > {{ data.threshold }}</span>
+            </div>
+            <el-progress 
+              :percentage="data.rate" 
+              :color="getQualificationColor(data.rate)"
+              :format="percent => `${percent.toFixed(1)}%`"
+              :stroke-width="18"
+            />
+            <div class="qualification-details">
+              <span>合格天数: {{ data.qualifiedDays }}/{{ data.totalDays }}</span>
+            </div>
+          </div>
         </div>
       </el-card>
     </div>
@@ -161,6 +192,13 @@ export default {
         comparison: null,
         metrics: null
       },
+      qualifiedThresholds: {
+        '超短期预测': 0.65,
+        '短期预测': 0.6,
+        '中期预测': 0.4
+      },
+      qualificationRates: null,
+      showQualificationCard: false,
     }
   },
   methods: {
@@ -243,12 +281,14 @@ export default {
       const predictionTypes = ['超短期预测', '短期预测', '中期预测'].filter(type => data[type])
       
       predictionTypes.forEach(type => {
-        if (data['实测值']) {
-          const predictedMap = new Map(data[type].map(v => [
-            new Date(v.timestamp).toISOString(),
-            v.power
-          ]))
+        const predictedMap = new Map(data[type].map(v => [
+          new Date(v.timestamp).toISOString(),
+          v.power
+        ]))
 
+        // 如果有实测值，计算评估指标
+        let metricsText = type;
+        if (data['实测值']) {
           const predictedValues = []
           const actualValues = []
           
@@ -265,19 +305,19 @@ export default {
 
           if (predictedValues.length > 0) {
             const metrics = this.calculateMetrics(actualValues, predictedValues)
-            const metricsText = `${type} (MAE: ${metrics.mae.toFixed(1)} | RMSE: ${metrics.rmse.toFixed(1)} | ACC: ${(metrics.acc * 100).toFixed(1)}% | K: ${metrics.k.toFixed(2)} | Pe: ${metrics.pe.toFixed(1)})`
-            
-            datasets.push({
-              label: metricsText,
-              data: sortedTimestamps.map(ts => predictedMap.get(ts) || null),
-              borderColor: colors[type],
-              backgroundColor: `${colors[type]}33`,
-              tension: 0.3,
-              pointRadius: 3,
-              spanGaps: true
-            })
+            metricsText = `${type} (MAE: ${metrics.mae.toFixed(1)} | RMSE: ${metrics.rmse.toFixed(1)} | ACC: ${(metrics.acc * 100).toFixed(1)}% | K: ${metrics.k.toFixed(2)} | Pe: ${metrics.pe.toFixed(1)})`
           }
         }
+        
+        datasets.push({
+          label: metricsText,
+          data: sortedTimestamps.map(ts => predictedMap.get(ts) || null),
+          borderColor: colors[type],
+          backgroundColor: `${colors[type]}33`,
+          tension: 0.3,
+          pointRadius: 3,
+          spanGaps: true
+        })
       })
 
       // 更新图表
@@ -442,8 +482,9 @@ export default {
     // 计算每日指标的方法
     calculateDailyMetrics(data) {
       console.log('计算每日指标的输入数据:', data)
+      // 如果没有实测值数据，则无法计算评估指标
       if (!data['实测值']) {
-        console.warn('没有实测值数据')
+        console.warn('没有实测值数据，无法计算评估指标')
         return null
       }
 
@@ -491,14 +532,40 @@ export default {
           .filter(([, dayData]) => dayData.predicted.length > 0)
           .map(([date, dayData]) => {
             const metrics = this.calculateMetrics(dayData.actual, dayData.predicted)
-            return { date, ...metrics }
+            // 添加合格状态
+            const threshold = this.qualifiedThresholds[type] || 0
+            const isQualified = metrics.k > threshold
+            return { date, ...metrics, isQualified }
           })
           .sort((a, b) => new Date(a.date) - new Date(b.date))
-
-        console.log(`${type} 的每日指标:`, dailyMetrics[type])
       })
 
+      // 计算合格率
+      this.calculateQualificationRates(dailyMetrics)
+
       return dailyMetrics
+    },
+
+    // 添加计算合格率方法
+    calculateQualificationRates(dailyMetrics) {
+      const qualificationRates = {}
+      
+      Object.entries(dailyMetrics).forEach(([type, metrics]) => {
+        // 过滤出合格的日期
+        const qualifiedDays = metrics.filter(day => day.isQualified)
+        // 计算合格率
+        const rate = metrics.length > 0 ? (qualifiedDays.length / metrics.length) * 100 : 0
+        // 存储合格率和相关信息
+        qualificationRates[type] = {
+          totalDays: metrics.length,
+          qualifiedDays: qualifiedDays.length,
+          rate: rate,
+          threshold: this.qualifiedThresholds[type]
+        }
+      })
+      
+      this.qualificationRates = qualificationRates
+      this.showQualificationCard = Object.keys(qualificationRates).length > 0
     },
 
     // 更新指标图表的方法
@@ -614,6 +681,40 @@ export default {
             }))
           })
 
+          // 构建图表插件，用于绘制合格线
+          const qualificationLinePlugin = {
+            id: 'qualificationLine',
+            beforeDraw: (chart) => {
+              if (this.currentMetric === 'k') {
+                const ctx = chart.ctx
+                const yAxis = chart.scales.y
+                const chartArea = chart.chartArea
+
+                Object.entries(this.qualifiedThresholds).forEach(([type, threshold]) => {
+                  if (this.selectedTypes.includes(type)) {
+                    const y = yAxis.getPixelForValue(threshold)
+                    ctx.save()
+                    ctx.beginPath()
+                    ctx.moveTo(chartArea.left, y)
+                    ctx.lineTo(chartArea.right, y)
+                    ctx.lineWidth = 1
+                    ctx.strokeStyle = `${this.colors[type]}99`
+                    ctx.setLineDash([5, 5])
+                    ctx.stroke()
+                    
+                    // 添加标签
+                    ctx.textAlign = 'left'
+                    ctx.textBaseline = 'bottom'
+                    ctx.fillStyle = this.colors[type]
+                    ctx.font = '12px Arial'
+                    ctx.fillText(`${type}合格线: K > ${threshold}`, chartArea.left + 10, y - 2)
+                    ctx.restore()
+                  }
+                })
+              }
+            }
+          }
+
           this.metricChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -670,7 +771,8 @@ export default {
                   }
                 }
               }
-            }
+            },
+            plugins: [qualificationLinePlugin]
           })
           console.log('图表实例创建成功:', this.metricChart)
         } catch (error) {
@@ -751,15 +853,37 @@ export default {
             })
             .filter(row => row) // 过滤无效项
 
+        // 添加合格率数据
+        const qualificationHeader = ['\n合格率分析', '合格标准', '合格天数', '总天数', '合格率(%)']
+        const qualificationRows = []
+        if (this.qualificationRates) {
+            Object.entries(this.qualificationRates).forEach(([type, data]) => {
+                qualificationRows.push([
+                    type,
+                    `K值 > ${data.threshold}`,
+                    data.qualifiedDays,
+                    data.totalDays,
+                    data.rate.toFixed(1)
+                ])
+            })
+        }
+
         // 确保所有行都是有效数组
         const csvData = [
             headers,
             ...dataRows,
             metricsHeader,
             ...metricsRows
-        ].filter(row => Array.isArray(row))
+        ]
+
+        // 添加合格率数据到CSV
+        if (qualificationRows.length > 0) {
+            csvData.push(qualificationHeader)
+            csvData.push(...qualificationRows)
+        }
 
         return csvData
+            .filter(row => Array.isArray(row))
             .map(row => {
                 // 确保每个单元格都是字符串
                 const processedRow = row.map(cell => {
@@ -778,10 +902,11 @@ export default {
         return
       }
 
-      const headers = ['日期', '预测类型', 'ACC(%)', 'MAE(MW)', 'MSE(MW²)', 'RMSE(MW)', 'K值', 'Pe(MW)']
+      const headers = ['日期', '预测类型', 'ACC(%)', 'MAE(MW)', 'MSE(MW²)', 'RMSE(MW)', 'K值', 'Pe(MW)', '合格标准', '是否合格']
       const rows = []
       
       Object.entries(this.exportData.metrics).forEach(([type, days]) => {
+        const threshold = this.qualifiedThresholds[type] || 0
         days.forEach(day => {
           rows.push([
             day.date,
@@ -791,10 +916,29 @@ export default {
             day.mse.toFixed(2),
             day.rmse.toFixed(2),
             day.k.toFixed(2),
-            day.pe.toFixed(2)
+            day.pe.toFixed(2),
+            `K值 > ${threshold}`,
+            day.isQualified ? '是' : '否'
           ])
         })
       })
+
+      // 添加合格率汇总
+      if (this.qualificationRates) {
+        rows.push([])
+        rows.push(['合格率汇总'])
+        rows.push(['预测类型', '合格标准', '合格天数', '总天数', '合格率(%)'])
+        
+        Object.entries(this.qualificationRates).forEach(([type, data]) => {
+          rows.push([
+            type,
+            `K值 > ${data.threshold}`,
+            data.qualifiedDays,
+            data.totalDays,
+            data.rate.toFixed(1)
+          ])
+        })
+      }
 
       const csvContent = [headers, ...rows]
         .map(row => row.join(','))
@@ -869,6 +1013,47 @@ export default {
       link.href = URL.createObjectURL(blob)
       link.download = `功率对比图表_${new Date().toLocaleString().replace(/[/\s:]/g, '-')}.svg`
       link.click()
+    },
+
+    getQualificationColor(rate) {
+      if (rate >= 80) return '#4CAF50';
+      if (rate >= 60) return '#FFC107';
+      return '#F44336';
+    },
+
+    getDailyQualificationData() {
+      if (!this.dailyMetrics) return []
+      
+      // 收集所有日期
+      const allDates = new Set()
+      Object.entries(this.dailyMetrics).forEach(([type, days]) => {
+        if (type !== '实测值' && this.selectedTypes.includes(type)) {
+          days.forEach(day => allDates.add(day.date))
+        }
+      })
+      
+      // 为每个日期创建一行数据
+      return Array.from(allDates)
+        .map(date => {
+          const row = { date }
+          
+          // 添加每种预测类型的数据
+          Object.entries(this.dailyMetrics).forEach(([type, days]) => {
+            if (type !== '实测值' && this.selectedTypes.includes(type)) {
+              const dayData = days.find(day => day.date === date)
+              if (dayData) {
+                row[type] = dayData
+              }
+            }
+          })
+          
+          return row
+        })
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+    },
+
+    getSelectedPredictionTypes() {
+      return this.selectedTypes.filter(type => type !== '实测值')
     },
   },
   beforeUnmount() {
@@ -1224,5 +1409,193 @@ canvas {
 /* 覆盖清除按钮的排版 */
 :deep(.el-picker-panel .el-time-panel__btn.confirm) {
   margin-left: 8px;
+}
+
+.qualification-container {
+  margin-top: 24px;
+}
+
+.qualification-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+}
+
+.qualification-header {
+  margin-bottom: 20px;
+}
+
+.qualification-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.qualification-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.qualification-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.qualification-type {
+  margin-bottom: 10px;
+}
+
+.type-label {
+  font-weight: 500;
+}
+
+.threshold-label {
+  color: #909399;
+}
+
+.qualification-details {
+  margin-top: 10px;
+}
+
+.daily-qualification-table {
+  margin-top: 20px;
+}
+
+.daily-qualification-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.big-item {
+  flex: 1 0 100%;
+  margin-bottom: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.qualification-chart {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.qualification-type {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.type-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.threshold-label {
+  padding: 4px 10px;
+  background: #f5f7fa;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.qualification-details {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+}
+
+.daily-qualification-table {
+  margin-top: 30px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.daily-qualification-table h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 16px;
+}
+
+.daily-qualification-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+:deep(.el-table) {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:deep(.el-table th) {
+  background-color: #f5f7fa;
+  color: #333;
+  font-weight: 600;
+}
+
+:deep(.el-progress-bar__inner) {
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:deep(.el-progress) {
+  margin-bottom: 5px;
+}
+
+:deep(.el-progress-bar__outer) {
+  border-radius: 12px;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* 添加空数据提示样式 */
+.empty-data-container {
+  margin-top: 30px;
+}
+
+.empty-data-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.empty-data-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  color: #909399;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 60px;
+  margin-bottom: 20px;
+  color: #DCDFE6;
+}
+
+.empty-data-content h3 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 10px 0;
+}
+
+.empty-text {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
 }
 </style> 

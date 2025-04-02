@@ -399,11 +399,15 @@ def predict(csv_file, model_folder, window_size=16):
         files['file'].close()
         
         if response.status_code == 201:
-            result = response.json()
-            print(f"✅ 数据已成功导入数据库")
-            print(f"   总记录数: {result['total']}, 更新: {result['updated']}, 插入: {result['inserted']}")
-            logger.info(f"✅ 数据已成功导入数据库")
-            logger.info(f"   总记录数: {result['total']}, 更新: {result['updated']}, 插入: {result['inserted']}")
+            try:
+                result = response.json()
+                print(f"✅ 数据已成功导入数据库")
+                print(f"   总记录数: {result['total']}, 更新: {result['updated']}, 插入: {result['inserted']}")
+                logger.info(f"✅ 数据已成功导入数据库")
+                logger.info(f"   总记录数: {result['total']}, 更新: {result['updated']}, 插入: {result['inserted']}")
+            except Exception as e:
+                print(f"✅ 数据已成功导入数据库，但解析响应失败: {str(e)}")
+                logger.info(f"✅ 数据已成功导入数据库，但解析响应失败: {str(e)}")
         else:
             try:
                 error_msg = response.json().get('error', f"HTTP错误: {response.status_code}")
@@ -419,6 +423,25 @@ def predict(csv_file, model_folder, window_size=16):
                 print(f"   响应内容: {response.text}")
                 logger.error(f"❌ 数据导入失败: HTTP错误 {response.status_code}, 无法解析响应")
                 logger.error(f"   响应内容: {response.text}")
+            
+            # 如果调用失败，尝试重新传输一次
+            try:
+                print("尝试重新传输数据...")
+                logger.info("尝试重新传输数据...")
+                # 重新打开文件
+                files = {'file': open(output_file, 'rb')}
+                response = requests.post(url, files=files)
+                files['file'].close()
+                
+                if response.status_code == 201:
+                    print(f"✅ 重试后成功导入数据库")
+                    logger.info(f"✅ 重试后成功导入数据库")
+                else:
+                    print(f"❌ 重试后仍然失败: HTTP错误 {response.status_code}")
+                    logger.error(f"❌ 重试后仍然失败: HTTP错误 {response.status_code}")
+            except Exception as retry_err:
+                print(f"❌ 重试导入数据库失败: {str(retry_err)}")
+                logger.error(f"❌ 重试导入数据库失败: {str(retry_err)}")
     except Exception as e:
         print(f"❌ 调用数据库接口失败: {str(e)}")
         logger.error(f"❌ 调用数据库接口失败: {str(e)}")

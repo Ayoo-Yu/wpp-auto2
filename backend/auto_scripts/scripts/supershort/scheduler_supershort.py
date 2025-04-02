@@ -10,7 +10,10 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # 创建文件处理器
-file_handler = logging.FileHandler("scheduler.log", encoding="utf-8")
+# 获取当前脚本所在目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+log_file = os.path.join(current_dir, "logs", "scheduler.log")
+file_handler = logging.FileHandler(log_file, encoding="utf-8")
 file_handler.setLevel(logging.INFO)
 
 # 定义日志格式
@@ -37,8 +40,10 @@ run_param_optimization_now = "--run-param-now" in sys.argv  # 检查是否有立
 run_training_now = "--run-train-now" in sys.argv  # 检查是否有立即运行训练的参数
 
 # 定义日志目录路径
-log_dir_train = "./logs/auto_train"
-log_dir_param = "./logs/param_optimizer"
+# 获取当前脚本所在目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+log_dir_train = os.path.join(current_dir, "logs", "auto_train")
+log_dir_param = os.path.join(current_dir, "logs", "param_optimizer")
 
 def get_train_flag_file(date_str):
     """获取训练完成标志文件的路径"""

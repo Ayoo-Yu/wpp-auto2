@@ -32,6 +32,20 @@ services:
     networks:
       - wind-power-network
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: wind-power-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - wind-power-network
+
 volumes:  # 声明命名卷
   postgres_data:
   minio_data:

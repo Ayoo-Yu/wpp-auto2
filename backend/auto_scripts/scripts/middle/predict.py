@@ -303,17 +303,47 @@ def save_predictions_to_csv(predictions, timestamp):
         response = requests.post(url, files=files)
         
         if response.status_code == 201:
-            result = response.json()
-            print(f"✅ 数据已成功导入数据库")
-            print(f"   总记录数: {result['total']}, 更新: {result['updated']}, 插入: {result['inserted']}")
-            logger.info(f"✅ 数据已成功导入数据库")
-            logger.info(f"   总记录数: {result['total']}, 更新: {result['updated']}, 插入: {result['inserted']}")
+            try:
+                result = response.json()
+                print(f"✅ 数据已成功导入数据库")
+                print(f"   总记录数: {result['total']}, 更新: {result['updated']}, 插入: {result['inserted']}")
+                logger.info(f"✅ 数据已成功导入数据库")
+                logger.info(f"   总记录数: {result['total']}, 更新: {result['updated']}, 插入: {result['inserted']}")
+            except Exception as e:
+                print(f"✅ 数据已成功导入数据库，但解析响应失败: {str(e)}")
+                logger.info(f"✅ 数据已成功导入数据库，但解析响应失败: {str(e)}")
         else:
-            print(f"❌ 数据导入失败: {response.json()['error']}")
-            logger.error(f"❌ 数据导入失败: {response.json()['error']}")
+            try:
+                error_msg = response.json().get('error', f"HTTP错误: {response.status_code}")
+                print(f"❌ 数据导入失败: {error_msg}")
+                logger.error(f"❌ 数据导入失败: {error_msg}")
+            except Exception as json_err:
+                print(f"❌ 数据导入失败: HTTP错误 {response.status_code}, 响应解析失败: {str(json_err)}")
+                print(f"   响应内容: {response.text}")
+                logger.error(f"❌ 数据导入失败: HTTP错误 {response.status_code}, 响应解析失败: {str(json_err)}")
+                logger.error(f"   响应内容: {response.text}")
     except Exception as e:
         print(f"❌ 调用数据库接口失败: {str(e)}")
         logger.error(f"❌ 调用数据库接口失败: {str(e)}")
+        
+        # 如果调用失败，尝试重新传输一次
+        try:
+            print("尝试重新传输数据...")
+            logger.info("尝试重新传输数据...")
+            # 确保文件句柄已关闭后重新打开
+            files = {'file': open(csv_filepath, 'rb')}
+            response = requests.post(url, files=files)
+            files['file'].close()
+            
+            if response.status_code == 201:
+                print(f"✅ 重试后成功导入数据库")
+                logger.info(f"✅ 重试后成功导入数据库")
+            else:
+                print(f"❌ 重试后仍然失败: HTTP错误 {response.status_code}")
+                logger.error(f"❌ 重试后仍然失败: HTTP错误 {response.status_code}")
+        except Exception as retry_err:
+            print(f"❌ 重试导入数据库失败: {str(retry_err)}")
+            logger.error(f"❌ 重试导入数据库失败: {str(retry_err)}")
     
     return csv_filepath
 
