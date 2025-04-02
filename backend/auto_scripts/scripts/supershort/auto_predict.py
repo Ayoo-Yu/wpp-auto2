@@ -14,7 +14,9 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # 确保日志目录存在
-log_dir = "./logs/auto_predict"
+# 获取当前脚本所在目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+log_dir = os.path.join(current_dir, "logs", "auto_predict")
 os.makedirs(log_dir, exist_ok=True)
 
 # 创建日志文件
@@ -69,7 +71,9 @@ def get_predict_period_flag_file(csv_filename):
         period_str = csv_filename
     
     # 创建标志文件路径
-    log_dir = "./logs/auto_predict"
+    # 获取当前脚本所在目录
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    log_dir = os.path.join(current_dir, "logs", "auto_predict")
     os.makedirs(log_dir, exist_ok=True)
     return os.path.join(log_dir, f"predict_{period_str}.flag")
 

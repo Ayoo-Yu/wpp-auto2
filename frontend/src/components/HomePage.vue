@@ -4,7 +4,7 @@
     <div class="content-container">
       <!-- 头部区域 -->
       <div class="hero-section">
-        <h1>三峡新能源风电功率预测平台</h1>
+        <h1>华中科技大学风电功率预测平台</h1>
         <p class="subtitle">智能 · 高效 · 精准</p>
       </div>
 
@@ -81,7 +81,7 @@
 
       <!-- 底部区域 -->
       <footer class="footer">
-        <p>&copy; 2024 三峡新能源. 版权所有.</p>
+        <p>&copy; 2024 华中科技大学. 版权所有.</p>
       </footer>
     </div>
   </div>

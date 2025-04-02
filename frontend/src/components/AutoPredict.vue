@@ -172,8 +172,8 @@
             <template #header>
               <div class="task-card-header">
                 <span>预测任务</span>
-                <el-tag :type="taskStatus.prediction ? 'success' : 'danger'">
-                  {{ taskStatus.prediction ? '运行中' : '未运行' }}
+                <el-tag :type="getTaskPredictionType(taskStatus)">
+                  {{ getTaskPredictionStatus(taskStatus) }}
                 </el-tag>
               </div>
             </template>
@@ -780,9 +780,13 @@ const fetchScriptInfo = async (name) => {
 // 获取任务状态
 const fetchTaskStatus = async (name) => {
   try {
+    // 获取参数优化的执行周期
+    const paramOptDay = getParamOptDay(name);
+    
     const params = {
       type: name,
-      date: taskDateInfo.selectedDate
+      date: taskDateInfo.selectedDate,
+      param_opt_day: paramOptDay // 添加参数优化天数参数
     }
     
     const res = await apiClient.get('/api/task_status', { params })
@@ -870,7 +874,7 @@ const fetchLogs = async (name) => {
   currentPrediction = name
   logsDialogVisible.value = true
   // 初始化日志过滤条件
-  logsFilters.logType = 'main'
+  logsFilters.logType = 'train'
   logsFilters.date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
   // 加载日志
   fetchLogsByFilter()
@@ -882,9 +886,14 @@ const fetchLogsByFilter = async () => {
   try {
     const params = {
       type: currentPrediction,
-      logType: logsFilters.logType || 'main',
+      logType: logsFilters.logType || 'train',
       date: logsFilters.date || new Date().toISOString().slice(0, 10).replace(/-/g, ''),
       lines: 500
+    }
+    
+    // 如果是参数优化日志，添加参数优化日
+    if (logsFilters.logType === 'param') {
+      params.param_opt_day = getParamOptDay(currentPrediction)
     }
     
     const res = await apiClient.get('/api/logs', { params })
@@ -904,7 +913,7 @@ const fetchLogsByFilter = async () => {
 
 // 重置日志过滤条件
 const resetLogsFilters = () => {
-  logsFilters.logType = 'main'
+  logsFilters.logType = 'train'
   logsFilters.date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
   fetchLogsByFilter()
 }
@@ -1113,12 +1122,124 @@ const startUltraShortTask = async () => {
 
 // 获取参数优化执行的星期
 const getParamOptWeekday = (taskType) => {
+  // 首先尝试从脚本详情中提取实际配置的参数优化星期
+  // 如果脚本详情中包含相关信息，则使用实际配置值
+  if (scriptInfo.value) {
+    try {
+      // 针对不同任务类型查找不同的关键词
+      let searchTerm = '';
+      if (taskType === 'ultra_short') {
+        searchTerm = '超短期参数优化';
+      } else if (taskType === 'short') {
+        searchTerm = '短期参数优化';
+      } else if (taskType === 'medium') {
+        searchTerm = '中期参数优化';
+      }
+      
+      // 查找包含关键词的行
+      if (searchTerm && scriptInfo.value.includes(searchTerm)) {
+        const lines = scriptInfo.value.split('\n');
+        for (const line of lines) {
+          if (line.includes(searchTerm) && line.includes('每周')) {
+            // 从行中提取星期几
+            if (line.includes('每周一')) return '每周一';
+            if (line.includes('每周二')) return '每周二';
+            if (line.includes('每周三')) return '每周三';
+            if (line.includes('每周四')) return '每周四';
+            if (line.includes('每周五')) return '每周五';
+            if (line.includes('每周六')) return '每周六';
+            if (line.includes('每周日')) return '每周日';
+          }
+        }
+      }
+    } catch (e) {
+      console.error('解析脚本信息失败:', e);
+    }
+  }
+  
+  // 如果无法从脚本详情中提取，则使用默认配置
   const weekdayMap = {
     'ultra_short': '每周六',
     'short': '每周五',
     'medium': '每周四'
   }
-  return weekdayMap[taskType] || '每周六'
+  return weekdayMap[taskType] || '每周六';
+}
+
+// 获取参数优化日(周几)，返回0-6的数字，对应周一到周日
+const getParamOptDay = (taskType) => {
+  // 先从getParamOptWeekday获取参数优化的星期几
+  const weekdayStr = getParamOptWeekday(taskType);
+  
+  // 将中文星期几转换为数字(0-6)
+  const weekdayMap = {
+    '每周一': 0,
+    '每周二': 1,
+    '每周三': 2,
+    '每周四': 3,
+    '每周五': 4,
+    '每周六': 5,
+    '每周日': 6
+  };
+  
+  return weekdayMap[weekdayStr] !== undefined ? weekdayMap[weekdayStr] : 
+         (taskType === 'ultra_short' ? 5 : // 默认超短期是周六
+          taskType === 'short' ? 4 :       // 默认短期是周五
+          taskType === 'medium' ? 3 : 5);  // 默认中期是周四，其他默认周六
+}
+
+// 获取预测任务的状态类型
+const getTaskPredictionType = (taskStatus) => {
+  // 如果是超短期预测
+  if (currentPrediction === 'ultra_short') {
+    if (taskStatus.prediction && taskStatus.predictionCount >= 96) {
+      // 完成了96次预测表示当天预测任务已完成
+      return 'success';
+    } else if (taskStatus.prediction) {
+      // 预测任务正在运行但尚未完成
+      return 'warning';
+    } else {
+      // 预测任务未运行
+      return 'danger';
+    }
+  } 
+  // 如果是短期或中期预测，只要预测任务执行了就显示已完成
+  else {
+    if (taskStatus.prediction) {
+      // 预测任务已执行
+      return 'success';
+    } else {
+      // 预测任务未运行
+      return 'danger';
+    }
+  }
+}
+
+// 获取预测任务的状态文本
+const getTaskPredictionStatus = (taskStatus) => {
+  // 如果是超短期预测
+  if (currentPrediction === 'ultra_short') {
+    if (taskStatus.prediction && taskStatus.predictionCount >= 96) {
+      // 完成了96次预测表示当天预测任务已完成
+      return '已完成';
+    } else if (taskStatus.prediction) {
+      // 预测任务正在运行但尚未完成
+      return '运行中';
+    } else {
+      // 预测任务未运行
+      return '未运行';
+    }
+  } 
+  // 如果是短期或中期预测，只要预测任务执行了就显示已完成
+  else {
+    if (taskStatus.prediction) {
+      // 预测任务已执行
+      return '已完成';
+    } else {
+      // 预测任务未运行
+      return '未运行';
+    }
+  }
 }
 </script>
 

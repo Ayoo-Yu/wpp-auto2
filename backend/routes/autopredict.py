@@ -85,12 +85,12 @@ log_dirs = {
     },
     'short': {
         'base': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'short', 'logs'),
-        'train': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'short', 'logs', 'auto_train'),
+        'train': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'short', 'logs', 'auto_pre_train'),
         'param': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'short', 'logs', 'param_optimizer')
     },
     'medium': {
         'base': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'middle', 'logs'),
-        'train': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'middle', 'logs', 'auto_train'),
+        'train': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'middle', 'logs', 'auto_pre_train'),
         'param': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'middle', 'logs', 'param_optimizer')
     }
 }
@@ -713,7 +713,7 @@ def get_script_info():
 @autopredict_bp.route('/logs', methods=['GET'])
 def get_logs():
     prediction_type = request.args.get('type')
-    log_type = request.args.get('logType', 'main') # main, train, predict, param
+    log_type = request.args.get('logType', 'train') # train, main, predict, param
     date_str = request.args.get('date', datetime.datetime.now().strftime('%Y%m%d'))
     lines = request.args.get('lines', 500, type=int)
     
@@ -780,30 +780,82 @@ def get_logs():
                 # 预测日志格式
                 log_files = glob.glob(os.path.join(log_dir, f"{date_str}*.log"))
             elif log_type == 'param':
-                # 参数优化日志 - 查找对应周的日志
+                # 参数优化日志 - 根据param_opt_day计算正确的周期
                 try:
+                    # 获取参数优化执行日（0-6 表示周一到周日）
+                    param_opt_day = request.args.get('param_opt_day', None)
+                    if param_opt_day is not None:
+                        param_opt_day = int(param_opt_day)
+                    else:
+                        # 默认参数优化日
+                        param_opt_day_map = {
+                            'ultra_short': 5,  # 周六
+                            'short': 4,        # 周五
+                            'medium': 3        # 周四
+                        }
+                        param_opt_day = param_opt_day_map.get(prediction_type, 5)
+                    
                     # 解析所选日期
                     selected_date = datetime.datetime.strptime(date_str, '%Y%m%d')
-                    # 计算所在周的周一
-                    monday = selected_date - datetime.timedelta(days=selected_date.weekday())
-                    monday_str = monday.strftime('%Y%m%d')
+                    # 计算所选日期在其所在周的星期几（0-6表示周一到周日）
+                    selected_weekday = selected_date.weekday()
                     
-                    # 查找该周的参数优化标志文件
-                    param_flag_path = os.path.join(log_dir, f"{monday_str}_param_opt_done.flag")
+                    # 计算参数优化周期的开始日期
+                    days_diff = 0
+                    if selected_weekday >= param_opt_day:
+                        # 计算到本周参数优化日的天数差
+                        days_diff = selected_weekday - param_opt_day
+                    else:
+                        # 计算到上周参数优化日的天数差
+                        days_diff = selected_weekday + 7 - param_opt_day
+                    
+                    # 找到对应的参数优化日期
+                    param_opt_date = selected_date - datetime.timedelta(days=days_diff)
+                    param_opt_date_str = param_opt_date.strftime('%Y%m%d')
+                    
+                    # 查找参数优化完成标志文件
+                    param_flag_path = os.path.join(log_dir, f"{param_opt_date_str}_param_opt_done.flag")
+                    
+                    # 如果找不到精确日期的标志文件，尝试查找当周的标志文件（兼容现有逻辑）
+                    if not os.path.exists(param_flag_path):
+                        # 计算该参数优化日所在周的周一
+                        param_opt_monday = param_opt_date - datetime.timedelta(days=param_opt_date.weekday())
+                        monday_str = param_opt_monday.strftime('%Y%m%d')
+                        param_flag_path = os.path.join(log_dir, f"{monday_str}_param_opt_done.flag")
                     
                     if os.path.exists(param_flag_path):
-                        # 存在标志文件，查找最接近的日志
-                        week_logs = glob.glob(os.path.join(log_dir, f"{monday_str}*.log"))
-                        if not week_logs:
-                            # 尝试查找该月的所有参数优化日志
-                            year_month = monday_str[:6]  # 提取年月
-                            month_logs = glob.glob(os.path.join(log_dir, f"{year_month}*.log"))
-                            
-                            if month_logs:
-                                # 选择最近的一个日志
-                                log_files = [max(month_logs, key=os.path.getmtime)]
+                        # 存在标志文件，先尝试查找精确日期的日志
+                        date_logs = glob.glob(os.path.join(log_dir, f"{param_opt_date_str}*.log"))
+                        if date_logs:
+                            # 找到了精确日期的日志
+                            log_files = date_logs
                         else:
-                            log_files = week_logs
+                            # 尝试查找该周的参数优化日志
+                            monday = param_opt_date - datetime.timedelta(days=param_opt_date.weekday())
+                            monday_str = monday.strftime('%Y%m%d')
+                            week_logs = glob.glob(os.path.join(log_dir, f"{monday_str}*.log"))
+                            if week_logs:
+                                log_files = week_logs
+                            else:
+                                # 尝试查找该月的所有参数优化日志
+                                year_month = param_opt_date_str[:6]  # 提取年月
+                                month_logs = glob.glob(os.path.join(log_dir, f"{year_month}*.log"))
+                                if month_logs:
+                                    # 找到最接近参数优化日期的日志
+                                    closest_log = None
+                                    min_diff = float('inf')
+                                    for log in month_logs:
+                                        log_date_str = os.path.basename(log).split('.')[0][:8]
+                                        try:
+                                            log_date = datetime.datetime.strptime(log_date_str, '%Y%m%d')
+                                            diff = abs((param_opt_date - log_date).days)
+                                            if diff < min_diff:
+                                                min_diff = diff
+                                                closest_log = log
+                                        except ValueError:
+                                            continue
+                                    if closest_log:
+                                        log_files = [closest_log]
                 except ValueError:
                     # 日期格式错误，返回错误信息
                     record_task_history(prediction_type, 'logs', 'failed', f'日期格式无效: {date_str}')
@@ -946,6 +998,18 @@ def get_task_history():
 def get_task_status():
     prediction_type = request.args.get('type')
     date_str = request.args.get('date', datetime.datetime.now().strftime('%Y%m%d'))
+    # 获取参数优化执行日（0-6 表示周一到周日）
+    param_opt_day = request.args.get('param_opt_day', None)
+    if param_opt_day is not None:
+        param_opt_day = int(param_opt_day)
+    else:
+        # 默认参数优化日
+        param_opt_day_map = {
+            'ultra_short': 5,  # 周六
+            'short': 4,        # 周五
+            'medium': 3        # 周四
+        }
+        param_opt_day = param_opt_day_map.get(prediction_type, 5)
     
     if not prediction_type or prediction_type not in prediction_status:
         return jsonify({'error': '无效的预测类型'}), 400
@@ -977,11 +1041,34 @@ def get_task_status():
             status['training'] = True
             status['trainingTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(train_flag_path)).strftime('%Y-%m-%d %H:%M:%S')
         
-        # 检查参数优化任务状态
-        # 计算所选日期所在周的周一
-        selected_monday = selected_date - datetime.timedelta(days=selected_date.weekday())
-        monday_str = selected_monday.strftime('%Y%m%d')
-        param_flag_path = os.path.join(log_dirs[prediction_type]['param'], f"{monday_str}_param_opt_done.flag")
+        # 检查参数优化任务状态 - 修改为根据参数优化日计算周期
+        # 计算所选日期在其所在周的星期几（0-6表示周一到周日）
+        selected_weekday = selected_date.weekday()
+        
+        # 计算参数优化周期的开始日期
+        # 如果当前日期的星期几大于等于参数优化日，就查找本周的参数优化记录
+        # 否则查找上周的参数优化记录
+        days_diff = 0
+        if selected_weekday >= param_opt_day:
+            # 计算到本周参数优化日的天数差
+            days_diff = selected_weekday - param_opt_day
+        else:
+            # 计算到上周参数优化日的天数差
+            days_diff = selected_weekday + 7 - param_opt_day
+        
+        # 找到对应的参数优化日期
+        param_opt_date = selected_date - datetime.timedelta(days=days_diff)
+        param_opt_date_str = param_opt_date.strftime('%Y%m%d')
+        
+        # 查找参数优化完成标志
+        param_flag_path = os.path.join(log_dirs[prediction_type]['param'], f"{param_opt_date_str}_param_opt_done.flag")
+        
+        # 如果找不到精确日期的标志文件，尝试查找当周的标志文件（兼容现有逻辑）
+        if not os.path.exists(param_flag_path):
+            # 计算该参数优化日所在周的周一
+            param_opt_monday = param_opt_date - datetime.timedelta(days=param_opt_date.weekday())
+            monday_str = param_opt_monday.strftime('%Y%m%d')
+            param_flag_path = os.path.join(log_dirs[prediction_type]['param'], f"{monday_str}_param_opt_done.flag")
         
         if os.path.exists(param_flag_path):
             status['paramOpt'] = True
@@ -995,8 +1082,15 @@ def get_task_status():
             # 查找指定日期的所有日志文件
             date_logs = glob.glob(os.path.join(predict_log_dir, f"{date_str}*.log"))
             
-            # 计算当天预测完成次数
-            status['predictionCount'] = len(date_logs)
+            # 通过检查auto_predict目录下的flag文件来计算预测完成次数
+            predict_flag_dir = os.path.join(log_dirs[prediction_type]['base'], 'auto_predict')
+            if os.path.exists(predict_flag_dir):
+                # 查找指定日期的所有预测完成标志文件
+                prediction_flags = glob.glob(os.path.join(predict_flag_dir, f"predict_{date_str}*.flag"))
+                status['predictionCount'] = len(prediction_flags)
+            else:
+                # 如果目录不存在，回退到使用日志文件数量
+                status['predictionCount'] = len(date_logs)
             
             if date_logs:
                 status['prediction'] = True

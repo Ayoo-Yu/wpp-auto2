@@ -11,7 +11,9 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # 确保日志目录存在
-log_dir = "./logs/scheduler_predict"
+# 获取当前脚本所在目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+log_dir = os.path.join(current_dir, "logs", "scheduler_predict")
 os.makedirs(log_dir, exist_ok=True)
 
 # 创建日志文件
@@ -48,8 +50,13 @@ def run_predict():
     current_time = now.strftime('%H:%M')
     logging.info(f"开始执行15分钟周期预测... 当前时间: {current_time}")
     
+    # 获取当前脚本所在目录
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    # 构建auto_predict.py的绝对路径
+    script_path = os.path.join(current_dir, "auto_predict.py")
+    
     # 执行预测脚本
-    cmd = f"python auto_predict.py"
+    cmd = f"python \"{script_path}\""
     try:
         result = subprocess.run(cmd, shell=True, check=True, 
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
@@ -87,8 +94,8 @@ def main():
     # 立即运行一次以测试
     run_predict()
     
-    # 每15分钟运行一次预测
-    schedule.every(15).minutes.do(run_predict)
+    # 每5分钟运行一次预测
+    schedule.every(5).minutes.do(run_predict)
     
     # 每天午夜重置计数
     schedule.every().day.at("00:00").do(reset_daily_counter)
