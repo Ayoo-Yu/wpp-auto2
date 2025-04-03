@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from database_config import Base, engine, minio_client, get_db
 from config import Config, MINIO_CONFIG
 from s3_error import S3Error
-from models import Dataset
+from db_models import Dataset
 from datetime import datetime
 from services.file_service import allowed_file, save_uploaded_file
 import os

@@ -7842,3 +7842,109 @@ LINE 1: ...me, output_path, prediction_type, status) VALUES ('202502121...
 [2025-04-03 09:53:28,747] INFO in logging_config: Wind Forecast Backend Startup
 [2025-04-03 09:55:50,530] INFO in logging_config: Wind Forecast Backend Startup
 [2025-04-03 09:55:57,201] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 16:35:45,603] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 16:43:08,877] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 16:44:24,283] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 16:47:56,811] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 16:49:17,958] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 16:49:20,458] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 16:49:53,215] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 16:49:55,767] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 17:00:36,864] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 17:01:26,691] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 17:02:53,696] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 17:02:56,136] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 17:03:18,726] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 17:03:21,239] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 17:35:35,272] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 17:51:37,780] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 17:52:54,127] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 17:55:36,593] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 17:55:39,051] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 17:57:34,548] INFO in app: 成功连接服务器！
+[2025-04-03 17:57:40,245] INFO in modeltrain: 收到模型训练请求: {'file_id': '20250403175735267024', 'model': 'CUSTOM', 'wfcapacity': 453.5, 'train_ratio': 0.9, 'custom_params': {'boosting_type': 'gbdt', 'learning_rate': 0.05, 'num_leaves': 31, 'feature_fraction': 0.9, 'drop_rate': 0.1, 'top_rate': 0.2, 'other_rate': 0.1}}
+[2025-04-03 17:57:40,246] INFO in modeltrain: 收到自定义模型参数: {'boosting_type': 'gbdt', 'learning_rate': 0.05, 'num_leaves': 31, 'feature_fraction': 0.9, 'drop_rate': 0.1, 'top_rate': 0.2, 'other_rate': 0.1}
+[2025-04-03 17:57:40,246] INFO in modeltrain: 训练集id: 20250403175735267024, 模型选择: CUSTOM, 装机容量: 453.5, 训练集占比: 0.9, 类型: <class 'float'>
+[2025-04-03 17:57:40,247] INFO in train_run: 输出结果将保存到: results\20250403_175740
+[2025-04-03 17:57:40,247] INFO in train_run: 训练集占比设置为: 0.9
+[2025-04-03 17:57:40,248] INFO in train_run: 使用自定义模型参数: {'boosting_type': 'gbdt', 'learning_rate': 0.05, 'num_leaves': 31, 'feature_fraction': 0.9, 'drop_rate': 0.1, 'top_rate': 0.2, 'other_rate': 0.1}
+[2025-04-03 17:57:40,323] INFO in train_run: 数据加载完成!
+[2025-04-03 17:57:40,329] INFO in train_run: 数据预处理完成!
+[2025-04-03 17:57:40,330] INFO in train_run: 数据集分割完成! 训练集大小: 2675, 验证集大小: 298
+[2025-04-03 17:57:40,381] INFO in train_run: 特征工程完成!
+[2025-04-03 17:57:40,414] INFO in train_run: 数据标准化完成!
+[2025-04-03 17:57:40,468] INFO in train_run: 时间窗口创建完成!
+[2025-04-03 17:57:40,469] INFO in train_run: 模型参数获取完成!
+[2025-04-03 17:57:40,470] INFO in train_run: {'boosting_type': 'gbdt', 'learning_rate': 0.05, 'num_leaves': 31, 'feature_fraction': 0.9, 'drop_rate': 0.1, 'top_rate': 0.2, 'other_rate': 0.1, 'name': 'CUSTOM'}
+[2025-04-03 17:57:40,471] INFO in train: 模型和 scaler 将被保存到目录: models\20250403_175740
+[2025-04-03 17:57:40,472] INFO in train: 开始训练 CUSTOM 模型...
+[2025-04-03 17:57:40,472] INFO in train: 使用参数: {'boosting_type': 'gbdt', 'learning_rate': 0.05, 'num_leaves': 31, 'feature_fraction': 0.9, 'drop_rate': 0.1, 'top_rate': 0.2, 'other_rate': 0.1, 'objective': 'regression', 'metric': 'rmse'}
+[2025-04-03 17:57:57,289] INFO in train: 评估结果已保存到 models\20250403_175740\CUSTOM_evaluation.json
+[2025-04-03 17:57:57,289] INFO in train: CUSTOM 均方误差: 4508.127417174361
+[2025-04-03 17:57:57,290] INFO in train: CUSTOM 均方根误差: 67.14259018815375
+[2025-04-03 17:57:57,290] INFO in train: CUSTOM 平均绝对误差: 50.723440685400135
+[2025-04-03 17:57:57,291] INFO in train: CUSTOM R²分数: -0.24592697246256856
+[2025-04-03 17:57:57,291] INFO in train: CUSTOM 预测精度: 0.7667976623565074
+[2025-04-03 17:57:57,292] INFO in train: CUSTOM K值: 0.2109129781315248
+[2025-04-03 17:57:57,304] INFO in train: CUSTOM 模型已保存到 models\20250403_175740\CUSTOM.joblib
+[2025-04-03 17:57:57,308] INFO in train: Scaler 已保存到 models\20250403_175740\scaler.joblib
+[2025-04-03 17:57:57,309] INFO in train_run: 模型训练与评估完成!
+[2025-04-03 17:57:57,313] INFO in train: 原生预测结果已保存到 results\20250403_175740\CUSTOM_predicted_vs_actual_power.csv
+[2025-04-03 17:57:57,323] INFO in train: 详细预测报告已保存到 results\20250403_175740\CUSTOM_detailed_report.txt
+[2025-04-03 17:57:57,324] INFO in train_run: 预测结果保存完成!
+[2025-04-03 17:57:57,606] INFO in train_run: 可视化结果完成!
+[2025-04-03 17:57:57,703] INFO in prediction_timestamp: 已经为测试集预测结果匹配时间戳 'results\20250403_175740\CUSTOM_predicted_vs_actual_power_timestamp.csv'
+[2025-04-03 17:57:57,705] INFO in modeltrain: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_train_test__1_20250403175735267024_20250403175757.csv
+[2025-04-03 17:57:59,427] INFO in modeltrain: 测试集评估完成。相关结果保存在以下路径：D:\my-vue-project\wind-power-forecast\backend\forecasts\evaluation_train_test__1_20250403175735267024_20250403175757
+[2025-04-03 17:57:59,429] INFO in modeltrain: 将原生报告复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\report_train_test__1_20250403175735267024_20250403175757.txt
+[2025-04-03 17:57:59,430] INFO in modeltrain: 预测文件下载url为: /download/forecast_train_test__1_20250403175735267024_20250403175757.csv
+[2025-04-03 17:57:59,430] INFO in modeltrain: 训练报告下载url为: /download/report_train_test__1_20250403175735267024_20250403175757.txt
+[2025-04-03 17:58:09,604] INFO in download: 正在下载以下文件： forecast_train_test__1_20250403175735267024_20250403175757.csv
+[2025-04-03 17:58:10,448] INFO in download: 正在下载以下文件： report_train_test__1_20250403175735267024_20250403175757.txt
+[2025-04-03 17:58:41,691] INFO in app: 成功连接服务器！
+[2025-04-03 17:58:47,345] INFO in predict: 收到预测请求: {'csvfileId': '20250403175846754679', 'modelfileId': '20250403175846819440', 'scalerfileId': '20250403175846842439'}
+[2025-04-03 17:58:47,345] INFO in predict: 预测数据选择: 20250403175846754679, 预测模型选择: 20250403175846819440, 归一化模型选择: 20250403175846842439
+[2025-04-03 17:58:47,483] INFO in predict: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_test1_-__20250403175846754679_20250403175847.csv
+[2025-04-03 17:58:47,535] INFO in predict: 文件已上传到MinIO: wind-predictions/forecast_test1_-__20250403175846754679_20250403175847.csv
+[2025-04-03 17:58:53,432] INFO in app: 与服务器断开连接！
+[2025-04-03 18:07:38,355] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 18:12:36,343] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 18:12:38,713] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 18:14:15,988] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 18:14:18,358] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 18:14:36,657] INFO in app: 成功连接服务器！
+[2025-04-03 18:14:40,711] INFO in modeltrain: 收到模型训练请求: {'file_id': '20250403181437248738', 'model': 'DART', 'wfcapacity': 453.5, 'train_ratio': 0.9}
+[2025-04-03 18:14:40,712] INFO in modeltrain: 训练集id: 20250403181437248738, 模型选择: DART, 装机容量: 453.5, 训练集占比: 0.9, 类型: <class 'float'>
+[2025-04-03 18:14:40,713] INFO in train_run: 输出结果将保存到: results\20250403_181440
+[2025-04-03 18:14:40,714] INFO in train_run: 训练集占比设置为: 0.9
+[2025-04-03 18:14:40,744] INFO in train_run: 数据加载完成!
+[2025-04-03 18:14:40,751] INFO in train_run: 数据预处理完成!
+[2025-04-03 18:14:40,752] INFO in train_run: 数据集分割完成! 训练集大小: 899, 验证集大小: 100
+[2025-04-03 18:14:40,832] INFO in train_run: 特征工程完成!
+[2025-04-03 18:14:40,854] INFO in train_run: 数据标准化完成!
+[2025-04-03 18:14:40,873] INFO in train_run: 时间窗口创建完成!
+[2025-04-03 18:14:40,874] INFO in train_run: 模型参数获取完成!
+[2025-04-03 18:14:40,875] INFO in train_run: {'boosting_type': 'dart', 'objective': 'regression', 'metric': 'rmse', 'num_leaves': 31, 'learning_rate': 0.05, 'feature_fraction': 0.9, 'drop_rate': 0.1, 'name': 'DART'}
+[2025-04-03 18:14:40,877] INFO in train: 模型和 scaler 将被保存到目录: models\20250403_181440
+[2025-04-03 18:14:40,877] INFO in train: 开始训练 DART 模型...
+[2025-04-03 18:14:40,878] INFO in train: 使用参数: {'boosting_type': 'dart', 'objective': 'regression', 'metric': 'rmse', 'num_leaves': 31, 'learning_rate': 0.05, 'feature_fraction': 0.9, 'drop_rate': 0.1}
+[2025-04-03 18:15:12,044] INFO in train: 评估结果已保存到 models\20250403_181440\DART_evaluation.json
+[2025-04-03 18:15:12,045] INFO in train: DART 均方误差: 190.04833963895013
+[2025-04-03 18:15:12,045] INFO in train: DART 均方根误差: 13.785802103575625
+[2025-04-03 18:15:12,046] INFO in train: DART 平均绝对误差: 12.049955755819205
+[2025-04-03 18:15:12,046] INFO in train: DART R²分数: 0.40603154575638156
+[2025-04-03 18:15:12,047] INFO in train: DART 预测精度: 0.7092944983238476
+[2025-04-03 18:15:12,047] INFO in train: DART K值: 0.7032593244159215
+[2025-04-03 18:15:12,056] INFO in train: DART 模型已保存到 models\20250403_181440\DART.joblib
+[2025-04-03 18:15:12,059] INFO in train: Scaler 已保存到 models\20250403_181440\scaler.joblib
+[2025-04-03 18:15:12,063] INFO in train_run: 模型训练与评估完成!
+[2025-04-03 18:15:12,066] INFO in train: 原生预测结果已保存到 results\20250403_181440\DART_predicted_vs_actual_power.csv
+[2025-04-03 18:15:12,076] INFO in train: 详细预测报告已保存到 results\20250403_181440\DART_detailed_report.txt
+[2025-04-03 18:15:12,076] INFO in train_run: 预测结果保存完成!
+[2025-04-03 18:15:12,381] INFO in train_run: 可视化结果完成!
+[2025-04-03 18:15:12,424] INFO in prediction_timestamp: 已经为测试集预测结果匹配时间戳 'results\20250403_181440\DART_predicted_vs_actual_power_timestamp.csv'
+[2025-04-03 18:15:12,427] INFO in modeltrain: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_test1_20250403181437248738_20250403181512.csv
+[2025-04-03 18:15:15,617] INFO in modeltrain: 测试集评估完成。相关结果保存在以下路径：D:\my-vue-project\wind-power-forecast\backend\forecasts\evaluation_test1_20250403181437248738_20250403181512
+[2025-04-03 18:15:15,620] INFO in modeltrain: 将原生报告复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\report_test1_20250403181437248738_20250403181512.txt
+[2025-04-03 18:15:15,620] INFO in modeltrain: 预测文件下载url为: /download/forecast_test1_20250403181437248738_20250403181512.csv
+[2025-04-03 18:15:15,621] INFO in modeltrain: 训练报告下载url为: /download/report_test1_20250403181437248738_20250403181512.txt

@@ -12,6 +12,8 @@ from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, create_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from database_config import Base, get_db
+# 导入TaskHistory模型
+from db_models import TaskHistory
 
 # 全局状态字典，其他代码依赖这个变量
 prediction_status = {
@@ -19,19 +21,6 @@ prediction_status = {
     'short': False,
     'medium': False
 }
-
-# 定义任务历史记录模型
-class TaskHistory(Base):
-    __tablename__ = 'task_history'
-    
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    task_id = Column(String(50), nullable=False, index=True)  # UUID
-    task_type = Column(String(20), nullable=False, index=True)  # ultra_short, short, medium
-    action = Column(String(20), nullable=False)  # start, stop, delete, schedule, etc.
-    status = Column(String(20), nullable=False)  # success, failed
-    created_at = Column(DateTime, default=datetime.datetime.now)
-    details = Column(Text, nullable=True)  # 详细信息，如错误原因等
-    user = Column(String(50), nullable=True)  # 操作用户，可选
 
 # 获取当前文件所在目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
