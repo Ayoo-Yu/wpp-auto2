@@ -7,17 +7,19 @@ import psycopg2
 from psycopg2 import sql
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from sqlalchemy.orm import Session
-from models import Model
+from db_models import Base, Model
 from sqlalchemy import inspect
 import time
 import os
 
-
-# 修改后（使用config中的配置）
-SQLALCHEMY_DATABASE_URL = (
+# 导出数据库连接URL供其他模块使用
+SQLALCHEMY_DATABASE_URI = (
     f"postgresql+psycopg2://{POSTGRES_CONFIG['user']}:{POSTGRES_CONFIG['password']}"
     f"@{POSTGRES_CONFIG['host']}:{POSTGRES_CONFIG['port']}/{POSTGRES_CONFIG['database']}"
 )
+
+# 保留旧变量名以保持兼容性
+SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URI
 
 # 在engine创建之前添加数据库自动创建逻辑
 def create_database_if_not_exists():
@@ -79,7 +81,7 @@ def create_engine_with_retry():
     
     for attempt in range(max_retries):
         try:
-            return create_engine(SQLALCHEMY_DATABASE_URL)
+            return create_engine(SQLALCHEMY_DATABASE_URI)
         except Exception as e:
             print(f"创建数据库引擎失败 (尝试 {attempt+1}/{max_retries}): {e}")
             if attempt < max_retries - 1:
@@ -201,19 +203,24 @@ def cleanup_old_models(db: Session, keep_last=5):
         models = db.query(Model).order_by(Model.train_time.desc()).all()
         
         # 删除旧版本
-        for model in models[keep_last:]:
-            # 删除MinIO中的文件
-            try:
-                minio_client.remove_object("wind-models", model.model_path)
-                if model.scaler_path:
-                    minio_client.remove_object("wind-scalers", model.scaler_path)
-            except Exception as e:
-                print(f"删除MinIO文件失败: {e}")
+        if len(models) > keep_last:
+            for model in models[keep_last:]:
+                print(f"准备删除旧模型: {model.model_name}")
+                
+                # 删除S3上的模型文件
+                if model.model_path:
+                    try:
+                        bucket_name = MINIO_CONFIG["buckets"]["models"]
+                        object_name = os.path.basename(model.model_path)
+                        minio_client.remove_object(bucket_name, object_name)
+                        print(f"已删除模型文件: {object_name}")
+                    except Exception as e:
+                        print(f"删除模型文件失败: {e}")
+                
+                # 从数据库删除记录
+                db.delete(model)
             
-            # 删除数据库记录
-            db.delete(model)
-        
-        db.commit()
+            db.commit()
+            print(f"已清理旧模型，保留最新的{keep_last}个版本")
     except Exception as e:
-        db.rollback()
-        raise e
+        print(f"清理旧模型失败: {e}")

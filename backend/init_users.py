@@ -1,5 +1,5 @@
-from database_config import get_db, Base, engine
-from models import User, UserRole
+from database_config import get_db, engine
+from db_models import Base, User, UserRole
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 import logging
