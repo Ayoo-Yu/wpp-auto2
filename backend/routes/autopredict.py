@@ -287,14 +287,25 @@ def get_status():
     try:
         success, result = safe_pm2_command(['jlist'])
         if not success:
-            return jsonify({'error': f"获取PM2状态失败: {result}"}), 500
+            # 如果PM2命令执行失败 (例如 PM2 未安装或服务未启动)
+            print(f"获取PM2状态失败，PM2命令执行出错: {result}")
+            # 返回当前默认状态，前端可能需要处理这种情况
+            return jsonify(prediction_status) 
             
-        output = result.stdout
-        if not output or output.strip() == '[]':
-            # PM2可能没有运行任何进程，但不一定是错误
-            processes = []
-        else:
-            processes = json.loads(output)
+        output = result.stdout.strip() if result.stdout else ''
+        
+        processes = [] # 初始化为空列表
+        if output: # 仅在输出不为空时尝试解析
+            try:
+                processes = json.loads(output)
+                # 确保 processes 是一个列表
+                if not isinstance(processes, list):
+                    print(f"警告: PM2 jlist 输出不是预期的列表格式: {output}")
+                    processes = []
+            except json.JSONDecodeError as e:
+                # 如果解析失败，记录警告并视为空列表
+                print(f"警告: 解析 PM2 jlist 输出失败: {e}. 输出内容: '{output}'")
+                processes = []
             
         # 更新每个预测任务的状态
         for key, script_path in scripts.items():
@@ -1022,7 +1033,8 @@ def get_task_status():
         'trainingTime': '',
         'predictionTime': '',
         'paramOptTime': '',
-        'predictionCount': 0
+        'predictionCount': 0,
+        'predictionCompleted': False # 新增字段，用于区分 short/medium 的完成与运行中
     }
     
     try:
@@ -1079,44 +1091,82 @@ def get_task_status():
             # 超短期预测需要检查预测日志
             predict_log_dir = log_dirs[prediction_type]['predict']
             
-            # 查找指定日期的所有日志文件
+            # 查找指定日期的所有日志文件 (用于获取最新时间)
             date_logs = glob.glob(os.path.join(predict_log_dir, f"{date_str}*.log"))
-            
-            # 通过检查auto_predict目录下的flag文件来计算预测完成次数
+
+            # 通过检查auto_predict目录下的flag文件来计算预测完成次数和状态
             predict_flag_dir = os.path.join(log_dirs[prediction_type]['base'], 'auto_predict')
+            predict_done_flags = []
             if os.path.exists(predict_flag_dir):
                 # 查找指定日期的所有预测完成标志文件
-                prediction_flags = glob.glob(os.path.join(predict_flag_dir, f"predict_{date_str}*.flag"))
-                status['predictionCount'] = len(prediction_flags)
+                 predict_done_flags = glob.glob(os.path.join(predict_flag_dir, f"predict_{date_str}*.flag"))
+                 status['predictionCount'] = len(predict_done_flags)
             else:
-                # 如果目录不存在，回退到使用日志文件数量
-                status['predictionCount'] = len(date_logs)
-            
-            if date_logs:
-                status['prediction'] = True
-                latest_log = max(date_logs, key=os.path.getmtime)
-                status['predictionTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(latest_log)).strftime('%Y-%m-%d %H:%M:%S')
-            
-            # 只有当天才检查进程状态
+                 status['predictionCount'] = 0 # Default to 0 if flag dir doesn't exist
+
+            # 超短期的 'prediction' 状态表示任务是否 *应该* 在运行或已完成当天次数
+            # 如果当天完成次数 >= 96，则标记为 True (完成)
+            # 如果当天完成次数 < 96 但 > 0，或者 PM2 进程在运行 (仅限今天)，也标记为 True (运行中)
+            status['prediction'] = status['predictionCount'] >= 96
+
+            if status['predictionCount'] > 0:
+                 # If any prediction was done, get the time of the latest flag
+                 latest_flag = max(predict_done_flags, key=os.path.getmtime)
+                 status['predictionTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(latest_flag)).strftime('%Y-%m-%d %H:%M:%S')
+            elif date_logs: # Fallback to log time if no flags but logs exist
+                 latest_log = max(date_logs, key=os.path.getmtime)
+                 status['predictionTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(latest_log)).strftime('%Y-%m-%d %H:%M:%S')
+
+
+            # 只有当天才检查PM2进程状态，并用来判断是否 "运行中"
             if is_today:
-                predict_script = ultra_short_scripts['prediction']
-                predict_online = query_pm2_state(predict_script)
-                status['prediction'] = predict_online or status['prediction']
-        else:
-            # 短期和中期预测查找日志文件
-            predict_logs_dir = os.path.join(log_dirs[prediction_type]['base'], 'predictions')
-            date_logs = glob.glob(os.path.join(predict_logs_dir, f"{date_str}*.log"))
+                 predict_script = ultra_short_scripts['prediction']
+                 predict_online = query_pm2_state(predict_script)
+                 # 如果PM2在线，且完成次数不足，则状态为运行中 (prediction=True, count < 96)
+                 # 如果PM2不在线，则状态依赖于完成次数
+                 if predict_online and status['predictionCount'] < 96:
+                     status['prediction'] = True # Mark as 'running'
+
+        else: # short and medium
+            # 短期和中期预测查找完成标志文件
+            # predict_flag_dir = os.path.join(log_dirs[prediction_type]['base'], 'predictions') # 旧逻辑：错误的目录假设
+            # 使用训练日志目录查找标志文件，因为标志文件似乎在此处生成
+            predict_flag_dir = log_dirs[prediction_type].get('train') # 获取训练日志目录路径
             
-            if date_logs:
-                status['prediction'] = True
-                latest_log = max(date_logs, key=os.path.getmtime)
-                status['predictionTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(latest_log)).strftime('%Y-%m-%d %H:%M:%S')
-            
-            # 只有当天才检查进程状态
-            if is_today:
-                script_online = query_pm2_state(scripts[prediction_type])
-                status['prediction'] = script_online or status['prediction']
+            if not predict_flag_dir:
+                # 如果找不到训练日志目录配置，记录错误并跳过检查
+                print(f"错误：未找到 {prediction_type} 类型的训练日志目录配置")
+                status['prediction'] = False
+                status['predictionCompleted'] = False
+            else:
+                # 假设完成标志文件名为 YYYYMMDD_predict_done.flag
+                predict_flag_path = os.path.join(predict_flag_dir, f"{date_str}_predict_done.flag")
+
+                # --- 添加调试日志 ---
+                print(f"DEBUG: Checking for prediction flag: {predict_flag_path}")
+                flag_exists = os.path.exists(predict_flag_path)
+                print(f"DEBUG: Flag exists result: {flag_exists}")
+                # --- 结束调试日志 ---
+
+                if flag_exists: # 使用变量简化后续判断
+                    status['prediction'] = True 
+                    status['predictionCompleted'] = True # 标记为真正完成
+                    status['predictionTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(predict_flag_path)).strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    status['prediction'] = False 
+                    status['predictionCompleted'] = False # 默认未完成
+
+                # 只有当天才检查PM2进程状态作为补充（但主要依赖flag）
+                # 如果flag不存在，但PM2进程在运行（仅限今天），可能表示正在运行但未完成
+                if is_today and not status['predictionCompleted']: # 仅在今天且未完成时检查PM2
+                    script_online = query_pm2_state(scripts[prediction_type])
+                    if script_online:
+                         status['prediction'] = True # 任务状态是存在的 (运行中)
+                         # predictionCompleted 保持 False
         
+        # --- 添加调试日志 ---
+        print(f"DEBUG: Final status for {prediction_type} on {date_str}: {status}")
+        # --- 结束调试日志 ---
         return jsonify({'status': status})
     except Exception as e:
         print(f"获取任务状态失败: {str(e)}")

@@ -452,7 +452,8 @@ const taskStatus = reactive({
   trainingTime: '',
   predictionTime: '',
   paramOptTime: '',
-  predictionCount: 0
+  predictionCount: 0,
+  predictionCompleted: false
 })
 
 const taskDateInfo = reactive({
@@ -800,6 +801,17 @@ const fetchTaskStatus = async (name) => {
       taskStatus.predictionTime = res.data.status.predictionTime || ''
       taskStatus.paramOptTime = res.data.status.paramOptTime || ''
       taskStatus.predictionCount = res.data.status.predictionCount || 0
+      taskStatus.predictionCompleted = res.data.status.predictionCompleted || false
+    } else {
+      // 如果后端没有返回 status 对象，重置所有状态为 false
+      taskStatus.training = false
+      taskStatus.prediction = false
+      taskStatus.paramOpt = false
+      taskStatus.trainingTime = ''
+      taskStatus.predictionTime = ''
+      taskStatus.paramOptTime = ''
+      taskStatus.predictionCount = 0
+      taskStatus.predictionCompleted = false
     }
   } catch (error) {
     console.error('获取任务状态失败:', error)
@@ -1192,24 +1204,30 @@ const getParamOptDay = (taskType) => {
 const getTaskPredictionType = (taskStatus) => {
   // 如果是超短期预测
   if (currentPrediction === 'ultra_short') {
-    if (taskStatus.prediction && taskStatus.predictionCount >= 96) {
+    if (taskStatus.predictionCount >= 96) {
       // 完成了96次预测表示当天预测任务已完成
       return 'success';
-    } else if (taskStatus.prediction) {
+    } else if (taskStatus.prediction && taskStatus.predictionCount > 0) {
       // 预测任务正在运行但尚未完成
+      return 'warning';
+    } else if (taskStatus.prediction) {
+      // PM2 进程在运行但还没有任何预测完成 (可能是刚启动)
       return 'warning';
     } else {
       // 预测任务未运行
       return 'danger';
     }
   } 
-  // 如果是短期或中期预测，只要预测任务执行了就显示已完成
+  // 如果是短期或中期预测
   else {
-    if (taskStatus.prediction) {
-      // 预测任务已执行
+    if (taskStatus.predictionCompleted) {
+      // 任务已完成 (基于标志文件)
       return 'success';
+    } else if (taskStatus.prediction) {
+      // 任务正在运行 (当天PM2在线但无标志文件)
+      return 'warning';
     } else {
-      // 预测任务未运行
+      // 任务未运行
       return 'danger';
     }
   }
@@ -1219,24 +1237,30 @@ const getTaskPredictionType = (taskStatus) => {
 const getTaskPredictionStatus = (taskStatus) => {
   // 如果是超短期预测
   if (currentPrediction === 'ultra_short') {
-    if (taskStatus.prediction && taskStatus.predictionCount >= 96) {
+    if (taskStatus.predictionCount >= 96) {
       // 完成了96次预测表示当天预测任务已完成
       return '已完成';
-    } else if (taskStatus.prediction) {
+    } else if (taskStatus.prediction && taskStatus.predictionCount > 0) {
       // 预测任务正在运行但尚未完成
       return '运行中';
+    } else if (taskStatus.prediction) {
+        // PM2 进程在运行但还没有任何预测完成 (可能是刚启动)
+        return '运行中';
     } else {
       // 预测任务未运行
       return '未运行';
     }
   } 
-  // 如果是短期或中期预测，只要预测任务执行了就显示已完成
+  // 如果是短期或中期预测
   else {
-    if (taskStatus.prediction) {
-      // 预测任务已执行
+    if (taskStatus.predictionCompleted) {
+      // 任务已完成 (基于标志文件)
       return '已完成';
+    } else if (taskStatus.prediction) {
+      // 任务正在运行 (当天PM2在线但无标志文件)
+      return '运行中';
     } else {
-      // 预测任务未运行
+      // 任务未运行
       return '未运行';
     }
   }
