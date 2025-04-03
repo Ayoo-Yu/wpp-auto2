@@ -18,3 +18,6 @@ backend/logs/auto_train/20250324.log
 /backend/auto_scripts/scripts/short/logs
 backend/auto_scripts/train_test.csv
 backend/logs/app.log
+backend/logs/app.log
+backend/scheduler.log
+backend/logs/app.log
