@@ -6,7 +6,15 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
+import { ensureFormControlsTextColor } from './utils/styleCheck';
+
 // 此处不再需要背景切换逻辑，由 AppLayout 中统一控制
+
+// 在组件挂载后检查并修复文字颜色
+onMounted(() => {
+  ensureFormControlsTextColor();
+});
 </script>
 
 <style>
@@ -18,6 +26,37 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* 全局覆盖Element Plus组件的文字颜色 - 最高优先级 */
+body .el-input__inner, 
+body .el-textarea__inner,
+body .el-select-dropdown__item,
+body .el-date-editor .el-input__inner,
+body .el-date-editor .el-range-input,
+body .el-form-item__label,
+body .el-table,
+body .el-table th, 
+body .el-table tr, 
+body .el-table td,
+body .el-dropdown-menu__item,
+body .el-dialog,
+body .el-drawer,
+body .el-popover,
+body .el-tooltip,
+body .el-input input,
+body .el-input__wrapper input,
+body .el-select input,
+body .el-date-picker input,
+body .el-picker-panel,
+body .el-date-table td,
+body .el-date-table th {
+  color: #333 !important;
+}
+
+/* 确保白色背景下的文字颜色为深色 */
+body .el-date-picker {
+  color: #333 !important;
 }
 
 /* 主题色定义 */

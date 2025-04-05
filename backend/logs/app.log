@@ -7982,3 +7982,7 @@ LINE 1: ...me, output_path, prediction_type, status) VALUES ('202502121...
 [2025-04-05 10:59:17,508] INFO in logging_config: Wind Forecast Backend Startup
 [2025-04-05 10:59:48,481] INFO in app: 成功连接服务器！
 [2025-04-05 10:59:50,668] INFO in app: 与服务器断开连接！
+[2025-04-05 11:58:05,587] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 11:58:08,028] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 12:23:29,864] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 12:23:32,284] INFO in logging_config: Wind Forecast Backend Startup

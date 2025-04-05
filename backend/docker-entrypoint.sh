@@ -60,6 +60,10 @@ python -m init_users
 echo "检查并修复管理员权限..."
 python -m fix_admin_permissions
 
+# 修复所有角色权限
+echo "检查并修复所有角色权限..."
+python -m fix_user_permissions
+
 # 使用标记文件判断是否为首次部署
 # 确保工作目录存在
 mkdir -p /app/backend/data

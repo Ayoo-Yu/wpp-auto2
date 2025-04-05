@@ -191,27 +191,44 @@ export default {
     // 检查权限
     const hasPermission = (permission) => {
       // 简化权限检查，只要是管理员就有所有权限
-      if (!currentUser.value) return false
+      if (!currentUser.value) {
+        console.log('当前用户未加载，无法检查权限');
+        return false;
+      }
+      
+      // 系统管理员角色直接授予所有权限
+      if (currentUser.value.role === '系统管理员') {
+        console.log(`用户是系统管理员，自动授予权限: ${permission}`);
+        return true;
+      }
       
       // 检查用户的权限列表
       if (currentUser.value.permissions) {
+        console.log(`检查权限 ${permission}，当前权限信息:`, currentUser.value.permissions);
+        
         // 处理权限可能是数组或嵌套对象的情况
         let permissions = currentUser.value.permissions;
         
         // 如果权限是对象且有permissions属性
         if (typeof permissions === 'object' && !Array.isArray(permissions) && permissions.permissions) {
+          console.log('权限是嵌套对象格式，提取permissions数组');
           permissions = permissions.permissions;
         }
         
         // 如果权限是数组
         if (Array.isArray(permissions)) {
-          // 如果用户权限中包含所需权限，则返回true
-          return permissions.includes(permission);
+          const hasPermission = permissions.includes(permission);
+          console.log(`权限检查结果 ${permission}: ${hasPermission ? '有权限' : '无权限'}`);
+          return hasPermission;
+        } else {
+          console.log(`权限格式不是数组: ${typeof permissions}`);
         }
+      } else {
+        console.log('用户没有权限信息');
       }
       
-      // 向下兼容：系统管理员拥有所有权限
-      return currentUser.value.role === '系统管理员'
+      console.log(`权限检查失败: ${permission}`);
+      return false;
     }
 
     const toggleCollapse = () => {
