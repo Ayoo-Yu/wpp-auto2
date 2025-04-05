@@ -37,7 +37,7 @@ RUN apt-get update && apt-get install -y curl postgresql-client && \
 WORKDIR /app
 
 # 复制环境配置
-COPY environment.yml .
+COPY wind-power-forecast/backend/environment.yml .
 
 # 配置pip使用阿里云镜像源
 RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ && \
@@ -49,8 +49,16 @@ RUN conda env create -f environment.yml && conda clean --all --yes
 # 激活Conda环境
 ENV PATH /opt/conda/envs/wind-power-env/bin:$PATH
 
+# 复制alembic迁移配置 (从项目根目录复制)
+COPY migration /app/migration/
+COPY alembic.ini /app/alembic.ini
+
+# 确保有正确的权限
+RUN chmod -R 755 /app/migration
+RUN chmod 644 /app/alembic.ini
+
 # 复制项目代码
-COPY . .
+COPY wind-power-forecast/backend /app/
 
 # 创建符号链接，使脚本文件能在预期路径被找到
 RUN mkdir -p /app/backend/auto_scripts/scripts/supershort /app/backend/auto_scripts/scripts/short /app/backend/auto_scripts/scripts/middle
@@ -75,7 +83,7 @@ RUN echo "module.exports = { apps: [{\
 }] }" > ecosystem.config.js
 
 # 创建启动脚本
-COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+COPY wind-power-forecast/backend/docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
 
 # 暴露端口
