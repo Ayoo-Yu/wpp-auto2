@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from models import User, Role, LoginHistory
 import os
 from typing import Optional, Dict, Any
+from utils.password_utils import generate_password_hash as werkzeug_generate_hash
+from utils.password_utils import verify_password as werkzeug_verify_password
 
 # JWT密钥，实际应用中应从环境变量获取
 JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key")
@@ -12,14 +14,31 @@ JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION = 24  # 小时
 
 def get_password_hash(password: str) -> str:
-    """生成密码哈希"""
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return hashed_password.decode('utf-8')
+    """
+    生成密码哈希，使用统一的werkzeug实现
+    这会让新创建的密码都使用werkzeug格式
+    """
+    return werkzeug_generate_hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """验证密码"""
-    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    """
+    验证密码，兼容bcrypt和werkzeug两种格式
+    """
+    # 首先尝试使用werkzeug验证（新的统一方式）
+    try:
+        if werkzeug_verify_password(plain_password, hashed_password):
+            return True
+    except Exception as e:
+        print(f"werkzeug验证出错: {e}")
+    
+    # 如果werkzeug验证失败，尝试使用bcrypt（旧格式）
+    try:
+        if bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8')):
+            return True
+    except Exception as e:
+        print(f"bcrypt验证出错: {e}")
+    
+    return False
 
 def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
     """创建JWT访问令牌"""

@@ -21,3 +21,8 @@ backend/logs/app.log
 backend/logs/app.log
 backend/scheduler.log
 backend/logs/app.log
+postgres_image.tar
+pgadmin_image.tar
+minio_image.tar
+frontend_image.tar
+backend_image.tar

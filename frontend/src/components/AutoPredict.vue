@@ -374,8 +374,8 @@
 
 <script setup>
 import { ref, reactive, inject, onMounted, onUnmounted, computed } from 'vue'
-import axios from 'axios'
 import { ElMessage } from 'element-plus'
+import axiosInstance from '../api/axios'
 
 const isAnimatedBackground = inject('isAnimatedBackground');
 
@@ -497,12 +497,10 @@ const showErrorDialog = (title, details) => {
   errorDialogVisible.value = true
 }
 
-// 创建axios实例并添加拦截器
-const apiClient = axios.create({
-  timeout: 30000 // 30秒超时
-})
+// 创建axios实例并添加拦截器 - 替换为共享实例
+const apiClient = axiosInstance;
 
-// 添加响应拦截器处理所有请求的错误
+// 保留原始的拦截器代码，因为这是组件特定的错误处理逻辑
 apiClient.interceptors.response.use(
   response => {
     // 检查是否有警告消息，有则显示警告而不是错误

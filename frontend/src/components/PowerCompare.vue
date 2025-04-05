@@ -173,7 +173,10 @@ export default {
   name: 'PowerCompare',
   data() {
     return {
-      backendBaseUrl: 'http://127.0.0.1:5000',
+      // API地址设置
+      backendBaseUrl: window.location.hostname !== 'localhost' 
+        ? `http://${window.location.hostname}:5000` 
+        : 'http://localhost:5000',
       timeRange: [],
       selectedTypes: ['实测值', '短期预测'],
       chartData: null,

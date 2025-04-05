@@ -5,8 +5,9 @@ from services.auth_service import (
     authenticate_user, create_user, update_user, get_user_by_id, get_all_users,
     create_role, get_role_by_id, get_all_roles, create_access_token,
     log_login_attempt, update_last_login, decode_token, check_permission, get_user_by_username,
-    verify_password
+    verify_password as verify_password_bcrypt
 )
+from utils.password_utils import verify_password
 from models import User, Role
 from functools import wraps
 from datetime import timedelta
@@ -114,8 +115,17 @@ def login():
         if not user.is_active:
             return jsonify({"message": "账户已被禁用，请联系管理员"}), 403
         
-        # 验证密码
-        if not verify_password(data['password'], user.password_hash):
+        # 先尝试使用新的统一密码验证方法
+        password_valid = verify_password(data['password'], user.password_hash)
+        
+        # 如果新的验证方法失败，尝试使用旧的bcrypt方法
+        if not password_valid:
+            print(f"统一密码验证失败，尝试使用bcrypt方法 - 用户: {user.username}")
+            password_valid = verify_password_bcrypt(data['password'], user.password_hash)
+        
+        if not password_valid:
+            # 记录更详细的日志，帮助调试
+            print(f"两种密码验证方法均失败 - 用户: {user.username}, 哈希值: {user.password_hash[:20]}...")
             return jsonify({"message": "用户名或密码错误"}), 401
         
         # 更新最后登录时间

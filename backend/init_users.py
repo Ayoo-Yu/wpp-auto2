@@ -1,6 +1,6 @@
 from database_config import get_db, engine
-from db_models import Base, User, UserRole
-from werkzeug.security import generate_password_hash
+from db_models import Base, User, Role
+from utils.password_utils import generate_password_hash
 from datetime import datetime
 import logging
 
@@ -14,76 +14,110 @@ def init_users_and_roles():
         
         db = next(get_db())
         
-        # 检查是否已经有角色
-        roles_count = db.query(UserRole).count()
-        if roles_count > 0:
-            logger.info("已经存在角色数据，跳过初始化")
-            return
+        # 检查和创建角色
+        init_roles(db)
         
-        logger.info("开始初始化默认角色和管理员用户")
-        
-        # 创建默认角色
-        admin_role = UserRole(
-            name="系统管理员",
-            description="系统管理员，拥有所有权限",
-            permissions={
-                "homepage": {"view": True, "edit": True},
-                "modeltrain": {"view": True, "edit": True},
-                "powerpredict": {"view": True, "edit": True},
-                "autopredict": {"view": True, "edit": True},
-                "powercompare": {"view": True, "edit": True},
-                "users": {"view": True, "edit": True}
-            }
-        )
-        
-        operator_role = UserRole(
-            name="运行操作人员",
-            description="运行操作人员，可以操作大部分功能",
-            permissions={
-                "homepage": {"view": True, "edit": True},
-                "modeltrain": {"view": True, "edit": True},
-                "powerpredict": {"view": True, "edit": True},
-                "autopredict": {"view": True, "edit": True},
-                "powercompare": {"view": True, "edit": True},
-                "users": {"view": False, "edit": False}
-            }
-        )
-        
-        viewer_role = UserRole(
-            name="普通人员",
-            description="普通人员，只能查看",
-            permissions={
-                "homepage": {"view": True, "edit": False},
-                "modeltrain": {"view": True, "edit": False},
-                "powerpredict": {"view": True, "edit": False},
-                "autopredict": {"view": True, "edit": False},
-                "powercompare": {"view": True, "edit": False},
-                "users": {"view": False, "edit": False}
-            }
-        )
-        
-        db.add_all([admin_role, operator_role, viewer_role])
-        db.commit()
-        
-        # 创建默认管理员用户
-        admin_user = User(
-            username="admin",
-            password_hash=generate_password_hash("admin123"),
-            email="admin@example.com",
-            full_name="系统管理员",
-            is_active=True,
-            role_id=admin_role.id,
-            created_at=datetime.now()
-        )
-        
-        db.add(admin_user)
-        db.commit()
-        
-        logger.info(f"初始化完成，创建了管理员用户: {admin_user.username}")
+        # 检查和创建管理员用户
+        init_admin_user(db)
         
     except Exception as e:
         logger.error(f"初始化用户和角色失败: {str(e)}")
         raise
+
+def init_roles(db):
+    """初始化角色"""
+    # 检查是否已经有角色
+    roles_count = db.query(Role).count()
+    if roles_count > 0:
+        logger.info("已经存在角色数据，跳过角色初始化")
+        return
+    
+    logger.info("开始初始化默认角色")
+    
+    # 创建默认角色 - 使用列表格式的权限，与auth.py中的权限检查兼容
+    admin_role = Role(
+        name="系统管理员",
+        description="系统管理员，拥有所有权限",
+        permissions={
+            "permissions": [
+                "manage_users",
+                "manage_roles",
+                "view_all_data",
+                "upload_files",
+                "download_files",
+                "train_models",
+                "run_predictions",
+                "configure_system",
+                "view_dashboard",
+                "manage_tasks"
+            ]
+        }
+    )
+    
+    operator_role = Role(
+        name="运行操作人员",
+        description="运行操作人员，可以操作大部分功能",
+        permissions={
+            "permissions": [
+                "view_all_data",
+                "upload_files",
+                "download_files",
+                "train_models",
+                "run_predictions",
+                "view_dashboard"
+            ]
+        }
+    )
+    
+    viewer_role = Role(
+        name="普通人员",
+        description="普通人员，只能查看",
+        permissions={
+            "permissions": [
+                "view_dashboard"
+            ]
+        }
+    )
+    
+    db.add_all([admin_role, operator_role, viewer_role])
+    db.commit()
+    logger.info("角色初始化完成")
+
+def init_admin_user(db):
+    """初始化管理员用户"""
+    # 检查是否已经有管理员用户
+    admin_exists = db.query(User).filter(User.username == "admin").first()
+    if admin_exists:
+        logger.info("管理员用户已存在，跳过用户初始化")
+        return
+    
+    logger.info("开始初始化管理员用户")
+    
+    # 获取系统管理员角色
+    admin_role = db.query(Role).filter(Role.name == "系统管理员").first()
+    if not admin_role:
+        logger.error("未找到系统管理员角色，无法创建管理员用户")
+        return
+    
+    # 使用统一的哈希函数
+    password_hash = generate_password_hash("admin123")
+    logger.info(f"生成的密码哈希: {password_hash[:20]}...")
+    
+    # 创建默认管理员用户
+    admin_user = User(
+        username="admin",
+        password_hash=password_hash,
+        email="admin@example.com",
+        full_name="系统管理员",
+        is_active=True,
+        role_id=admin_role.id,
+        created_at=datetime.now()
+    )
+    
+    db.add(admin_user)
+    db.commit()
+    
+    logger.info(f"初始化完成，创建了管理员用户: {admin_user.username}")
 
 if __name__ == "__main__":
     init_users_and_roles() 

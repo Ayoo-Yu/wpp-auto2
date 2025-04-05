@@ -303,17 +303,23 @@ def init_users():
     if roles_count > 0:
         return jsonify({'message': '已经初始化过，不需要重复操作'}), 400
     
-    # 创建默认角色
+    # 创建默认角色 - 使用列表格式的权限
     admin_role = Role(
         name="系统管理员",
         description="系统管理员，拥有所有权限",
         permissions={
-            "homepage": {"view": True, "edit": True},
-            "modeltrain": {"view": True, "edit": True},
-            "powerpredict": {"view": True, "edit": True},
-            "autopredict": {"view": True, "edit": True},
-            "powercompare": {"view": True, "edit": True},
-            "users": {"view": True, "edit": True}
+            "permissions": [
+                "manage_users",
+                "manage_roles",
+                "view_all_data",
+                "upload_files",
+                "download_files",
+                "train_models",
+                "run_predictions",
+                "configure_system",
+                "view_dashboard",
+                "manage_tasks"
+            ]
         }
     )
     
@@ -321,12 +327,14 @@ def init_users():
         name="运行操作人员",
         description="运行操作人员，可以操作大部分功能",
         permissions={
-            "homepage": {"view": True, "edit": True},
-            "modeltrain": {"view": True, "edit": True},
-            "powerpredict": {"view": True, "edit": True},
-            "autopredict": {"view": True, "edit": True},
-            "powercompare": {"view": True, "edit": True},
-            "users": {"view": False, "edit": False}
+            "permissions": [
+                "view_all_data",
+                "upload_files",
+                "download_files",
+                "train_models",
+                "run_predictions",
+                "view_dashboard"
+            ]
         }
     )
     
@@ -334,12 +342,9 @@ def init_users():
         name="普通人员",
         description="普通人员，只能查看",
         permissions={
-            "homepage": {"view": True, "edit": False},
-            "modeltrain": {"view": True, "edit": False},
-            "powerpredict": {"view": True, "edit": False},
-            "autopredict": {"view": True, "edit": False},
-            "powercompare": {"view": True, "edit": False},
-            "users": {"view": False, "edit": False}
+            "permissions": [
+                "view_dashboard"
+            ]
         }
     )
     

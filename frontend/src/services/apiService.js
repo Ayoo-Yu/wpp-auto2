@@ -1,7 +1,17 @@
 // src/services/apiService.js
 import axios from 'axios';
 
-const backendBaseUrl = 'http://127.0.0.1:5000';
+// 确定API基础URL
+let backendBaseUrl;
+
+// 如果不是localhost，使用当前域名+端口
+if (window.location.hostname !== 'localhost') {
+  backendBaseUrl = `http://${window.location.hostname}:5000`; // 明确指定后端端口为5000
+} else {
+  backendBaseUrl = 'http://localhost:5000'; // 本地开发环境
+}
+
+console.log('apiService使用API基础URL:', backendBaseUrl);
 
 export const upload_train_csv = (file, onUploadProgress) => {
   // 检查文件类型是否是 joblib

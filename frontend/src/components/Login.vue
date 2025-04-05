@@ -255,6 +255,11 @@ export default {
   overflow: hidden;
 }
 
+/* 添加全局输入框文字样式，确保在云服务器上可见 */
+:deep(.el-input__inner) {
+  color: #333 !important; /* 深色文字，确保在白色背景上可见 */
+}
+
 .background-container {
   position: absolute;
   top: 0;

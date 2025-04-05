@@ -1,0 +1,125 @@
+# version: '3.8'  # 可以注释或删除此行
+
+services:
+  frontend:
+    image: wind-power-forecast-frontend:latest
+    ports:
+      - "8080:80"
+    networks:
+      - wind-power-network
+    depends_on:
+      - backend
+
+  backend:
+    image: wind-power-forecast-backend:latest
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=yzz0216yh
+      - DB_NAME=windpower
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - SQLALCHEMY_ECHO=true
+      - LOG_LEVEL=DEBUG
+    networks:
+      - wind-power-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # 其他服务保持不变...
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=yzz0216yh
+      - POSTGRES_DB=windpower
+      - POSTGRES_HOST_AUTH_METHOD=md5
+    ports:
+      - "5432:5432"
+    networks:
+      - wind-power-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+      
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    command: server /data --console-address ":9001"
+    networks:
+      - wind-power-network
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 10s
+      
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    networks:
+      - wind-power-network
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-O", "-", "http://localhost:80/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # 调试工具容器
+  debug-tools:
+    image: postgres:15-alpine
+    command: sleep infinity
+    networks:
+      - wind-power-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    name: wind-power-postgres-data
+  minio_data:
+    name: wind-power-minio-data
+  pgadmin_data:
+    name: wind-power-pgadmin-data
+
+networks:
+  wind-power-network:
+    driver: bridge

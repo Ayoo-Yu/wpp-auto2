@@ -1,0 +1,9 @@
+/* 确保输入框文字在任何背景下都可见 */
+.el-input__inner {
+  color: #333 !important;
+}
+
+/* 表单项标签颜色 */
+.el-form-item__label {
+  color: #333 !important;
+} 

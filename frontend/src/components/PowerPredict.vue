@@ -238,7 +238,10 @@ export default {
   },
   data() {
     return {
-      backendBaseUrl: 'http://127.0.0.1:5000',
+      // API地址设置
+      backendBaseUrl: window.location.hostname !== 'localhost' 
+        ? `http://${window.location.hostname}:5000` 
+        : 'http://localhost:5000',
       customUploadText_datacsv: '选择预测数据集',
       customUploadText_model: '请选择预测模型',
       customUploadText_scaler: '请选择归一化模型',
