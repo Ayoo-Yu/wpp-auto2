@@ -33,16 +33,20 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: ..  # 修改构建上下文为项目根目录
+      dockerfile: wind-power-forecast/backend/Dockerfile  # 使用相对于项目根目录的Dockerfile路径
     ports:
       - "5000:5000"
     environment:
       - FLASK_ENV=development
       - DB_HOST=postgres       # 使用数据库服务名称
       - DB_PORT=5432
+      - DB_USER=postgres       # 添加数据库用户名
+      - DB_PASSWORD=yzz0216yh  # 添加数据库密码
+      - DB_NAME=windpower      # 添加数据库名称
       - MINIO_ENDPOINT=minio   # 使用MinIO服务名称
       - MINIO_PORT=9000
+    
     networks:
       - wind-power-network  # 连接同一网络
     depends_on:

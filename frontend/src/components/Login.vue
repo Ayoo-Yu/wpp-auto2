@@ -170,6 +170,9 @@ export default {
         loading.value = true
         
         try {
+          // 先清除本地存储，确保获取最新权限
+          localStorage.removeItem('user');
+          
           const userData = await login(formData.username, formData.password)
           
           // 简化登录成功处理
