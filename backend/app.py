@@ -19,13 +19,13 @@ from logging_config import configure_logging
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# 配置 CORS，关闭预检请求验证
+# 配置 CORS，允许所有跨域请求
 CORS(app, resources={r"/*": {
-    "origins": "*",
+    "origins": "*",  # 允许所有来源
     "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    "allow_headers": "*",
-    "expose_headers": "*",
-    "supports_credentials": True,
+    "allow_headers": ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
+    "expose_headers": ["Content-Type", "Content-Length", "Authorization", "Accept", "X-Requested-With", "Origin"],
+    "supports_credentials": False,  # 改为False，因为我们不使用凭证
     "max_age": 86400  # 预检请求结果缓存24小时
 }})
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
@@ -114,6 +114,15 @@ def initialize():
             try:
                 Base.metadata.create_all(bind=engine)
                 print("✅ 数据库表创建完成")
+                
+                # 初始化用户和角色
+                try:
+                    from init_users import init_users_and_roles
+                    init_users_and_roles()
+                    print("✅ 初始用户和角色创建完成")
+                except Exception as e:
+                    print(f"警告: 初始用户创建失败: {e}")
+                    
             except Exception as e:
                 print(f"警告: 数据库表创建失败: {e}")
         else:

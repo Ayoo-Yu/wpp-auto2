@@ -82,8 +82,7 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="profile">个人设置</el-dropdown-item>
-                <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
+                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -95,66 +94,13 @@
         <router-view></router-view>
       </el-main>
     </el-container>
-    
-    <!-- 修改密码对话框 -->
-    <el-dialog
-      v-model="showChangePasswordDialog"
-      title="修改密码"
-      width="400px"
-    >
-      <el-form 
-        ref="passwordForm" 
-        :model="passwordFormData" 
-        :rules="passwordRules" 
-        label-width="100px"
-      >
-        <el-form-item label="当前密码" prop="currentPassword">
-          <el-input
-            v-model="passwordFormData.currentPassword"
-            type="password"
-            placeholder="请输入当前密码"
-            show-password
-          />
-        </el-form-item>
-        
-        <el-form-item label="新密码" prop="newPassword">
-          <el-input
-            v-model="passwordFormData.newPassword"
-            type="password"
-            placeholder="请输入新密码"
-            show-password
-          />
-        </el-form-item>
-        
-        <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input
-            v-model="passwordFormData.confirmPassword"
-            type="password"
-            placeholder="请再次输入新密码"
-            show-password
-          />
-        </el-form-item>
-      </el-form>
-      
-      <template #footer>
-        <el-button @click="showChangePasswordDialog = false">取消</el-button>
-        <el-button 
-          type="primary" 
-          :loading="changingPassword"
-          @click="handleChangePassword"
-        >
-          确认
-        </el-button>
-      </template>
-    </el-dialog>
   </el-container>
 </template>
 
 <script>
-import { ref, reactive, computed, provide, onMounted } from 'vue'
+import { ref, computed, provide, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { changePassword } from '../api/auth'
 
 // 引入 Element Plus 图标
 import {
@@ -186,40 +132,6 @@ export default {
     
     // 用户信息
     const currentUser = ref(null)
-    
-    // 修改密码相关
-    const passwordForm = ref(null)
-    const showChangePasswordDialog = ref(false)
-    const changingPassword = ref(false)
-    
-    const passwordFormData = reactive({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    })
-    
-    const passwordRules = {
-      currentPassword: [
-        { required: true, message: '请输入当前密码', trigger: 'blur' }
-      ],
-      newPassword: [
-        { required: true, message: '请输入新密码', trigger: 'blur' },
-        { min: 6, message: '密码长度不能少于6个字符', trigger: 'blur' }
-      ],
-      confirmPassword: [
-        { required: true, message: '请再次输入新密码', trigger: 'blur' },
-        {
-          validator: (rule, value, callback) => {
-            if (value !== passwordFormData.newPassword) {
-              callback(new Error('两次输入的密码不一致'))
-            } else {
-              callback()
-            }
-          },
-          trigger: 'blur'
-        }
-      ]
-    }
 
     // 将 isAnimatedBackground 提供给子组件使用
     provide('isAnimatedBackground', isAnimatedBackground)
@@ -314,8 +226,6 @@ export default {
     const handleCommand = (command) => {
       if (command === 'logout') {
         handleLogout()
-      } else if (command === 'profile') {
-        showChangePasswordDialog.value = true
       }
     }
     
@@ -342,47 +252,6 @@ export default {
       })
     }
     
-    // 处理修改密码
-    const handleChangePassword = async () => {
-      if (!passwordForm.value) return
-      
-      await passwordForm.value.validate(async (valid) => {
-        if (!valid) return
-        
-        changingPassword.value = true
-        
-        try {
-          // 获取当前登录的用户名
-          const username = currentUser.value ? currentUser.value.username : ''
-          
-          if (!username) {
-            ElMessage.error('未找到当前用户信息，请重新登录')
-            handleLogout()
-            return
-          }
-          
-          await changePassword(
-            username,
-            passwordFormData.currentPassword,
-            passwordFormData.newPassword
-          )
-          
-          showChangePasswordDialog.value = false
-          ElMessage.success('密码修改成功')
-          
-          // 清空表单
-          passwordFormData.currentPassword = ''
-          passwordFormData.newPassword = ''
-          passwordFormData.confirmPassword = ''
-        } catch (error) {
-          console.error('密码修改失败:', error)
-          ElMessage.error('密码修改失败: ' + (error.response?.data?.message || '服务器错误'))
-        } finally {
-          changingPassword.value = false
-        }
-      })
-    }
-    
     // 生命周期钩子
     onMounted(() => {
       fetchCurrentUser()
@@ -399,12 +268,6 @@ export default {
       userInitial,
       userName,
       handleCommand,
-      passwordForm,
-      passwordFormData,
-      passwordRules,
-      showChangePasswordDialog,
-      changingPassword,
-      handleChangePassword,
       hasPermission
     }
   },
@@ -416,6 +279,17 @@ export default {
 .app-container {
   height: 100vh;
   position: relative;
+}
+
+/* 对话框样式 */
+.dialog-footer {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.custom-form :deep(.el-form-item__content) {
+  flex-wrap: nowrap;
+  justify-content: flex-start;
 }
 
 /* 背景容器 */

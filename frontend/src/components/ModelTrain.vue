@@ -241,7 +241,9 @@ export default {
   },
   data() {
     return {
-      backendBaseUrl: 'http://127.0.0.1:5000',
+      backendBaseUrl: window.location.hostname !== 'localhost' 
+        ? `http://${window.location.hostname}:5000` 
+        : 'http://localhost:5000',
       customUploadText_modeltrain: '点击上传训练数据集文件',
       fileId: null,
       selectedFile: null,

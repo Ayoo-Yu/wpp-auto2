@@ -7948,3 +7948,37 @@ LINE 1: ...me, output_path, prediction_type, status) VALUES ('202502121...
 [2025-04-03 18:15:15,620] INFO in modeltrain: 将原生报告复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\report_test1_20250403181437248738_20250403181512.txt
 [2025-04-03 18:15:15,620] INFO in modeltrain: 预测文件下载url为: /download/forecast_test1_20250403181437248738_20250403181512.csv
 [2025-04-03 18:15:15,621] INFO in modeltrain: 训练报告下载url为: /download/report_test1_20250403181437248738_20250403181512.txt
+[2025-04-03 18:29:16,570] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-03 18:29:18,960] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-04 23:44:22,594] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-04 23:44:25,482] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 00:15:14,124] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 00:15:16,572] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 00:29:34,234] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 00:29:36,665] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 00:45:35,103] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 00:45:37,511] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 00:49:43,556] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 00:50:04,083] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 00:51:07,179] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 00:51:09,608] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 01:03:46,036] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 09:30:17,828] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 09:30:20,296] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 09:55:58,143] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 09:56:00,583] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:07:13,911] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:07:16,520] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:11:32,707] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:12:04,050] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:12:17,964] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:13:02,373] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:13:04,841] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:14:44,537] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:14:46,997] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:19:15,644] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:19:18,084] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:59:14,996] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:59:17,508] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-05 10:59:48,481] INFO in app: 成功连接服务器！
+[2025-04-05 10:59:50,668] INFO in app: 与服务器断开连接！
