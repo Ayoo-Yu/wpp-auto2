@@ -1,17 +1,17 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15-alpine
-    container_name: wind-power-postgres
+  kingbase:
+    image: kingbase_v009r001c002b0014_single_x86:v1  # 请替换为实际导入的金仓数据库镜像名称和标签
+    container_name: wind-power-kingbase
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: yzz0216yh
-      POSTGRES_DB: windpower
+      KINGBASE_USER: system
+      KINGBASE_PASSWORD: yzz0216yh
+      KINGBASE_DB: windpower
     volumes:
-      - postgres_data:/var/lib/postgresql/data  # 使用命名卷
+      - kingbase_data:/opt/kingbase/data  # 根据金仓数据库的数据存储路径可能需要调整
     ports:
-      - "5432:5432"
+      - "54321:54321"  # 金仓数据库默认端口为54321
     restart: unless-stopped
     networks:
       - wind-power-network
@@ -41,13 +41,13 @@ services:
     ports:
       - "5050:80"
     depends_on:
-      - postgres
+      - kingbase
     restart: unless-stopped
     networks:
       - wind-power-network
 
 volumes:  # 声明命名卷
-  postgres_data:
+  kingbase_data:
   minio_data:
 
 networks:

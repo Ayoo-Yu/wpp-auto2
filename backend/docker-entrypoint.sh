@@ -18,10 +18,10 @@ import sys
 import time
 
 # 从环境变量获取数据库连接信息
-host = os.environ.get('DB_HOST', 'postgres')
-port = os.environ.get('DB_PORT', '5432')
-user = os.environ.get('DB_USER', 'postgres')
-password = os.environ.get('DB_PASSWORD', 'postgres')
+host = os.environ.get('DB_HOST', 'kingbase')
+port = os.environ.get('DB_PORT', '54321')
+user = os.environ.get('DB_USER', 'system')
+password = os.environ.get('DB_PASSWORD', '12345678ab')
 dbname = os.environ.get('DB_NAME', 'windpower')
 
 try:

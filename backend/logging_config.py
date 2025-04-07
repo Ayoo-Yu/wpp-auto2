@@ -1,6 +1,25 @@
 import logging
 import os
 from logging.handlers import TimedRotatingFileHandler
+from datetime import datetime, timedelta
+
+class BeijingTimeFormatter(logging.Formatter):
+    """自定义日志格式化器，使用北京时间"""
+    
+    def formatTime(self, record, datefmt=None):
+        """重写formatTime方法，将日志时间调整为北京时间（UTC+8）"""
+        # 获取UTC时间
+        utc_time = datetime.fromtimestamp(record.created)
+        # 调整为北京时间（UTC+8）
+        beijing_time = utc_time + timedelta(hours=8)
+        
+        if datefmt:
+            s = beijing_time.strftime(datefmt)
+        else:
+            s = beijing_time.strftime("%Y-%m-%d %H:%M:%S")
+            # 添加毫秒
+            s = "%s,%03d" % (s, record.msecs)
+        return s
 
 class SocketIOHandler(logging.Handler):
     """自定义日志处理器，通过SocketIO发送日志消息。"""
@@ -33,8 +52,8 @@ def configure_logging(app, socketio):
     socketio_handler = SocketIOHandler(socketio)
     socketio_handler.setLevel(logging.INFO)
     
-    # 格式化
-    formatter = logging.Formatter(
+    # 创建使用北京时间的格式化器
+    formatter = BeijingTimeFormatter(
         '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
     )
     console_handler.setFormatter(formatter)

@@ -284,7 +284,7 @@ export default {
         name: file.name,
         size: file.size,
         type: file.type,
-        uploadDate: new Date().toLocaleString(),
+        uploadDate: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
       };
       this.initializeSocket();
     },

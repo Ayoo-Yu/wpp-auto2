@@ -1,12 +1,8 @@
 import sys
 import os
 import pytest
-
-# 添加backend目录到Python路径
-backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if backend_dir not in sys.path:
-    sys.path.insert(0, backend_dir)
-
+import psycopg2
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from sqlalchemy import create_engine, text
 from minio import Minio
 from backend.config import MINIO_CONFIG # type: ignore
@@ -19,14 +15,27 @@ def setup_database():
     yield
     Base.metadata.drop_all(bind=engine)
 
+# 数据库连接URL需要更新为金仓数据库
+SQLALCHEMY_DATABASE_URI = "postgresql://system:12345678ab@localhost:54321/test_wind_power"
+
+# 使用临时测试数据库
+@pytest.fixture(scope="session")
+def temp_db():
+    """创建测试专用的临时数据库"""
+    # 连接到默认数据库
+    conn = psycopg2.connect(
+        "postgresql://system:12345678ab@localhost:54321/test",
+        isolation_level=ISOLATION_LEVEL_AUTOCOMMIT
+    )
+
 # 修改后的 test_db fixture
 @pytest.fixture(scope="session")
 def test_db():
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:yzz0216yh@localhost:5432/test_wind_power"
+    SQLALCHEMY_DATABASE_URI = "postgresql://system:12345678ab@localhost:54321/test_wind_power"
     
     # 创建测试数据库
     admin_engine = create_engine(
-        "postgresql://postgres:yzz0216yh@localhost:5432/postgres",
+        "postgresql://system:12345678ab@localhost:54321/test",
         isolation_level="AUTOCOMMIT"
     )
     with admin_engine.connect() as conn:

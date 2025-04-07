@@ -1,4 +1,4 @@
-# version: '3.8'  # 可以注释或删除此行
+# 已更新的local-images.yaml，适用于云服务器部署
 
 services:
   frontend:
@@ -16,20 +16,18 @@ services:
       - "5000:5000"
     environment:
       - FLASK_ENV=development
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=yzz0216yh
-      - DB_NAME=windpower
-      - MINIO_ENDPOINT=minio
+      - DB_HOST=kingbase       # 修改为金仓数据库
+      - DB_PORT=54321          # 金仓数据库端口
+      - DB_USER=system         # 金仓默认用户
+      - DB_PASSWORD=12345678ab # 金仓默认密码
+      - DB_NAME=windpower      # 数据库名
+      - MINIO_ENDPOINT=minio   
       - MINIO_PORT=9000
-      - SQLALCHEMY_ECHO=true
-      - LOG_LEVEL=DEBUG
     networks:
       - wind-power-network
     depends_on:
-      postgres:
-        condition: service_healthy
+      kingbase:
+        condition: service_started  # 金仓数据库不支持健康检查，使用service_started
       minio:
         condition: service_healthy
     restart: on-failure
@@ -37,64 +35,66 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 60s
+      retries: 3
+      start_period: 40s
 
-  # 其他服务保持不变...
-  postgres:
-    image: postgres:15-alpine
+  kingbase:
+    image: kingbase_v009r001c002b0014_single_x86:v1
+    container_name: wind-power-kingbase
+    privileged: true  # 金仓数据库需要特权模式
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=yzz0216yh
-      - POSTGRES_DB=windpower
-      - POSTGRES_HOST_AUTH_METHOD=md5
+      - NEED_START=yes
+      - DB_USER=system
+      - DB_PASSWORD=12345678ab
+      - DB_MODE=oracle  # 金仓数据库推荐使用oracle模式
+      - ENCODING=UTF8
+    volumes:
+      - kingbase_data:/home/kingbase/userdata/
     ports:
-      - "5432:5432"
+      - "54321:54321"
+    restart: unless-stopped
     networks:
       - wind-power-network
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-      
+    command: /usr/sbin/init
+
   minio:
     image: minio/minio:latest
+    container_name: wind-power-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
     ports:
       - "9000:9000"
       - "9001:9001"
-    environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
-    command: server /data --console-address ":9001"
+    restart: unless-stopped
     networks:
       - wind-power-network
-    volumes:
-      - minio_data:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
       start_period: 10s
-      
+
   pgadmin:
     image: dpage/pgadmin4:latest
+    container_name: wind-power-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
-    networks:
-      - wind-power-network
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
-      postgres:
-        condition: service_healthy
+      kingbase:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - wind-power-network
     healthcheck:
       test: ["CMD", "wget", "-O", "-", "http://localhost:80/misc/ping"]
       interval: 30s
@@ -102,19 +102,9 @@ services:
       retries: 3
       start_period: 20s
 
-  # 调试工具容器
-  debug-tools:
-    image: postgres:15-alpine
-    command: sleep infinity
-    networks:
-      - wind-power-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-
 volumes:
-  postgres_data:
-    name: wind-power-postgres-data
+  kingbase_data:  # 修改为金仓数据卷
+    name: wind-power-kingbase-data
   minio_data:
     name: wind-power-minio-data
   pgadmin_data:

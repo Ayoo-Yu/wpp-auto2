@@ -950,7 +950,7 @@ export default {
       const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8' })
       const link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
-      link.download = `每日评估指标_${new Date().toLocaleString().replace(/[/\s:]/g, '-')}.csv`
+      link.download = `每日评估指标_${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }).replace(/[/\s:]/g, '-')}.csv`
       link.click()
     },
 
@@ -973,7 +973,7 @@ export default {
       const blob = new Blob([svgContent], { type: 'image/svg+xml' })
       const link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
-      link.download = `指标图表_${new Date().toLocaleString().replace(/[/\s:]/g, '-')}.svg`
+      link.download = `指标图表_${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }).replace(/[/\s:]/g, '-')}.svg`
       link.click()
     },
 
@@ -988,7 +988,7 @@ export default {
       const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8' })
       const link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
-      link.download = `功率对比数据_${new Date().toLocaleString().replace(/[/\s:]/g, '-')}.csv`
+      link.download = `功率对比数据_${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }).replace(/[/\s:]/g, '-')}.csv`
       link.click()
     },
 
@@ -1014,7 +1014,7 @@ export default {
       
       const link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
-      link.download = `功率对比图表_${new Date().toLocaleString().replace(/[/\s:]/g, '-')}.svg`
+      link.download = `功率对比图表_${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }).replace(/[/\s:]/g, '-')}.svg`
       link.click()
     },
 

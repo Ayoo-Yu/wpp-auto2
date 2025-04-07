@@ -3,14 +3,13 @@ from minio import Minio
 from minio.commonconfig import ENABLED
 import json
 
-# 从环境变量读取配置，如果不存在则使用默认值
-POSTGRES_CONFIG = {
+KINGBASE_CONFIG = {
     "host": os.environ.get("DB_HOST", "localhost"),
-    "port": os.environ.get("DB_PORT", "5432"),
-    "user": "postgres",
-    "password": "yzz0216yh",
-    "database": "windpower",
-    # "default_db": "postgres"  # 新增默认数据库配置
+    "port": os.environ.get("DB_PORT", "54321"),  # 金仓数据库默认端口
+    "user": "system",                           # 金仓默认用户
+    "password": "12345678ab",                   # 金仓默认密码
+    "database": "test",                         # 使用test作为初始数据库
+    "default_db": "test"                        # 默认数据库名称
 }
 
 MINIO_CONFIG = {
@@ -43,16 +42,13 @@ class Config:
     MAX_CONTENT_LENGTH = 200 * 1024 * 1024  # 200MB
     ALLOWED_EXTENSIONS = {'csv','joblib'}
 
-    # 根据需要加载更多自定义配置，如数据库连接、模型路径等
-
-    # 新增数据库配置
-    POSTGRES_CONFIG = {
+    KINGBASE_CONFIG = {
         "host": os.environ.get("DB_HOST", "localhost"),
-        "port": os.environ.get("DB_PORT", "5432"),
-        "user": "postgres",
-        "password": "yzz0216yh",
-        "database": "windpower",
-        "default_db": "postgres"  # 新增默认数据库配置
+        "port": os.environ.get("DB_PORT", "54321"),  # 金仓数据库默认端口
+        "user": "system",                           # 金仓用户
+        "password": "12345678ab",                   # 金仓密码
+        "database": "test",                             # 使用test作为初始数据库
+        "default_db": "test"                              # 默认数据库名称
     }
     
     MINIO_CONFIG = {
@@ -86,7 +82,7 @@ class Config:
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:yzz0216yh@localhost:5432/test_wind_power"
+    SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{KINGBASE_CONFIG['user']}:{KINGBASE_CONFIG['password']}@{KINGBASE_CONFIG['host']}:{KINGBASE_CONFIG['port']}/windpower"
     PRESERVE_CONTEXT_ON_EXCEPTION = False
 
 def set_bucket_policy(client, bucket_name, policy):

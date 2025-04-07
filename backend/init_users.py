@@ -3,15 +3,20 @@ from db_models import Base, User, Role
 from utils.password_utils import generate_password_hash
 from datetime import datetime
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
 def init_users_and_roles():
     """初始化默认角色和管理员用户"""
     try:
+        # 添加调试信息
+        print("初始化数据库表和用户...")
+        
         # 创建数据库表
         Base.metadata.create_all(bind=engine)
         
+        # 使用get_db获取数据库会话
         db = next(get_db())
         
         # 检查和创建角色
