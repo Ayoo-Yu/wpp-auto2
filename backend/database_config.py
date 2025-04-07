@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from minio import Minio
-from config import POSTGRES_CONFIG, MINIO_CONFIG
+from config import KINGBASE_CONFIG, MINIO_CONFIG
 from base import Base
 import psycopg2
 from psycopg2 import sql
@@ -11,76 +11,40 @@ from db_models import Base, Model
 from sqlalchemy import inspect
 import time
 import os
+import subprocess
+
+# 导入自定义金仓方言
+import kingbase_dialect
 
 # 导出数据库连接URL供其他模块使用
-SQLALCHEMY_DATABASE_URI = (
-    f"postgresql+psycopg2://{POSTGRES_CONFIG['user']}:{POSTGRES_CONFIG['password']}"
-    f"@{POSTGRES_CONFIG['host']}:{POSTGRES_CONFIG['port']}/{POSTGRES_CONFIG['database']}"
-)
+print("构建数据库连接URL...")
+print(f"DB_USER环境变量：{os.environ.get('DB_USER', '未设置')}")
+print(f"KINGBASE_CONFIG['user']值：{KINGBASE_CONFIG['user']}")
+print(f"DB_PASSWORD是否已设置：{'是' if os.environ.get('DB_PASSWORD') else '否'}")
+print(f"DB_HOST环境变量：{os.environ.get('DB_HOST', '未设置')}")
+print(f"DB_PORT环境变量：{os.environ.get('DB_PORT', '未设置')}")
+print(f"DB_NAME环境变量：{os.environ.get('DB_NAME', '未设置')}")
+
+# 强制使用system用户和密码，连接到kingbase服务，使用自定义kingbase方言
+SQLALCHEMY_DATABASE_URI = f"postgresql+kingbase://system:12345678ab@kingbase:54321/windpower"
+
+print(f"最终连接URL：{SQLALCHEMY_DATABASE_URI}")
 
 # 保留旧变量名以保持兼容性
 SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URI
-
-# 在engine创建之前添加数据库自动创建逻辑
-def create_database_if_not_exists():
-    max_retries = 5
-    retry_delay = 5  # 秒
-    
-    for attempt in range(max_retries):
-        try:
-            # 使用默认数据库连接
-            conn = psycopg2.connect(
-                dbname="postgres",
-                user=POSTGRES_CONFIG['user'],
-                password=POSTGRES_CONFIG['password'],
-                host=POSTGRES_CONFIG['host'],
-                port=POSTGRES_CONFIG['port']
-            )
-            conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-            
-            with conn.cursor() as cursor:
-                # 检查数据库是否存在
-                cursor.execute(
-                    sql.SQL("SELECT 1 FROM pg_database WHERE datname = {}")
-                    .format(sql.Literal(POSTGRES_CONFIG['database']))
-                )
-                exists = cursor.fetchone()
-                
-                if not exists:
-                    cursor.execute(
-                        sql.SQL("CREATE DATABASE {}")
-                        .format(sql.Identifier(POSTGRES_CONFIG['database']))
-                    )
-                    print(f"✅ 成功创建数据库: {POSTGRES_CONFIG['database']}")
-                else:
-                    print(f"✅ 数据库已存在: {POSTGRES_CONFIG['database']}")
-            
-            conn.close()
-            return  # 成功连接并完成操作，退出函数
-            
-        except psycopg2.OperationalError as e:
-            print(f"数据库连接失败 (尝试 {attempt+1}/{max_retries}): {e}")
-            if attempt < max_retries - 1:
-                print(f"等待 {retry_delay} 秒后重试...")
-                time.sleep(retry_delay)
-            else:
-                print("达到最大重试次数，无法连接到数据库")
-                raise
-
-# 执行数据库创建
-try:
-    create_database_if_not_exists()
-except Exception as e:
-    print(f"警告: 数据库初始化失败: {e}")
-    print("应用将继续启动，但可能无法正常工作")
 
 # 创建engine，添加重试机制
 def create_engine_with_retry():
     max_retries = 5
     retry_delay = 5  # 秒
     
+    print("DEBUG: 进入 create_engine_with_retry 函数...")
     for attempt in range(max_retries):
         try:
+            print(f"DEBUG: 尝试第 {attempt+1} 次创建引擎，使用 URI: {SQLALCHEMY_DATABASE_URI}")
+            # 确保SQLALCHEMY_DATABASE_URI使用的是我们硬编码的值
+            if 'postgres:' in SQLALCHEMY_DATABASE_URI:
+                print("警告! 检测到连接字符串中包含 'postgres:' 用户!")
             return create_engine(SQLALCHEMY_DATABASE_URI)
         except Exception as e:
             print(f"创建数据库引擎失败 (尝试 {attempt+1}/{max_retries}): {e}")
@@ -91,7 +55,7 @@ def create_engine_with_retry():
                 print("达到最大重试次数，无法创建数据库引擎")
                 raise
 
-# 原有engine创建保持不变，但使用重试机制
+# 使用重试机制创建engine
 try:
     engine = create_engine_with_retry()
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -182,10 +146,12 @@ except Exception as e:
     minio_client = None
 
 def get_db():
+    print("调试: get_db函数被调用")
     if SessionLocal is None:
         print("警告: 数据库会话不可用")
         raise Exception("数据库连接不可用")
-        
+    
+    print(f"调试: 创建数据库会话，引擎连接URL为: {SQLALCHEMY_DATABASE_URI}")
     db = SessionLocal()
     try:
         yield db
@@ -211,16 +177,37 @@ def cleanup_old_models(db: Session, keep_last=5):
                 if model.model_path:
                     try:
                         bucket_name = MINIO_CONFIG["buckets"]["models"]
-                        object_name = os.path.basename(model.model_path)
+                        object_name = model.model_path.split("/")[-1]
                         minio_client.remove_object(bucket_name, object_name)
-                        print(f"已删除模型文件: {object_name}")
+                        print(f"✅ 已从S3删除模型文件: {object_name}")
                     except Exception as e:
-                        print(f"删除模型文件失败: {e}")
+                        print(f"警告: 从S3删除模型文件失败: {e}")
                 
-                # 从数据库删除记录
+                # 删除关联的缩放器
+                if model.scaler_path:
+                    try:
+                        bucket_name = MINIO_CONFIG["buckets"]["scalers"]
+                        object_name = model.scaler_path.split("/")[-1]
+                        minio_client.remove_object(bucket_name, object_name)
+                        print(f"✅ 已从S3删除缩放器文件: {object_name}")
+                    except Exception as e:
+                        print(f"警告: 从S3删除缩放器文件失败: {e}")
+                
+                # 删除关联的指标
+                if model.metrics_path:
+                    try:
+                        bucket_name = MINIO_CONFIG["buckets"]["metrics"]
+                        object_name = model.metrics_path.split("/")[-1]
+                        minio_client.remove_object(bucket_name, object_name)
+                        print(f"✅ 已从S3删除指标文件: {object_name}")
+                    except Exception as e:
+                        print(f"警告: 从S3删除指标文件失败: {e}")
+                
+                # 删除数据库中的记录
                 db.delete(model)
             
             db.commit()
-            print(f"已清理旧模型，保留最新的{keep_last}个版本")
+            print(f"✅ 成功清理旧模型，保留最新的{keep_last}个")
     except Exception as e:
-        print(f"清理旧模型失败: {e}")
+        print(f"警告: 清理旧模型失败: {e}")
+        db.rollback()

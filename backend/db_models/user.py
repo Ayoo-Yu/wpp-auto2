@@ -15,6 +15,7 @@ class Role(Base):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     
     users = relationship("User", back_populates="role")
+    user_roles = relationship("UserRole", back_populates="role")
     
     def __repr__(self):
         return f"<Role {self.name}>"
@@ -37,6 +38,7 @@ class User(Base):
     
     role = relationship("Role", back_populates="users")
     login_history = relationship("LoginHistory", back_populates="user")
+    roles = relationship("UserRole", back_populates="user")
     
     def __repr__(self):
         return f"<User {self.username}>"

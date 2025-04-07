@@ -39,19 +39,19 @@ services:
       - "5000:5000"
     environment:
       - FLASK_ENV=development
-      - DB_HOST=postgres       # 使用数据库服务名称
-      - DB_PORT=5432
-      - DB_USER=postgres       # 添加数据库用户名
-      - DB_PASSWORD=yzz0216yh  # 添加数据库密码
-      - DB_NAME=windpower      # 添加数据库名称
+      - DB_HOST=kingbase       # 使用金仓数据库服务名称
+      - DB_PORT=54321          # 金仓数据库端口
+      - DB_USER=system         # 金仓默认用户
+      - DB_PASSWORD=12345678ab # 金仓默认密码
+      - DB_NAME=windpower      # 连接到windpower数据库
       - MINIO_ENDPOINT=minio   # 使用MinIO服务名称
       - MINIO_PORT=9000
     
     networks:
       - wind-power-network  # 连接同一网络
     depends_on:
-      postgres:
-        condition: service_healthy
+      kingbase:
+        condition: service_started  # 修改为service_started，不检查健康状态
       minio:
         condition: service_healthy
     restart: on-failure
@@ -62,26 +62,30 @@ services:
       retries: 3
       start_period: 40s
 
-  postgres:
-    image: postgres:15-alpine
-    container_name: wind-power-postgres
+  kingbase:
+    image: kingbase_v009r001c002b0014_single_x86:v1
+    container_name: wind-power-kingbase
+    privileged: true  # 必须添加，否则会有权限问题
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: yzz0216yh
-      POSTGRES_DB: windpower
+      - NEED_START=yes
+      - DB_USER=system  # 金仓默认用户
+      - DB_PASSWORD=12345678ab  # 金仓默认密码
+      - DB_MODE=oracle  # 使用oracle模式，这是金仓推荐的模式
+      - ENCODING=UTF8
     volumes:
-      - postgres_data:/var/lib/postgresql/data  # 使用命名卷
+      - kingbase_data:/home/kingbase/userdata/  # 注意这里的路径
     ports:
-      - "5432:5432"
+      - "54321:54321"  # 金仓数据库默认端口为54321
     restart: unless-stopped
     networks:
       - wind-power-network
+    command: /usr/sbin/init  # 必须使用此命令启动
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD", "ls", "/home/kingbase/userdata/data"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 30s
 
   minio:
     image: minio/minio
@@ -116,8 +120,8 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
-      postgres:
-        condition: service_healthy
+      kingbase:
+        condition: service_started  # 修改为service_started，不检查健康状态
     restart: unless-stopped
     networks:
       - wind-power-network
@@ -129,7 +133,7 @@ services:
       start_period: 20s
 
 volumes:  # 声明命名卷
-  postgres_data:
+  kingbase_data:
   minio_data:
   pgadmin_data:
 

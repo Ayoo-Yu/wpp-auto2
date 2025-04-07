@@ -16,7 +16,7 @@ load_dotenv()
 
 from logging_config import configure_logging
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='./static')
 app.config.from_object(Config)
 
 # 配置 CORS，允许所有跨域请求

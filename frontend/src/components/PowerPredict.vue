@@ -329,7 +329,7 @@ export default {
         name: file.name,
         size: file.size,
         type: type === 'Csv' ? file.type : 'joblib',
-        uploadDate: new Date().toLocaleString(),
+        uploadDate: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
       };
       this.initializeSocket();
     },
@@ -840,7 +840,7 @@ export default {
       // 创建下载链接
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `预测评估指标_${new Date().toISOString().slice(0, 10)}.csv`);
+      link.setAttribute('download', `预测评估指标_${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }).slice(0, 10)}.csv`);
       document.body.appendChild(link);
       
       // 触发下载

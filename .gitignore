@@ -26,3 +26,8 @@ pgadmin_image.tar
 minio_image.tar
 frontend_image.tar
 backend_image.tar
+backend.tar
+minio.tar
+pgadmin.tar
+kdb_x86_64_V009R001C002B0014.tar
+frontend.tar
