@@ -36,15 +36,15 @@ export default {
   methods: {
     beforeUpload(file) {
       const isJoblib = file.name.endsWith('.joblib'); // 只允许 .joblib 格式的文件
-      const isLt200M = file.size / 1024 / 1024 < 200; // 文件大小限制为 200MB
+      const isLt500M = file.size / 1024 / 1024 < 500; // 文件大小限制为 500MB
 
       if (!isJoblib) {
         this.$message.error('只能上传 .joblib 格式的文件！');
         return false;
       }
 
-      if (!isLt200M) {
-        this.$message.error('文件大小不能超过200MB！');
+      if (!isLt500M) {
+        this.$message.error('文件大小不能超过500MB！');
         return false;
       }
 

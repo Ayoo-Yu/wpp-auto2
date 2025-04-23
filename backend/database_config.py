@@ -12,6 +12,8 @@ from sqlalchemy import inspect
 import time
 import os
 import subprocess
+from sqlalchemy.pool import QueuePool  # 添加QueuePool导入
+from sqlalchemy import event
 
 # 导入自定义金仓方言
 import kingbase_dialect
@@ -25,8 +27,8 @@ print(f"DB_HOST环境变量：{os.environ.get('DB_HOST', '未设置')}")
 print(f"DB_PORT环境变量：{os.environ.get('DB_PORT', '未设置')}")
 print(f"DB_NAME环境变量：{os.environ.get('DB_NAME', '未设置')}")
 
-# 强制使用system用户和密码，连接到kingbase服务，使用自定义kingbase方言
-SQLALCHEMY_DATABASE_URI = f"postgresql+kingbase://system:12345678ab@kingbase:54321/windpower"
+# 使用KINGBASE_CONFIG中的配置构建连接URL
+SQLALCHEMY_DATABASE_URI = f"postgresql+kingbase://{KINGBASE_CONFIG['user']}:{KINGBASE_CONFIG['password']}@{KINGBASE_CONFIG['host']}:{KINGBASE_CONFIG['port']}/{KINGBASE_CONFIG['database']}"
 
 print(f"最终连接URL：{SQLALCHEMY_DATABASE_URI}")
 
@@ -45,7 +47,41 @@ def create_engine_with_retry():
             # 确保SQLALCHEMY_DATABASE_URI使用的是我们硬编码的值
             if 'postgres:' in SQLALCHEMY_DATABASE_URI:
                 print("警告! 检测到连接字符串中包含 'postgres:' 用户!")
-            return create_engine(SQLALCHEMY_DATABASE_URI)
+            
+            # 更新连接池设置
+            engine = create_engine(
+                SQLALCHEMY_DATABASE_URI,
+                poolclass=QueuePool,      # 使用QueuePool
+                pool_size=5,              # 减小初始连接池大小
+                max_overflow=15,          # 允许的额外连接数
+                pool_timeout=30,          # 等待连接的超时时间(秒)
+                pool_recycle=300,         # 连接回收时间(5分钟)
+                pool_pre_ping=True,       # 使用前检查连接是否有效
+                # 使用LIFO方式可以让最近使用过的连接被复用，增加缓存命中率
+                pool_use_lifo=True,
+                echo_pool=True            # 输出连接池日志
+            )
+            
+            # 添加连接池监听器，处理连接检出和归还事件
+            @event.listens_for(engine, "checkout")
+            def ping_connection(dbapi_connection, connection_record, connection_proxy):
+                cursor = dbapi_connection.cursor()
+                try:
+                    cursor.execute("SELECT 1")
+                except:
+                    # 如果连接失效，断开它，这样在下次使用时会创建新连接
+                    connection_proxy._pool.dispose()
+                    raise
+                cursor.close()
+            
+            # 定期清理空闲连接
+            @event.listens_for(engine, "checkin")
+            def checkout_connection(dbapi_connection, connection_record):
+                # 记录上次使用时间
+                connection_record.info['last_use_time'] = time.time()
+            
+            return engine
+            
         except Exception as e:
             print(f"创建数据库引擎失败 (尝试 {attempt+1}/{max_retries}): {e}")
             if attempt < max_retries - 1:
@@ -65,6 +101,21 @@ except Exception as e:
     # 创建一个空的引擎和会话，以便应用能够启动
     engine = None
     SessionLocal = None
+
+# 添加一个检查和清理空闲连接的函数
+def cleanup_idle_connections(engine, idle_timeout=120):
+    """清理空闲超过指定时间的连接"""
+    if not engine:
+        return
+        
+    try:
+        for connection in engine.pool._pool:
+            if hasattr(connection, 'info') and 'last_use_time' in connection.info:
+                if time.time() - connection.info['last_use_time'] > idle_timeout:
+                    # 标记连接为无效，这样它将被丢弃
+                    connection.invalidate()
+    except Exception as e:
+        print(f"清理空闲连接时发生错误: {e}")
 
 # 在engine创建之后检查迁移
 def check_migrations():
@@ -93,8 +144,11 @@ def init_minio_client():
     
     for attempt in range(max_retries):
         try:
+            # 构建完整的endpoint字符串，包含端口
+            endpoint = f"{MINIO_CONFIG['endpoint']}:{MINIO_CONFIG['port']}"
+            
             client = Minio(
-                MINIO_CONFIG["endpoint"],
+                endpoint,
                 access_key=MINIO_CONFIG["access_key"],
                 secret_key=MINIO_CONFIG["secret_key"],
                 secure=MINIO_CONFIG["secure"]
@@ -131,7 +185,7 @@ try:
     from config import set_bucket_policy
     
     # 设置存储桶策略
-    for bucket_name, policy in MINIO_CONFIG["access_control"].items():
+    for bucket_name, policy in MINIO_CONFIG["policies"].items():
         bucket_value = MINIO_CONFIG["buckets"].get(bucket_name.replace("wind-", ""))
         if bucket_value:
             try:
@@ -146,17 +200,25 @@ except Exception as e:
     minio_client = None
 
 def get_db():
+    """获取数据库会话，并确保在使用后正确关闭"""
     print("调试: get_db函数被调用")
     if SessionLocal is None:
         print("警告: 数据库会话不可用")
         raise Exception("数据库连接不可用")
+    
+    # 清理空闲连接
+    if engine:
+        cleanup_idle_connections(engine)
     
     print(f"调试: 创建数据库会话，引擎连接URL为: {SQLALCHEMY_DATABASE_URI}")
     db = SessionLocal()
     try:
         yield db
     finally:
-        db.close()
+        # 确保会话关闭并归还到连接池
+        if db:
+            print("调试: 关闭数据库会话")
+            db.close()
 
 def cleanup_old_models(db: Session, keep_last=5):
     """保留最近5个模型版本"""

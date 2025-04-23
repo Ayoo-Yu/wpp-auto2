@@ -4,6 +4,7 @@ from database_config import get_db
 from models import ShortlPower, MidPower, SupershortlPower
 from sqlalchemy.orm import Session
 import pandas as pd  # 添加pandas导入
+from db_session import db_session  # 导入上下文管理器
 
 prediction2database_bp = Blueprint('prediction2database', __name__, url_prefix='/prediction2database')
 
@@ -45,8 +46,7 @@ def batch_create_supershortl_power():
                 current_app.logger.error(f"数据格式错误: {row} - {str(e)}")
         
         # 批量插入
-        db: Session = next(get_db())
-        try:
+        with db_session() as db:
             # 检查重复时间戳
             existing_timestamps = {r['timestamp'] for r in records}
             duplicates = db.query(SupershortlPower.timestamp).filter(
@@ -77,13 +77,6 @@ def batch_create_supershortl_power():
                 "inserted": len(records) - len(duplicate_set),
                 "errors": 0
             }), 201
-            
-        except Exception as e:
-            db.rollback()
-            current_app.logger.error(f"批量插入/更新失败: {str(e)}")
-            return jsonify({"error": f"数据库操作失败: {str(e)}"}), 500
-        finally:
-            db.close()
             
     except Exception as e:
         current_app.logger.error(f"文件处理失败: {str(e)}")
@@ -123,8 +116,7 @@ def batch_create_shortl_power():
                 current_app.logger.error(f"数据格式错误: {row} - {str(e)}")
         
         # 批量插入
-        db: Session = next(get_db())
-        try:
+        with db_session() as db:
             # 检查重复时间戳
             existing_timestamps = {r['timestamp'] for r in records}
             duplicates = db.query(ShortlPower.timestamp).filter(
@@ -155,13 +147,6 @@ def batch_create_shortl_power():
                 "inserted": len(records) - len(duplicate_set),
                 "errors": 0
             }), 201
-            
-        except Exception as e:
-            db.rollback()
-            current_app.logger.error(f"批量插入/更新失败: {str(e)}")
-            return jsonify({"error": f"数据库操作失败: {str(e)}"}), 500
-        finally:
-            db.close()
             
     except Exception as e:
         current_app.logger.error(f"文件处理失败: {str(e)}")
@@ -201,8 +186,7 @@ def batch_create_mid_power():
                 current_app.logger.error(f"数据格式错误: {row} - {str(e)}")
         
         # 批量插入
-        db: Session = next(get_db())
-        try:
+        with db_session() as db:
             # 检查重复时间戳
             existing_timestamps = {r['timestamp'] for r in records}
             duplicates = db.query(MidPower.timestamp).filter(
@@ -233,13 +217,6 @@ def batch_create_mid_power():
                 "inserted": len(records) - len(duplicate_set),
                 "errors": 0
             }), 201
-            
-        except Exception as e:
-            db.rollback()
-            current_app.logger.error(f"批量插入/更新失败: {str(e)}")
-            return jsonify({"error": f"数据库操作失败: {str(e)}"}), 500
-        finally:
-            db.close()
             
     except Exception as e:
         current_app.logger.error(f"文件处理失败: {str(e)}")

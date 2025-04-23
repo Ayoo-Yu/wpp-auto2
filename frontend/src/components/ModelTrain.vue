@@ -43,7 +43,7 @@
               :uploadText="customUploadText_modeltrain"
               @file-selected="onFileSelected"
             />
-            <p class="upload-tip">请上传CSV文件，且不超过200MB</p>
+            <p class="upload-tip">请上传CSV文件，且不超过500MB</p>
           </div>
         </section>
 

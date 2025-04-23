@@ -8007,3 +8007,171 @@ LINE 1: ...me, output_path, prediction_type, status) VALUES ('202502121...
 [2025-04-07 20:49:47,554] INFO in logging_config: Wind Forecast Backend Startup
 [2025-04-07 20:50:38,702] INFO in logging_config: Wind Forecast Backend Startup
 [2025-04-07 20:50:45,621] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 17:54:43,442] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 17:54:51,794] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 17:57:51,087] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 17:59:17,613] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 18:26:26,767] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 18:32:56,664] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 18:32:59,089] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 18:44:40,724] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 18:44:43,284] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 18:48:24,012] INFO in app: 成功连接服务器！
+[2025-04-23 18:48:29,063] INFO in modeltrain: 收到模型训练请求: {'file_id': '20250423104824661598', 'model': 'GOSS', 'wfcapacity': 453.5, 'train_ratio': 0.9}
+[2025-04-23 18:48:29,064] INFO in modeltrain: 训练集id: 20250423104824661598, 模型选择: GOSS, 装机容量: 453.5, 训练集占比: 0.9, 类型: <class 'float'>
+[2025-04-23 18:48:29,064] INFO in train_run: 输出结果将保存到: results\20250423_104829
+[2025-04-23 18:48:29,065] INFO in train_run: 训练集占比设置为: 0.9
+[2025-04-23 18:48:29,132] INFO in train_run: 数据加载完成!
+[2025-04-23 18:48:29,139] INFO in train_run: 数据预处理完成!
+[2025-04-23 18:48:29,140] INFO in train_run: 数据集分割完成! 训练集大小: 2675, 验证集大小: 298
+[2025-04-23 18:48:29,191] INFO in train_run: 特征工程完成!
+[2025-04-23 18:48:29,224] INFO in train_run: 数据标准化完成!
+[2025-04-23 18:48:29,278] INFO in train_run: 时间窗口创建完成!
+[2025-04-23 18:48:29,280] INFO in train_run: 模型参数获取完成!
+[2025-04-23 18:48:29,281] INFO in train_run: {'boosting_type': 'goss', 'objective': 'regression', 'metric': 'rmse', 'num_leaves': 31, 'learning_rate': 0.05, 'feature_fraction': 0.9, 'top_rate': 0.2, 'other_rate': 0.1, 'name': 'GOSS'}
+[2025-04-23 18:48:29,282] INFO in train: 模型和 scaler 将被保存到目录: models\20250423_104829
+[2025-04-23 18:48:29,282] INFO in train: 开始训练 GOSS 模型...
+[2025-04-23 18:48:29,283] INFO in train: 使用参数: {'boosting_type': 'goss', 'objective': 'regression', 'metric': 'rmse', 'num_leaves': 31, 'learning_rate': 0.05, 'feature_fraction': 0.9, 'top_rate': 0.2, 'other_rate': 0.1}
+[2025-04-23 18:48:42,784] INFO in train: 评估结果已保存到 models\20250423_104829\GOSS_evaluation.json
+[2025-04-23 18:48:42,784] INFO in train: GOSS 均方误差: 4666.324829994297
+[2025-04-23 18:48:42,784] INFO in train: GOSS 均方根误差: 68.31050307232627
+[2025-04-23 18:48:42,785] INFO in train: GOSS 平均绝对误差: 51.72264575407209
+[2025-04-23 18:48:42,785] INFO in train: GOSS R²分数: -0.2896485458269913
+[2025-04-23 18:48:42,785] INFO in train: GOSS 预测精度: 0.7622037910683832
+[2025-04-23 18:48:42,786] INFO in train: GOSS K值: 0.172552161765562
+[2025-04-23 18:48:42,803] INFO in train: GOSS 模型已保存到 models\20250423_104829\GOSS.joblib
+[2025-04-23 18:48:42,805] INFO in train: Scaler 已保存到 models\20250423_104829\scaler.joblib
+[2025-04-23 18:48:42,805] INFO in train_run: 模型训练与评估完成!
+[2025-04-23 18:48:42,810] INFO in train: 原生预测结果已保存到 results\20250423_104829\GOSS_predicted_vs_actual_power.csv
+[2025-04-23 18:48:42,821] INFO in train: 详细预测报告已保存到 results\20250423_104829\GOSS_detailed_report.txt
+[2025-04-23 18:48:42,821] INFO in train_run: 预测结果保存完成!
+[2025-04-23 18:48:43,082] INFO in train_run: 可视化结果完成!
+[2025-04-23 18:48:43,176] INFO in prediction_timestamp: 已经为测试集预测结果匹配时间戳 'results\20250423_104829\GOSS_predicted_vs_actual_power_timestamp.csv'
+[2025-04-23 18:48:43,178] INFO in modeltrain: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_train_test__1_20250423104824661598_20250423104843.csv
+[2025-04-23 18:48:44,892] INFO in modeltrain: 测试集评估完成。相关结果保存在以下路径：D:\my-vue-project\wind-power-forecast\backend\forecasts\evaluation_train_test__1_20250423104824661598_20250423104843
+[2025-04-23 18:48:44,893] INFO in modeltrain: 将原生报告复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\report_train_test__1_20250423104824661598_20250423104843.txt
+[2025-04-23 18:48:44,893] INFO in modeltrain: 预测文件下载url为: /download/forecast_train_test__1_20250423104824661598_20250423104843.csv
+[2025-04-23 18:48:44,893] INFO in modeltrain: 训练报告下载url为: /download/report_train_test__1_20250423104824661598_20250423104843.txt
+[2025-04-23 18:51:27,206] INFO in app: 成功连接服务器！
+[2025-04-23 18:51:34,630] INFO in predict: 收到预测请求: {'csvfileId': '20250423105133806169', 'modelfileId': '20250423105133877769', 'scalerfileId': '20250423105133956770'}
+[2025-04-23 18:51:34,631] INFO in predict: 预测数据选择: 20250423105133806169, 预测模型选择: 20250423105133877769, 归一化模型选择: 20250423105133956770
+[2025-04-23 18:51:34,769] INFO in predict: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_test1_-__20250423105133806169_20250423105134.csv
+[2025-04-23 18:51:34,816] INFO in predict: 文件已上传到MinIO: wind-predictions/forecast_test1_-__20250423105133806169_20250423105134.csv
+[2025-04-23 18:52:04,186] INFO in app: 与服务器断开连接！
+[2025-04-23 18:54:06,051] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 22:55:12,344] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 22:55:14,813] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 22:55:39,943] INFO in app: 成功连接服务器！
+[2025-04-23 22:55:45,128] INFO in modeltrain: 收到模型训练请求: {'file_id': '20250423145540754119', 'model': 'GOSS', 'wfcapacity': 453.5, 'train_ratio': 0.9}
+[2025-04-23 22:55:45,129] INFO in modeltrain: 训练集id: 20250423145540754119, 模型选择: GOSS, 装机容量: 453.5, 训练集占比: 0.9, 类型: <class 'float'>
+[2025-04-23 22:55:45,130] INFO in train_run: 输出结果将保存到: results\20250423_145545
+[2025-04-23 22:55:45,131] INFO in train_run: 训练集占比设置为: 0.9
+[2025-04-23 22:55:45,245] INFO in train_run: 数据加载完成!
+[2025-04-23 22:55:45,256] INFO in train_run: 数据预处理完成!
+[2025-04-23 22:55:45,257] INFO in train_run: 数据集分割完成! 训练集大小: 2675, 验证集大小: 298
+[2025-04-23 22:55:45,361] INFO in train_run: 特征工程完成!
+[2025-04-23 22:55:45,423] INFO in train_run: 数据标准化完成!
+[2025-04-23 22:55:45,506] INFO in train_run: 时间窗口创建完成!
+[2025-04-23 22:55:45,507] INFO in train_run: 模型参数获取完成!
+[2025-04-23 22:55:45,508] INFO in train_run: {'boosting_type': 'goss', 'objective': 'regression', 'metric': 'rmse', 'num_leaves': 31, 'learning_rate': 0.05, 'feature_fraction': 0.9, 'top_rate': 0.2, 'other_rate': 0.1, 'name': 'GOSS'}
+[2025-04-23 22:55:45,510] INFO in train: 模型和 scaler 将被保存到目录: models\20250423_145545
+[2025-04-23 22:55:45,510] INFO in train: 开始训练 GOSS 模型...
+[2025-04-23 22:55:45,511] INFO in train: 使用参数: {'boosting_type': 'goss', 'objective': 'regression', 'metric': 'rmse', 'num_leaves': 31, 'learning_rate': 0.05, 'feature_fraction': 0.9, 'top_rate': 0.2, 'other_rate': 0.1}
+[2025-04-23 22:56:26,283] INFO in train: 评估结果已保存到 models\20250423_145545\GOSS_evaluation.json
+[2025-04-23 22:56:26,283] INFO in train: GOSS 均方误差: 4666.324829994297
+[2025-04-23 22:56:26,284] INFO in train: GOSS 均方根误差: 68.31050307232627
+[2025-04-23 22:56:26,284] INFO in train: GOSS 平均绝对误差: 51.72264575407209
+[2025-04-23 22:56:26,285] INFO in train: GOSS R²分数: -0.2896485458269913
+[2025-04-23 22:56:26,285] INFO in train: GOSS 预测精度: 0.7622037910683832
+[2025-04-23 22:56:26,286] INFO in train: GOSS K值: 0.172552161765562
+[2025-04-23 22:56:26,305] INFO in train: GOSS 模型已保存到 models\20250423_145545\GOSS.joblib
+[2025-04-23 22:56:26,308] INFO in train: Scaler 已保存到 models\20250423_145545\scaler.joblib
+[2025-04-23 22:56:26,309] INFO in train_run: 模型训练与评估完成!
+[2025-04-23 22:56:26,314] INFO in train: 原生预测结果已保存到 results\20250423_145545\GOSS_predicted_vs_actual_power.csv
+[2025-04-23 22:56:26,325] INFO in train: 详细预测报告已保存到 results\20250423_145545\GOSS_detailed_report.txt
+[2025-04-23 22:56:26,326] INFO in train_run: 预测结果保存完成!
+[2025-04-23 22:56:26,637] INFO in train_run: 可视化结果完成!
+[2025-04-23 22:56:26,798] INFO in prediction_timestamp: 已经为测试集预测结果匹配时间戳 'results\20250423_145545\GOSS_predicted_vs_actual_power_timestamp.csv'
+[2025-04-23 22:56:26,800] INFO in modeltrain: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_train_test__1_20250423145540754119_20250423145626.csv
+[2025-04-23 22:56:28,524] INFO in modeltrain: 测试集评估完成。相关结果保存在以下路径：D:\my-vue-project\wind-power-forecast\backend\forecasts\evaluation_train_test__1_20250423145540754119_20250423145626
+[2025-04-23 22:56:28,525] INFO in modeltrain: 将原生报告复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\report_train_test__1_20250423145540754119_20250423145626.txt
+[2025-04-23 22:56:28,526] INFO in modeltrain: 预测文件下载url为: /download/forecast_train_test__1_20250423145540754119_20250423145626.csv
+[2025-04-23 22:56:28,526] INFO in modeltrain: 训练报告下载url为: /download/report_train_test__1_20250423145540754119_20250423145626.txt
+[2025-04-23 22:56:28,528] INFO in app: 与服务器断开连接！
+[2025-04-23 22:56:28,529] INFO in app: 成功连接服务器！
+[2025-04-23 23:02:23,452] INFO in app: 与服务器断开连接！
+[2025-04-23 23:07:05,539] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:07:38,479] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:08:19,901] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:09:43,389] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:10:52,451] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:11:18,190] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:11:49,132] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:12:25,449] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:12:48,062] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:13:06,518] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:13:40,486] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:13:42,967] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:13:46,700] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:15:33,703] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:15:58,172] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:16:50,839] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:16:53,228] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:21:53,366] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:22:46,901] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-23 23:34:53,557] INFO in app: 成功连接服务器！
+[2025-04-23 23:34:57,793] INFO in modeltrain: 收到模型训练请求: {'file_id': '20250423153454316950', 'model': 'DART', 'wfcapacity': 453.5, 'train_ratio': 0.9}
+[2025-04-23 23:34:57,794] INFO in modeltrain: 训练集id: 20250423153454316950, 模型选择: DART, 装机容量: 453.5, 训练集占比: 0.9, 类型: <class 'float'>
+[2025-04-23 23:34:57,795] INFO in train_run: 输出结果将保存到: results\20250423_153457
+[2025-04-23 23:34:57,795] INFO in train_run: 训练集占比设置为: 0.9
+[2025-04-23 23:34:57,816] INFO in train_run: 数据加载完成!
+[2025-04-23 23:34:57,820] INFO in train_run: 数据预处理完成!
+[2025-04-23 23:34:57,821] INFO in train_run: 数据集分割完成! 训练集大小: 899, 验证集大小: 100
+[2025-04-23 23:34:57,860] INFO in train_run: 特征工程完成!
+[2025-04-23 23:34:57,876] INFO in train_run: 数据标准化完成!
+[2025-04-23 23:34:57,892] INFO in train_run: 时间窗口创建完成!
+[2025-04-23 23:34:57,893] INFO in train_run: 模型参数获取完成!
+[2025-04-23 23:34:57,893] INFO in train_run: {'boosting_type': 'dart', 'objective': 'regression', 'metric': 'rmse', 'num_leaves': 31, 'learning_rate': 0.05, 'feature_fraction': 0.9, 'drop_rate': 0.1, 'name': 'DART'}
+[2025-04-23 23:34:57,894] INFO in train: 模型和 scaler 将被保存到目录: models\20250423_153457
+[2025-04-23 23:34:57,894] INFO in train: 开始训练 DART 模型...
+[2025-04-23 23:34:57,895] INFO in train: 使用参数: {'boosting_type': 'dart', 'objective': 'regression', 'metric': 'rmse', 'num_leaves': 31, 'learning_rate': 0.05, 'feature_fraction': 0.9, 'drop_rate': 0.1}
+[2025-04-23 23:35:07,994] INFO in train: 评估结果已保存到 models\20250423_153457\DART_evaluation.json
+[2025-04-23 23:35:07,994] INFO in train: DART 均方误差: 190.04833963895013
+[2025-04-23 23:35:07,995] INFO in train: DART 均方根误差: 13.785802103575625
+[2025-04-23 23:35:07,995] INFO in train: DART 平均绝对误差: 12.049955755819205
+[2025-04-23 23:35:07,996] INFO in train: DART R²分数: 0.40603154575638156
+[2025-04-23 23:35:07,996] INFO in train: DART 预测精度: 0.7092944983238476
+[2025-04-23 23:35:07,997] INFO in train: DART K值: 0.7032593244159215
+[2025-04-23 23:35:08,005] INFO in train: DART 模型已保存到 models\20250423_153457\DART.joblib
+[2025-04-23 23:35:08,006] INFO in train: Scaler 已保存到 models\20250423_153457\scaler.joblib
+[2025-04-23 23:35:08,007] INFO in train_run: 模型训练与评估完成!
+[2025-04-23 23:35:08,009] INFO in train: 原生预测结果已保存到 results\20250423_153457\DART_predicted_vs_actual_power.csv
+[2025-04-23 23:35:08,017] INFO in train: 详细预测报告已保存到 results\20250423_153457\DART_detailed_report.txt
+[2025-04-23 23:35:08,018] INFO in train_run: 预测结果保存完成!
+[2025-04-23 23:35:08,209] INFO in train_run: 可视化结果完成!
+[2025-04-23 23:35:08,238] INFO in prediction_timestamp: 已经为测试集预测结果匹配时间戳 'results\20250423_153457\DART_predicted_vs_actual_power_timestamp.csv'
+[2025-04-23 23:35:08,240] INFO in modeltrain: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_test1_20250423153454316950_20250423153508.csv
+[2025-04-23 23:35:09,849] INFO in modeltrain: 测试集评估完成。相关结果保存在以下路径：D:\my-vue-project\wind-power-forecast\backend\forecasts\evaluation_test1_20250423153454316950_20250423153508
+[2025-04-23 23:35:09,850] INFO in modeltrain: 将原生报告复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\report_test1_20250423153454316950_20250423153508.txt
+[2025-04-23 23:35:09,850] INFO in modeltrain: 预测文件下载url为: /download/forecast_test1_20250423153454316950_20250423153508.csv
+[2025-04-23 23:35:09,851] INFO in modeltrain: 训练报告下载url为: /download/report_test1_20250423153454316950_20250423153508.txt
+[2025-04-23 23:35:24,381] INFO in download: 正在下载以下文件： forecast_test1_20250423153454316950_20250423153508.csv
+[2025-04-23 23:35:27,698] INFO in download: 正在下载以下文件： report_test1_20250423153454316950_20250423153508.txt
+[2025-04-23 23:36:36,828] INFO in app: 成功连接服务器！
+[2025-04-23 23:36:43,887] INFO in predict: 收到预测请求: {'csvfileId': '20250423153643301576', 'modelfileId': '20250423153643354052', 'scalerfileId': '20250423153643379052'}
+[2025-04-23 23:36:43,887] INFO in predict: 预测数据选择: 20250423153643301576, 预测模型选择: 20250423153643354052, 归一化模型选择: 20250423153643379052
+[2025-04-23 23:36:44,019] INFO in predict: 将原生预测文件复制到以下路径： D:\my-vue-project\wind-power-forecast\backend\forecasts\forecast_test1_-__20250423153643301576_20250423153644.csv
+[2025-04-23 23:36:44,073] INFO in predict: 文件已上传到MinIO: wind-predictions/forecast_test1_-__20250423153643301576_20250423153644.csv
+[2025-04-23 23:37:21,607] INFO in app: 与服务器断开连接！
+[2025-04-23 23:59:20,622] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-24 00:01:26,746] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-24 00:01:59,233] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-24 00:02:15,315] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-24 00:08:11,277] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-24 00:08:13,706] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-24 00:09:56,211] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-24 01:48:03,810] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-24 01:50:12,563] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-24 02:15:34,022] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-24 03:24:03,699] INFO in logging_config: Wind Forecast Backend Startup
+[2025-04-24 03:24:06,935] INFO in logging_config: Wind Forecast Backend Startup

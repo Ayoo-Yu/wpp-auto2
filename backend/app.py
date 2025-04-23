@@ -4,17 +4,53 @@ from flask import Flask, request, jsonify, current_app
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
-from database_config import Base, engine, minio_client, get_db
+from database_config import Base, engine, minio_client
 from config import Config, MINIO_CONFIG
 from s3_error import S3Error
 from db_models import Dataset
 from datetime import datetime
 from services.file_service import allowed_file, save_uploaded_file
 import os
+import socket
+import logging
+import time
+import shutil
+from db_session import db_session
+from connection_middleware import register_middleware
+from sqlalchemy import text
 # 加载环境变量
 load_dotenv()
 
+# 检查是否在Docker环境中运行
+def is_running_in_docker():
+    try:
+        with open('/proc/1/cgroup', 'r') as f:
+            return any('docker' in line for line in f)
+    except:
+        return False
+
+# 如果在本地环境运行且未设置数据库连接信息，则设置为本地Docker连接
+if not is_running_in_docker():
+    # 仅在未设置环境变量时设置默认值
+    if not os.environ.get('DB_HOST'):
+        os.environ['DB_HOST'] = 'localhost'  # 或Docker容器的IP
+    if not os.environ.get('DB_PORT'):
+        os.environ['DB_PORT'] = '54321'
+    if not os.environ.get('DB_USER'):
+        os.environ['DB_USER'] = 'system'
+    if not os.environ.get('DB_PASSWORD'):
+        os.environ['DB_PASSWORD'] = '12345678ab'
+    if not os.environ.get('DB_NAME'):
+        os.environ['DB_NAME'] = 'windpower'
+    if not os.environ.get('MINIO_ENDPOINT'):
+        os.environ['MINIO_ENDPOINT'] = 'localhost'
+    if not os.environ.get('MINIO_PORT'):
+        os.environ['MINIO_PORT'] = '9000'
+
 from logging_config import configure_logging
+# 导入会话管理模块和连接中间件
+from db_session import get_db, db_session
+from connection_middleware import register_middleware
 
 app = Flask(__name__, static_folder='./static')
 app.config.from_object(Config)
@@ -33,6 +69,9 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 # 配置日志
 configure_logging(app, socketio)
 
+# 注册数据库连接中间件
+register_middleware(app)
+
 # 注册蓝图
 from routes.upload import upload_bp
 from routes.modeltrain import modeltrain_bp
@@ -47,6 +86,7 @@ from routes.prediction2database import prediction2database_bp
 from routes.power_compare import bp as power_compare_bp
 from routes.auth import auth_bp  # 导入认证蓝图
 from routes.user import user_bp  # 导入用户路由蓝图
+from routes.example_route import example_bp  # 导入示例路由
 
 # app.register_blueprint(upload_bp, url_prefix='/')
 app.register_blueprint(modeltrain_bp, url_prefix='/')
@@ -60,6 +100,7 @@ app.register_blueprint(prediction2database_bp)
 app.register_blueprint(power_compare_bp)
 app.register_blueprint(auth_bp, url_prefix='/api/auth')  # 注册认证蓝图，使用 /api/auth 前缀
 app.register_blueprint(user_bp, url_prefix='/api/user')  # 注册用户路由蓝图，使用 /api/user 前缀
+app.register_blueprint(example_bp, url_prefix='/api/example')  # 注册示例路由
 
 # 添加健康检查端点
 @app.route('/health', methods=['GET'])
@@ -72,13 +113,9 @@ def health_check():
     
     # 检查数据库连接
     try:
-        if engine is not None:
-            # 尝试执行简单查询
-            with engine.connect() as connection:
-                connection.execute("SELECT 1")
+        with db_session() as db:
+            db.execute(text("SELECT 1"))
             health_status["database"] = "ok"
-        else:
-            health_status["database"] = "unavailable"
     except Exception as e:
         health_status["database"] = f"error: {str(e)}"
     
@@ -191,8 +228,7 @@ def upload_train_csv():
         print(f"✅ MinIO验证 - 文件大小：{obj_info.size}")
 
         # 数据库操作
-        db = next(get_db())
-        try:
+        with db_session() as db:
             # 生成本地路径（组合代码1和代码2的参数）
             ext = os.path.splitext(file.filename)[1]
             local_path = os.path.join(
@@ -220,12 +256,6 @@ def upload_train_csv():
                 "dataset_id": db_dataset.id,
                 "file_id": file_id  # 返回本地保存的ID
             })
-        except Exception as e:
-            db.rollback()
-            print(f"数据库错误：{str(e)}")
-            return jsonify({"error": "数据库操作失败"}), 500
-        finally:
-            db.close()
             
     except Exception as e:
         print(f"全局异常：{str(e)}")
@@ -274,8 +304,7 @@ def upload_predict_csv():
         print(f"✅ MinIO验证 - 文件大小：{obj_info.size}")
 
         # 数据库操作
-        db = next(get_db())
-        try:
+        with db_session() as db:
             # 生成本地路径（组合代码1和代码2的参数）
             ext = os.path.splitext(file.filename)[1]
             local_path = os.path.join(
@@ -303,12 +332,6 @@ def upload_predict_csv():
                 "dataset_id": db_dataset.id,
                 "file_id": file_id  # 返回本地保存的ID
             })
-        except Exception as e:
-            db.rollback()
-            print(f"数据库错误：{str(e)}")
-            return jsonify({"error": "数据库操作失败"}), 500
-        finally:
-            db.close()
             
     except Exception as e:
         print(f"全局异常：{str(e)}")
@@ -357,8 +380,7 @@ def upload_model():
         print(f"✅ MinIO验证 - 文件大小：{obj_info.size}")
 
         # 数据库操作
-        db = next(get_db())
-        try:
+        with db_session() as db:
             # 生成本地路径（组合代码1和代码2的参数）
             ext = os.path.splitext(file.filename)[1]
             local_path = os.path.join(
@@ -386,12 +408,6 @@ def upload_model():
                 "dataset_id": db_dataset.id,
                 "file_id": file_id  # 返回本地保存的ID
             })
-        except Exception as e:
-            db.rollback()
-            print(f"数据库错误：{str(e)}")
-            return jsonify({"error": "数据库操作失败"}), 500
-        finally:
-            db.close()
             
     except Exception as e:
         print(f"全局异常：{str(e)}")
@@ -440,8 +456,7 @@ def upload_scaler():
         print(f"✅ MinIO验证 - 文件大小：{obj_info.size}")
 
         # 数据库操作
-        db = next(get_db())
-        try:
+        with db_session() as db:
             # 生成本地路径（组合代码1和代码2的参数）
             ext = os.path.splitext(file.filename)[1]
             local_path = os.path.join(
@@ -469,12 +484,6 @@ def upload_scaler():
                 "dataset_id": db_dataset.id,
                 "file_id": file_id  # 返回本地保存的ID
             })
-        except Exception as e:
-            db.rollback()
-            print(f"数据库错误：{str(e)}")
-            return jsonify({"error": "数据库操作失败"}), 500
-        finally:
-            db.close()
             
     except Exception as e:
         print(f"全局异常：{str(e)}")

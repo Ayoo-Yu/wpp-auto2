@@ -12,7 +12,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, create_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from database_config import Base, get_db
-# 导入TaskHistory模型
+from db_session import db_session  # 导入上下文管理器
 from db_models import TaskHistory
 
 # 全局状态字典，其他代码依赖这个变量
@@ -233,8 +233,7 @@ def query_pm2_state(script_path):
 
 # 记录操作历史的辅助函数
 def record_task_history(task_type, action, status, details=None, user=None):
-    """
-    记录任务操作历史
+    """记录任务操作历史
     
     Args:
         task_type: 任务类型 (ultra_short, short, medium)
@@ -247,25 +246,22 @@ def record_task_history(task_type, action, status, details=None, user=None):
         UUID: 任务历史ID
     """
     task_id = str(uuid.uuid4())
-    db = next(get_db())
     try:
-        task_history = TaskHistory(
-            task_id=task_id,
-            task_type=task_type,
-            action=action,
-            status=status,
-            details=details,
-            user=user
-        )
-        db.add(task_history)
-        db.commit()
-        return task_id
+        with db_session() as db:
+            task_history = TaskHistory(
+                task_id=task_id,
+                task_type=task_type,
+                action=action,
+                status=status,
+                details=details,
+                user=user
+            )
+            db.add(task_history)
+            db.commit()
+            return task_id
     except Exception as e:
-        db.rollback()
         print(f"记录任务历史出错: {e}")
         return None
-    finally:
-        db.close()
 
 # 新建蓝图，所有接口的 URL 前缀为 /api
 autopredict_bp = Blueprint('autopredict', __name__)
@@ -945,53 +941,50 @@ def _update_prediction_status():
 # 获取任务历史记录
 @autopredict_bp.route('/history', methods=['GET'])
 def get_task_history():
-    task_type = request.args.get('type')  # 可选，筛选特定类型的任务
+    task_type = request.args.get('type')    # 可选，筛选特定类型
     action = request.args.get('action')   # 可选，筛选特定操作
     limit = request.args.get('limit', 50, type=int)  # 默认返回最近50条记录
     offset = request.args.get('offset', 0, type=int)  # 分页偏移量
     
     try:
-        db = next(get_db())
-        query = db.query(TaskHistory).order_by(TaskHistory.created_at.desc())
-        
-        # 应用筛选条件
-        if task_type:
-            query = query.filter(TaskHistory.task_type == task_type)
-        if action:
-            query = query.filter(TaskHistory.action == action)
+        with db_session() as db:
+            query = db.query(TaskHistory).order_by(TaskHistory.created_at.desc())
             
-        # 应用分页
-        total = query.count()
-        history = query.offset(offset).limit(limit).all()
-        
-        # 转换为可序列化的字典
-        result = []
-        for item in history:
-            result.append({
-                'id': item.id,
-                'task_id': item.task_id,
-                'task_type': item.task_type,
-                'action': item.action,
-                'status': item.status,
-                'created_at': item.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-                'details': item.details,
-                'user': item.user
+            # 应用筛选条件
+            if task_type:
+                query = query.filter(TaskHistory.task_type == task_type)
+            if action:
+                query = query.filter(TaskHistory.action == action)
+                
+            # 应用分页
+            total = query.count()
+            history = query.offset(offset).limit(limit).all()
+            
+            # 转换为可序列化的字典
+            result = []
+            for item in history:
+                result.append({
+                    'id': item.id,
+                    'task_id': item.task_id,
+                    'task_type': item.task_type,
+                    'action': item.action,
+                    'status': item.status,
+                    'created_at': item.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                    'details': item.details,
+                    'user': item.user
+                })
+            
+            return jsonify({
+                'total': total,
+                'offset': offset,
+                'limit': limit,
+                'data': result
             })
-        
-        return jsonify({
-            'total': total,
-            'offset': offset,
-            'limit': limit,
-            'data': result
-        })
         
     except Exception as e:
         error_msg = f"获取任务历史记录出错: {str(e)}\n{traceback.format_exc()}"
         print(error_msg)
         return jsonify({'error': error_msg}), 500
-    finally:
-        if 'db' in locals():
-            db.close()
 
 # 查询任务状态（训练、预测、参数优化）
 @autopredict_bp.route('/task_status', methods=['GET'])

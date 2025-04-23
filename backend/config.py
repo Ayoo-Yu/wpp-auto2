@@ -2,21 +2,43 @@ import os
 from minio import Minio
 from minio.commonconfig import ENABLED
 import json
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
+
+# 获取环境变量，如果不存在则使用默认值
+DB_HOST = os.environ.get('DB_HOST', 'kingbase')
+DB_PORT = os.environ.get('DB_PORT', '54321')
+DB_USER = os.environ.get('DB_USER', 'system')
+DB_PASSWORD = os.environ.get('DB_PASSWORD', '12345678ab')
+DB_NAME = os.environ.get('DB_NAME', 'windpower')
+
+# MinIO配置
+MINIO_ENDPOINT = os.environ.get('MINIO_ENDPOINT', 'minio')
+MINIO_PORT = os.environ.get('MINIO_PORT', '9000')
+MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY', 'minioadmin')
+MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY', 'minioadmin')
+MINIO_SECURE = os.environ.get('MINIO_SECURE', 'False').lower() == 'true'
+
+# 打印配置信息用于调试
+print(f"数据库连接配置: {DB_HOST}:{DB_PORT}/{DB_NAME}")
+print(f"MinIO连接配置: {'https' if MINIO_SECURE else 'http'}://{MINIO_ENDPOINT}:{MINIO_PORT}")
 
 KINGBASE_CONFIG = {
-    "host": os.environ.get("DB_HOST", "localhost"),
-    "port": os.environ.get("DB_PORT", "54321"),  # 金仓数据库默认端口
-    "user": "system",                           # 金仓默认用户
-    "password": "12345678ab",                   # 金仓默认密码
-    "database": "test",                         # 使用test作为初始数据库
-    "default_db": "test"                        # 默认数据库名称
+    "host": DB_HOST,
+    "port": DB_PORT,
+    "user": DB_USER,
+    "password": DB_PASSWORD,
+    "database": DB_NAME
 }
 
 MINIO_CONFIG = {
-    "endpoint": os.environ.get("MINIO_ENDPOINT", "localhost") + ":" + os.environ.get("MINIO_PORT", "9000"),
-    "access_key": "minioadmin",
-    "secret_key": "minioadmin",
-    "secure": False,
+    "endpoint": MINIO_ENDPOINT,
+    "port": MINIO_PORT,
+    "access_key": MINIO_ACCESS_KEY,
+    "secret_key": MINIO_SECRET_KEY,
+    "secure": MINIO_SECURE,
     "buckets": {
         "datasets": "wind-datasets",
         "models": "wind-models",
@@ -25,7 +47,7 @@ MINIO_CONFIG = {
         "metrics": "wind-metrics",
         "logs": "wind-logs"
     },
-    "access_control": {
+    "policies": {
         "wind-datasets": "private",
         "wind-models": "public-read",
         "wind-predictions": "private",
@@ -40,22 +62,22 @@ class Config:
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
     DOWNLOAD_FOLDER = os.path.join(BASE_DIR, 'forecasts')
     MAX_CONTENT_LENGTH = 200 * 1024 * 1024  # 200MB
-    ALLOWED_EXTENSIONS = {'csv','joblib'}
+    ALLOWED_EXTENSIONS = {'csv', 'xlsx', 'xls', 'pkl', 'json', 'joblib', 'h5', 'hdf5', 'pb', 'pt', 'pth'}
 
     KINGBASE_CONFIG = {
-        "host": os.environ.get("DB_HOST", "localhost"),
-        "port": os.environ.get("DB_PORT", "54321"),  # 金仓数据库默认端口
-        "user": "system",                           # 金仓用户
-        "password": "12345678ab",                   # 金仓密码
-        "database": "test",                             # 使用test作为初始数据库
-        "default_db": "test"                              # 默认数据库名称
+        "host": DB_HOST,
+        "port": DB_PORT,
+        "user": DB_USER,
+        "password": DB_PASSWORD,
+        "database": DB_NAME
     }
     
     MINIO_CONFIG = {
-        "endpoint": os.environ.get("MINIO_ENDPOINT", "localhost") + ":" + os.environ.get("MINIO_PORT", "9000"),
-        "access_key": "minioadmin",
-        "secret_key": "minioadmin",
-        "secure": False,
+        "endpoint": MINIO_ENDPOINT,
+        "port": MINIO_PORT,
+        "access_key": MINIO_ACCESS_KEY,
+        "secret_key": MINIO_SECRET_KEY,
+        "secure": MINIO_SECURE,
         "buckets": {
             "datasets": "wind-datasets",
             "models": "wind-models",
@@ -64,7 +86,7 @@ class Config:
             "metrics": "wind-metrics",
             "logs": "wind-logs"
         },
-        "access_control": {
+        "policies": {
             "wind-datasets": "private",
             "wind-models": "public-read",
             "wind-predictions": "private",
@@ -80,10 +102,13 @@ class Config:
         'metrics_dir': os.path.join(BASE_DIR, 'saved_metrics')
     }
 
-class TestingConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{KINGBASE_CONFIG['user']}:{KINGBASE_CONFIG['password']}@{KINGBASE_CONFIG['host']}:{KINGBASE_CONFIG['port']}/windpower"
-    PRESERVE_CONTEXT_ON_EXCEPTION = False
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key')
+    SQLALCHEMY_DATABASE_URI = f"postgresql+kingbase://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
+    SESSION_TYPE = 'filesystem'
+    SESSION_PERMANENT = False
+    PERMANENT_SESSION_LIFETIME = 1800  # 30分钟
 
 def set_bucket_policy(client, bucket_name, policy):
     """更精确的策略配置"""
