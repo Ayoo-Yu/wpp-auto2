@@ -6,9 +6,9 @@ let API_BASE_URL;
 
 // 如果不是localhost，使用当前域名+端口
 if (window.location.hostname !== 'localhost') {
-  API_BASE_URL = `http://${window.location.hostname}:5000`; // 明确指定后端端口为5000
+  API_BASE_URL = `http://${window.location.hostname}:8080`; // 通过Nginx反向代理
 } else {
-  API_BASE_URL = 'http://localhost:5000'; // 本地开发环境
+  API_BASE_URL = 'http://localhost:8080'; // 本地开发环境也通过Nginx
 }
 
 console.log('使用API基础URL:', API_BASE_URL);

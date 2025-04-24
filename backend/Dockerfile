@@ -24,14 +24,10 @@
 
 FROM continuumio/miniconda3
 
-# 安装Node.js环境（PM2依赖）和PostgreSQL客户端工具
+# 安装Node.js环境和PostgreSQL客户端工具
 RUN apt-get update && apt-get install -y curl postgresql-client && \
     curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs && \
-    npm install -g pm2 && \
-    echo "PM2安装路径: $(which pm2)" && \
-    # 不创建符号链接，直接使用npm全局安装的路径
-    echo "export PM2_PATH=$(which pm2)" >> /etc/environment
+    apt-get install -y nodejs
 
 # 设置工作目录
 WORKDIR /app
@@ -48,6 +44,9 @@ RUN conda env create -f environment.yml && conda clean --all --yes
 
 # 激活Conda环境
 ENV PATH /opt/conda/envs/wind-power-env/bin:$PATH
+
+# 安装Gunicorn和gevent
+RUN pip install gunicorn gevent
 
 # 复制alembic迁移配置 (从项目根目录复制)
 COPY migration /app/migration/
@@ -71,16 +70,6 @@ RUN if [ -d "/app/auto_scripts/scripts/supershort" ]; then \
     if [ -d "/app/auto_scripts/scripts/middle" ]; then \
         ln -sf /app/auto_scripts/scripts/middle/scheduler_middle.py /app/backend/auto_scripts/scripts/middle/scheduler_middle.py; \
     fi
-
-# 创建PM2配置文件
-RUN echo "module.exports = { apps: [{\
-  name: 'python-app',\
-  script: 'app.py',\
-  interpreter: 'python',\
-  autorestart: true,\
-  watch: false,\
-  env: { NODE_ENV: 'production' }\
-}] }" > ecosystem.config.js
 
 # 创建启动脚本
 COPY wind-power-forecast/backend/docker-entrypoint.sh /app/docker-entrypoint.sh

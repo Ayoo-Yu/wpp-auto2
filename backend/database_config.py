@@ -52,8 +52,8 @@ def create_engine_with_retry():
             engine = create_engine(
                 SQLALCHEMY_DATABASE_URI,
                 poolclass=QueuePool,      # 使用QueuePool
-                pool_size=5,              # 减小初始连接池大小
-                max_overflow=15,          # 允许的额外连接数
+                pool_size=10,             # 增加连接池大小
+                max_overflow=20,          # 增加额外连接数
                 pool_timeout=30,          # 等待连接的超时时间(秒)
                 pool_recycle=300,         # 连接回收时间(5分钟)
                 pool_pre_ping=True,       # 使用前检查连接是否有效

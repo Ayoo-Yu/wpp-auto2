@@ -30,6 +30,7 @@ services:
       - wind-power-network  # 连接同一网络
     depends_on:
       - backend
+      - backend-autopredict
 
   backend:
     build:
@@ -62,6 +63,36 @@ services:
       retries: 3
       start_period: 40s
 
+  backend-autopredict:
+    build:
+      context: ..  # 构建上下文为项目根目录
+      dockerfile: wind-power-forecast/backend-autopredict/Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_ENV=development
+      - DB_HOST=kingbase
+      - DB_PORT=54321
+      - DB_USER=system
+      - DB_PASSWORD=12345678ab
+      - DB_NAME=windpower
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+    networks:
+      - wind-power-network
+    depends_on:
+      kingbase:
+        condition: service_started
+      minio:
+        condition: service_healthy
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+      
   kingbase:
     image: kingbase_v009r001c002b0014_single_x86:v1
     container_name: wind-power-kingbase

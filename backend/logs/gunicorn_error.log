@@ -1,0 +1,576 @@
+[2025-04-23 12:41:31 +0000] [1] [INFO] Starting gunicorn 20.1.0
+[2025-04-23 12:41:31 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+[2025-04-23 12:41:31 +0000] [1] [INFO] Using worker: sync
+[2025-04-23 12:41:31 +0000] [47] [INFO] Booting worker with pid: 47
+[2025-04-23 12:41:31 +0000] [48] [INFO] Booting worker with pid: 48
+[2025-04-23 12:41:31 +0000] [49] [INFO] Booting worker with pid: 49
+[2025-04-23 12:41:31 +0000] [50] [INFO] Booting worker with pid: 50
+[2025-04-23 12:57:42 +0000] [1] [INFO] Unhandled exception in main loop
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 209, in run
+    self.sleep()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 357, in sleep
+    ready = select.select([self.PIPE[0]], [], [], 1.0)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 194, in signal
+    self.wakeup()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 335, in wakeup
+    os.write(self.PIPE[1], b'.')
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/os.py", line 74, in write
+    hubs.trampoline(fd, write=True)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/__init__.py", line 139, in trampoline
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 12:57:42 +0000] [47] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 12:57:42 +0000] [50] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 12:57:42 +0000] [49] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 12:57:42 +0000] [48] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 12:57:42 +0000] [47] [INFO] Worker exiting (pid: 47)
+[2025-04-23 12:57:42 +0000] [50] [INFO] Worker exiting (pid: 50)
+[2025-04-23 12:57:42 +0000] [49] [INFO] Worker exiting (pid: 49)
+[2025-04-23 12:57:42 +0000] [48] [INFO] Worker exiting (pid: 48)
+[2025-04-23 13:04:33 +0000] [1] [INFO] Starting gunicorn 20.1.0
+[2025-04-23 13:04:33 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+[2025-04-23 13:04:33 +0000] [1] [INFO] Using worker: sync
+[2025-04-23 13:04:33 +0000] [48] [INFO] Booting worker with pid: 48
+[2025-04-23 13:04:33 +0000] [49] [INFO] Booting worker with pid: 49
+[2025-04-23 13:04:33 +0000] [50] [INFO] Booting worker with pid: 50
+[2025-04-23 13:04:33 +0000] [51] [INFO] Booting worker with pid: 51
+[2025-04-23 13:24:11 +0000] [1] [INFO] Unhandled exception in main loop
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 209, in run
+    self.sleep()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 357, in sleep
+    ready = select.select([self.PIPE[0]], [], [], 1.0)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 194, in signal
+    self.wakeup()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 335, in wakeup
+    os.write(self.PIPE[1], b'.')
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/os.py", line 74, in write
+    hubs.trampoline(fd, write=True)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/__init__.py", line 139, in trampoline
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:24:11 +0000] [50] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:24:11 +0000] [48] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:24:11 +0000] [49] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:24:11 +0000] [51] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:24:11 +0000] [50] [INFO] Worker exiting (pid: 50)
+[2025-04-23 13:24:11 +0000] [51] [INFO] Worker exiting (pid: 51)
+[2025-04-23 13:24:11 +0000] [48] [INFO] Worker exiting (pid: 48)
+[2025-04-23 13:24:11 +0000] [49] [INFO] Worker exiting (pid: 49)
+[2025-04-23 13:24:40 +0000] [1] [INFO] Starting gunicorn 20.1.0
+[2025-04-23 13:24:40 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+[2025-04-23 13:24:40 +0000] [1] [INFO] Using worker: sync
+[2025-04-23 13:24:40 +0000] [47] [INFO] Booting worker with pid: 47
+[2025-04-23 13:24:40 +0000] [48] [INFO] Booting worker with pid: 48
+[2025-04-23 13:24:40 +0000] [49] [INFO] Booting worker with pid: 49
+[2025-04-23 13:24:40 +0000] [50] [INFO] Booting worker with pid: 50
+[2025-04-23 13:25:33 +0000] [1] [INFO] Unhandled exception in main loop
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 209, in run
+    self.sleep()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 357, in sleep
+    ready = select.select([self.PIPE[0]], [], [], 1.0)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 194, in signal
+    self.wakeup()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 335, in wakeup
+    os.write(self.PIPE[1], b'.')
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/os.py", line 74, in write
+    hubs.trampoline(fd, write=True)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/__init__.py", line 139, in trampoline
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:25:33 +0000] [48] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:25:33 +0000] [49] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:25:33 +0000] [50] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:25:33 +0000] [47] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:25:33 +0000] [48] [INFO] Worker exiting (pid: 48)
+[2025-04-23 13:25:33 +0000] [49] [INFO] Worker exiting (pid: 49)
+[2025-04-23 13:25:33 +0000] [50] [INFO] Worker exiting (pid: 50)
+[2025-04-23 13:25:33 +0000] [47] [INFO] Worker exiting (pid: 47)
+[2025-04-23 13:26:27 +0000] [1] [INFO] Starting gunicorn 20.1.0
+[2025-04-23 13:26:27 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+[2025-04-23 13:26:27 +0000] [1] [INFO] Using worker: sync
+[2025-04-23 13:26:27 +0000] [54] [INFO] Booting worker with pid: 54
+[2025-04-23 13:26:27 +0000] [55] [INFO] Booting worker with pid: 55
+[2025-04-23 13:26:27 +0000] [56] [INFO] Booting worker with pid: 56
+[2025-04-23 13:26:27 +0000] [57] [INFO] Booting worker with pid: 57
+[2025-04-23 13:31:25 +0000] [1] [INFO] Unhandled exception in main loop
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 209, in run
+    self.sleep()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 357, in sleep
+    ready = select.select([self.PIPE[0]], [], [], 1.0)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 194, in signal
+    self.wakeup()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 335, in wakeup
+    os.write(self.PIPE[1], b'.')
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/os.py", line 74, in write
+    hubs.trampoline(fd, write=True)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/__init__.py", line 139, in trampoline
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:31:25 +0000] [56] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:31:25 +0000] [57] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:31:25 +0000] [56] [INFO] Worker exiting (pid: 56)
+[2025-04-23 13:31:25 +0000] [55] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:31:25 +0000] [54] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/arbiter.py", line 589, in spawn_worker
+    worker.init_process()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 142, in init_process
+    self.run()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 125, in run
+    self.run_for_one(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 84, in run_for_one
+    self.wait(timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/sync.py", line 36, in wait
+    ret = select.select(self.wait_fds, [], [], timeout)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/green/select.py", line 80, in select
+    return hub.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 310, in switch
+    return self.greenlet.switch()
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/hub.py", line 362, in run
+    self.wait(sleep_time)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/poll.py", line 80, in wait
+    presult = self.do_poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/hubs/epolls.py", line 31, in do_poll
+    return self.poll.poll(seconds)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/gunicorn/workers/base.py", line 197, in handle_quit
+    time.sleep(0.1)
+  File "/opt/conda/envs/wind-power-env/lib/python3.9/site-packages/eventlet/greenthread.py", line 35, in sleep
+    raise RuntimeError('do not call blocking functions from the mainloop')
+RuntimeError: do not call blocking functions from the mainloop
+[2025-04-23 13:31:25 +0000] [57] [INFO] Worker exiting (pid: 57)
+[2025-04-23 13:31:25 +0000] [55] [INFO] Worker exiting (pid: 55)
+[2025-04-23 13:31:25 +0000] [54] [INFO] Worker exiting (pid: 54)

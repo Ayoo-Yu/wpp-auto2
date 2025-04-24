@@ -80,6 +80,39 @@ else
     echo "检测到已初始化标记，跳过管理员密码重置"
 fi
 
+# 创建monkey patch预加载文件
+cat > /app/wsgi_app.py << EOL
+# 首先确保gevent monkey patching已应用
+import gevent.monkey
+gevent.monkey.patch_all()
+
+# 从app.py导入Flask应用实例
+from app import app as application
+
+# 这个文件会被Gunicorn直接导入
+print("✅ WSGI应用已成功预加载，gevent monkey patching已应用")
+
+# 导出app变量用于Gunicorn
+app = application
+EOL
+
+# 计算worker数量：(2 * CPU核心数) + 1
+CORES=$(grep -c ^processor /proc/cpuinfo)
+# 为了测试，我们将worker数量设置为4，避免系统资源过度消耗
+WORKERS=4
+echo "系统检测到 $CORES 个CPU核心，将启动 $WORKERS 个Gunicorn工作进程"
+
 # 启动应用
-echo "启动应用..."
-pm2-runtime start ecosystem.config.js 
+echo "使用Gunicorn启动应用..."
+exec gunicorn \
+  --workers $WORKERS \
+  --worker-class gevent \
+  --worker-connections 2000 \
+  --timeout 180 \
+  --keep-alive 5 \
+  --max-requests 1000 \
+  --max-requests-jitter 200 \
+  --log-level info \
+  --bind 0.0.0.0:5000 \
+  --preload \
+  wsgi_app:app 

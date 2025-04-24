@@ -7,7 +7,7 @@ from services.auth_service import (
     log_login_attempt, update_last_login, decode_token, check_permission, get_user_by_username,
     verify_password as verify_password_bcrypt
 )
-from utils.password_utils import verify_password
+from utils.password_utils import verify_password, generate_password_hash
 from models import User, Role
 from functools import wraps
 from datetime import timedelta
@@ -203,7 +203,7 @@ def change_password():
                 return jsonify({"message": "新密码长度不能少于8位"}), 400
                 
             # 更新密码
-            user.password_hash = verify_password(data['new_password'])
+            user.password_hash = generate_password_hash(data['new_password'])
             db.commit()
             
             return jsonify({"message": "密码修改成功"})
@@ -212,32 +212,112 @@ def change_password():
         return jsonify({"message": "服务器内部错误"}), 500
 
 # 获取所有用户
-@auth_bp.route('/users', methods=['GET'])
-@permission_required("manage_users")
-def get_users():
-    try:
-        with db_session() as db:
-            users = db.query(User).all()
-            
-            result = []
-            for user in users:
-                result.append({
-                    "id": user.id,
-                    "username": user.username,
-                    "email": user.email,
-                    "full_name": user.full_name,
-                    "role": {
-                        "id": user.role.id if user.role else None,
-                        "name": user.role.name if user.role else None
-                    },
-                    "is_active": user.is_active,
-                    "last_login": user.last_login
-                })
-            
-            return jsonify(result)
-    except Exception as e:
-        print(f"获取用户列表异常: {e}")
-        return jsonify({"message": "服务器内部错误"}), 500
+@auth_bp.route('/users', methods=['GET', 'POST'])
+def handle_users():
+    # 获取当前操作用户
+    current_username = request.args.get('username') or request.json.get('current_username')
+    
+    # GET请求：获取用户列表
+    if request.method == 'GET':
+        # 手动进行权限检查
+        try:
+            with db_session() as db:
+                user = db.query(User).filter(User.username == current_username).first()
+                if not user:
+                    return jsonify({"message": "用户不存在"}), 404
+                
+                # 检查用户是否有管理用户的权限
+                permissions = user.role.permissions
+                if isinstance(permissions, dict) and 'permissions' in permissions:
+                    permissions = permissions['permissions']
+                
+                if "manage_users" not in permissions:
+                    return jsonify({"message": "权限不足，需要manage_users权限"}), 403
+                
+                # 原get_users的逻辑
+                users = db.query(User).all()
+                
+                result = []
+                for user in users:
+                    result.append({
+                        "id": user.id,
+                        "username": user.username,
+                        "email": user.email,
+                        "full_name": user.full_name,
+                        "role": {
+                            "id": user.role.id if user.role else None,
+                            "name": user.role.name if user.role else None
+                        },
+                        "is_active": user.is_active,
+                        "last_login": user.last_login
+                    })
+                
+                return jsonify(result)
+        except Exception as e:
+            print(f"获取用户列表异常: {e}")
+            return jsonify({"message": "服务器内部错误"}), 500
+    
+    # POST请求：创建新用户
+    elif request.method == 'POST':
+        # 手动进行权限检查
+        try:
+            with db_session() as db:
+                user = db.query(User).filter(User.username == current_username).first()
+                if not user:
+                    return jsonify({"message": "用户不存在"}), 404
+                
+                # 检查用户是否有管理用户的权限
+                permissions = user.role.permissions
+                if isinstance(permissions, dict) and 'permissions' in permissions:
+                    permissions = permissions['permissions']
+                
+                if "manage_users" not in permissions:
+                    return jsonify({"message": "权限不足，需要manage_users权限"}), 403
+                
+                # 原create_new_user的逻辑
+                data = request.json
+                if not data or not data.get('username') or not data.get('password'):
+                    return jsonify({"message": "缺少必要参数"}), 400
+                
+                # 检查用户名是否已存在
+                existing_user = db.query(User).filter(User.username == data['username']).first()
+                if existing_user:
+                    return jsonify({"message": "用户名已存在"}), 400
+                
+                # 检查角色
+                role_id = data.get('role_id')
+                if role_id:
+                    role = db.query(Role).filter(Role.id == role_id).first()
+                    if not role:
+                        return jsonify({"message": "指定的角色不存在"}), 400
+                    
+                    # 只有超级管理员可以创建管理员用户
+                    if is_admin_role(role) and not is_super_admin(current_username):
+                        current_user = db.query(User).filter(User.username == current_username).first()
+                        if not current_user or not is_admin_role(current_user.role):
+                            return jsonify({"message": "只有超级管理员可以创建管理员用户"}), 403
+                
+                # 创建新用户
+                new_user = User(
+                    username=data['username'],
+                    password_hash=generate_password_hash(data['password']),
+                    email=data.get('email', ''),
+                    full_name=data.get('full_name', ''),
+                    is_active=data.get('is_active', True),
+                    role_id=role_id,
+                    first_login=True
+                )
+                
+                db.add(new_user)
+                db.commit()
+                
+                return jsonify({
+                    "message": "用户创建成功",
+                    "user_id": new_user.id
+                }), 201
+        except Exception as e:
+            print(f"创建用户异常: {e}")
+            return jsonify({"message": "服务器内部错误"}), 500
 
 # 获取单个用户
 @auth_bp.route('/users/<int:user_id>', methods=['GET'])
@@ -391,7 +471,7 @@ def reset_user_password(user_id):
                 return jsonify({"message": "新密码长度不能少于8位"}), 400
             
             # 更新密码
-            user.password_hash = verify_password(data['new_password'])
+            user.password_hash = generate_password_hash(data['new_password'])
             
             # 设置需要首次登录修改密码
             user.first_login = True
@@ -402,120 +482,84 @@ def reset_user_password(user_id):
         print(f"重置密码异常: {e}")
         return jsonify({"message": "服务器内部错误"}), 500
 
-# 创建新用户
-@auth_bp.route('/users', methods=['POST'])
-@permission_required("manage_users")
-def create_new_user():
-    data = request.json
-    if not data or not data.get('username') or not data.get('password'):
-        return jsonify({"message": "缺少必要参数"}), 400
-    
-    try:
-        # 获取当前操作用户
-        current_username = request.args.get('username') or request.json.get('current_username')
-        
-        with db_session() as db:
-            # 检查用户名是否已存在
-            existing_user = db.query(User).filter(User.username == data['username']).first()
-            if existing_user:
-                return jsonify({"message": "用户名已存在"}), 400
-            
-            # 检查角色
-            role_id = data.get('role_id')
-            if role_id:
-                role = db.query(Role).filter(Role.id == role_id).first()
-                if not role:
-                    return jsonify({"message": "指定的角色不存在"}), 400
-                
-                # 只有超级管理员可以创建管理员用户
-                if is_admin_role(role) and not is_super_admin(current_username):
-                    current_user = db.query(User).filter(User.username == current_username).first()
-                    if not current_user or not is_admin_role(current_user.role):
-                        return jsonify({"message": "只有超级管理员可以创建管理员用户"}), 403
-            
-            # 创建新用户
-            new_user = User(
-                username=data['username'],
-                password_hash=verify_password(data['password']),
-                email=data.get('email', ''),
-                full_name=data.get('full_name', ''),
-                is_active=data.get('is_active', True),
-                role_id=role_id,
-                first_login=True
-            )
-            
-            db.add(new_user)
-            db.commit()
-            
-            return jsonify({
-                "message": "用户创建成功",
-                "user_id": new_user.id
-            }), 201
-    except Exception as e:
-        print(f"创建用户异常: {e}")
-        return jsonify({"message": "服务器内部错误"}), 500
-
 # 创建角色
-@auth_bp.route('/roles', methods=['POST'])
-@permission_required("manage_roles")
-def create_role():
-    data = request.json
-    if not data or not data.get('name'):
-        return jsonify({"message": "缺少角色名称"}), 400
+@auth_bp.route('/roles', methods=['GET', 'POST'])
+def handle_roles():
+    # 获取当前操作用户
+    current_username = request.args.get('username') or request.json.get('current_username')
     
-    try:
-        with db_session() as db:
-            # 检查角色名是否已存在
-            existing_role = db.query(Role).filter(Role.name == data['name']).first()
-            if existing_role:
-                return jsonify({"message": "角色名称已存在"}), 400
-            
-            # 创建新角色
-            permissions = data.get('permissions', [])
-            if not isinstance(permissions, list):
-                permissions = []
-            
-            new_role = Role(
-                name=data['name'],
-                description=data.get('description', ''),
-                permissions={"permissions": permissions}
-            )
-            
-            db.add(new_role)
-            db.commit()
-            
-            return jsonify({
-                "message": "角色创建成功",
-                "role_id": new_role.id
-            }), 201
-    except Exception as e:
-        print(f"创建角色异常: {e}")
-        return jsonify({"message": "服务器内部错误"}), 500
-
-# 获取所有角色
-@auth_bp.route('/roles', methods=['GET'])
-def get_roles():
-    try:
-        with db_session() as db:
-            roles = db.query(Role).all()
-            
-            result = []
-            for role in roles:
-                permissions = role.permissions
+    # GET请求：获取所有角色
+    if request.method == 'GET':
+        try:
+            with db_session() as db:
+                roles = db.query(Role).all()
+                
+                result = []
+                for role in roles:
+                    permissions = role.permissions
+                    if isinstance(permissions, dict) and 'permissions' in permissions:
+                        permissions = permissions['permissions']
+                    
+                    result.append({
+                        "id": role.id,
+                        "name": role.name,
+                        "description": role.description,
+                        "permissions": permissions
+                    })
+                
+                return jsonify(result)
+        except Exception as e:
+            print(f"获取角色列表异常: {e}")
+            return jsonify({"message": "服务器内部错误"}), 500
+    
+    # POST请求：创建角色
+    elif request.method == 'POST':
+        # 手动进行权限检查
+        try:
+            with db_session() as db:
+                user = db.query(User).filter(User.username == current_username).first()
+                if not user:
+                    return jsonify({"message": "用户不存在"}), 404
+                
+                # 检查用户是否有管理角色的权限
+                permissions = user.role.permissions
                 if isinstance(permissions, dict) and 'permissions' in permissions:
                     permissions = permissions['permissions']
                 
-                result.append({
-                    "id": role.id,
-                    "name": role.name,
-                    "description": role.description,
-                    "permissions": permissions
-                })
-            
-            return jsonify(result)
-    except Exception as e:
-        print(f"获取角色列表异常: {e}")
-        return jsonify({"message": "服务器内部错误"}), 500
+                if "manage_roles" not in permissions:
+                    return jsonify({"message": "权限不足，需要manage_roles权限"}), 403
+                
+                # 原create_role的逻辑
+                data = request.json
+                if not data or not data.get('name'):
+                    return jsonify({"message": "缺少角色名称"}), 400
+                
+                # 检查角色名是否已存在
+                existing_role = db.query(Role).filter(Role.name == data['name']).first()
+                if existing_role:
+                    return jsonify({"message": "角色名称已存在"}), 400
+                
+                # 创建新角色
+                permissions = data.get('permissions', [])
+                if not isinstance(permissions, list):
+                    permissions = []
+                
+                new_role = Role(
+                    name=data['name'],
+                    description=data.get('description', ''),
+                    permissions={"permissions": permissions}
+                )
+                
+                db.add(new_role)
+                db.commit()
+                
+                return jsonify({
+                    "message": "角色创建成功",
+                    "role_id": new_role.id
+                }), 201
+        except Exception as e:
+            print(f"创建角色异常: {e}")
+            return jsonify({"message": "服务器内部错误"}), 500
 
 # 获取单个角色
 @auth_bp.route('/roles/<int:role_id>', methods=['GET'])

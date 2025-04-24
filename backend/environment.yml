@@ -76,6 +76,7 @@ dependencies:
       - typing-extensions==4.12.2
       - tzdata==2024.2
       - urllib3==2.3.0
-      - werkzeug==2.3.4
+      - werkzeug==2.3.3
       - wsproto==1.2.0
       - zipp==3.21.0
+      - gevent

@@ -1,0 +1,45 @@
+2025-04-03 09:38:11,017 - 
+================================================================================
+2025-04-03 09:38:11,017 - >>> 自动训练系统启动 <<<
+2025-04-03 09:38:11,017 - ================================================================================
+
+2025-04-03 09:38:11,017 - 自动训练系统启动
+2025-04-03 09:38:11,017 - 今天的日期是: 20250403
+2025-04-03 09:38:11,017 - 
+================================================================================
+2025-04-03 09:38:11,017 - >>> 启动训练监视线程 <<<
+2025-04-03 09:38:11,017 - ================================================================================
+
+2025-04-03 09:38:11,017 - 启动训练监视线程
+2025-04-03 09:38:11,018 - 训练文件路径: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv
+2025-04-03 09:38:11,018 - 模型存储目录: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\supershortmodel\20250403
+2025-04-03 09:38:11,018 - 训练完成标志文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\scripts\supershort\logs\auto_train\20250403_train_done.flag
+2025-04-03 09:38:11,018 - 开始监视 D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort 文件夹以进行训练...
+2025-04-03 09:38:11,018 - ❌ 未找到训练 CSV 文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv，等待 30 秒后重试...
+2025-04-03 09:38:41,025 - ❌ 未找到训练 CSV 文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv，等待 30 秒后重试...
+2025-04-03 09:39:11,030 - ❌ 未找到训练 CSV 文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv，等待 30 秒后重试...
+2025-04-03 09:39:41,035 - ❌ 未找到训练 CSV 文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv，等待 30 秒后重试...
+2025-04-03 09:40:11,039 - ❌ 未找到训练 CSV 文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv，等待 30 秒后重试...
+2025-04-03 09:40:41,053 - ❌ 未找到训练 CSV 文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv，等待 30 秒后重试...
+2025-04-03 09:41:11,061 - ❌ 未找到训练 CSV 文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv，等待 30 秒后重试...
+2025-04-03 09:41:41,066 - ❌ 未找到训练 CSV 文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv，等待 30 秒后重试...
+2025-04-03 17:59:21,346 - 
+================================================================================
+2025-04-03 17:59:21,346 - >>> 自动训练系统启动 <<<
+2025-04-03 17:59:21,346 - ================================================================================
+
+2025-04-03 17:59:21,346 - 自动训练系统启动
+2025-04-03 17:59:21,346 - 今天的日期是: 20250403
+2025-04-03 17:59:21,346 - 
+================================================================================
+2025-04-03 17:59:21,346 - >>> 启动训练监视线程 <<<
+2025-04-03 17:59:21,346 - ================================================================================
+
+2025-04-03 17:59:21,346 - 启动训练监视线程
+2025-04-03 17:59:21,346 - 训练文件路径: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv
+2025-04-03 17:59:21,346 - 模型存储目录: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\supershortmodel\20250403
+2025-04-03 17:59:21,347 - 训练完成标志文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\scripts\supershort\logs\auto_train\20250403_train_done.flag
+2025-04-03 17:59:21,347 - 开始监视 D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort 文件夹以进行训练...
+2025-04-03 17:59:21,347 - ❌ 未找到训练 CSV 文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv，等待 30 秒后重试...
+2025-04-03 17:59:51,348 - ❌ 未找到训练 CSV 文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv，等待 30 秒后重试...
+2025-04-03 18:00:21,354 - ❌ 未找到训练 CSV 文件: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_supershort\20250403.csv，等待 30 秒后重试...

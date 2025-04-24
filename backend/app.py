@@ -1,5 +1,7 @@
-import eventlet
-eventlet.monkey_patch()
+# 确保在第一时间进行gevent monkey patch
+import gevent.monkey
+gevent.monkey.patch_all()
+
 from flask import Flask, request, jsonify, current_app
 from flask_cors import CORS
 from flask_socketio import SocketIO
@@ -11,10 +13,6 @@ from db_models import Dataset
 from datetime import datetime
 from services.file_service import allowed_file, save_uploaded_file
 import os
-import socket
-import logging
-import time
-import shutil
 from db_session import db_session
 from connection_middleware import register_middleware
 from sqlalchemy import text
@@ -64,7 +62,7 @@ CORS(app, resources={r"/*": {
     "supports_credentials": False,  # 改为False，因为我们不使用凭证
     "max_age": 86400  # 预检请求结果缓存24小时
 }})
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent')
 
 # 配置日志
 configure_logging(app, socketio)
@@ -98,7 +96,7 @@ app.register_blueprint(autotask_bp, url_prefix='/')
 app.register_blueprint(actual_power_bp)
 app.register_blueprint(prediction2database_bp)
 app.register_blueprint(power_compare_bp)
-app.register_blueprint(auth_bp, url_prefix='/api/auth')  # 注册认证蓝图，使用 /api/auth 前缀
+app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(user_bp, url_prefix='/api/user')  # 注册用户路由蓝图，使用 /api/user 前缀
 app.register_blueprint(example_bp, url_prefix='/api/example')  # 注册示例路由
 
