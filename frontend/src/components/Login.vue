@@ -107,6 +107,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
 import { login, changePassword } from '../api/auth'
+import { isAuthReady, isAuthLoading } from '../store/authReady' // 导入认证状态
 
 export default {
   name: 'LoginView',
@@ -170,25 +171,37 @@ export default {
         loading.value = true
         
         try {
-          // 先清除本地存储，确保获取最新权限
+          // 先清除本地存储和认证状态，确保获取最新权限
           localStorage.removeItem('user');
+          localStorage.removeItem('accessToken');
+          isAuthReady.value = false; // 重置认证状态
+          isAuthLoading.value = true; // 标记为正在加载状态
           
           const userData = await login(formData.username, formData.password)
           
-          // 简化登录成功处理
+          // 存储用户信息和访问令牌
           localStorage.setItem('user', JSON.stringify(userData.user))
           
-          // 显示成功消息
-          ElMessage.success('登录成功')
-          
-          // 延迟一下再跳转，确保消息显示
-          setTimeout(() => {
-            // 跳转到首页
+          // 存储访问令牌
+          if (userData.access_token) {
+            localStorage.setItem('accessToken', userData.access_token)
+            console.log('访问令牌已存储:', userData.access_token)
+            
+            // 显示成功消息
+            ElMessage.success('登录成功')
+            
+            // 直接跳转到首页，让AppLayout处理认证状态检查
             router.push('/')
-          }, 500)
+          } else {
+            console.warn('登录响应中没有找到访问令牌')
+            ElMessage.error('登录异常：服务器未返回访问令牌')
+          }
         } catch (error) {
           console.error('登录失败:', error)
           ElMessage.error(error.response?.data?.message || '登录失败，请检查用户名和密码')
+          // 确保认证状态重置
+          isAuthReady.value = false;
+          isAuthLoading.value = false;
         } finally {
           loading.value = false
         }

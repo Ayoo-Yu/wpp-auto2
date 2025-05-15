@@ -2,7 +2,7 @@
   <div class="model-train-container">
     <!-- 页面标题和重置按钮区域 -->
     <div class="header-section">
-      <h1 class="page-title">风电功率预测模型训练</h1>
+      <h1 class="page-title">模型训练</h1>
       <el-button 
         class="reset-all-button" 
         type="primary" 
@@ -43,7 +43,7 @@
               :uploadText="customUploadText_modeltrain"
               @file-selected="onFileSelected"
             />
-            <p class="upload-tip">请上传CSV文件，且不超过500MB</p>
+            <p class="upload-tip">请上传本系统导出的CSV文件，且不超过500MB</p>
           </div>
         </section>
 
@@ -133,6 +133,8 @@
               :processing="processing" 
               :downloadUrl="downloadUrl"
               :reportDownloadUrl="reportDownloadUrl"
+              :modelDownloadUrl="modelDownloadUrl"
+              :scalerDownloadUrl="scalerDownloadUrl"
               @start-upload="handleManualUpload"
               @start-prediction="startPrediction"
               @download-file="downloadFile"
@@ -253,6 +255,8 @@ export default {
       selectedModel: null,
       downloadUrl: '',
       reportDownloadUrl: '',
+      modelDownloadUrl: '',
+      scalerDownloadUrl: '',
       logs: '',
       processing: false,
       socket: null,
@@ -304,11 +308,19 @@ export default {
       }
       if (response.download_url) {
         this.downloadUrl = `${this.backendBaseUrl}${response.download_url}`;
-        this.$message.success('文件上传并处理成功！');
+        this.$message.success('预测结果已生成，您可以下载预测结果。');
       }
       if (response.report_download_url) {
         this.reportDownloadUrl = `${this.backendBaseUrl}${response.report_download_url}`;
-        this.$message.success('预测报告已生成，您可以下载报告。');
+        this.$message.success('预测报告已生成，您可以下载评估报告。');
+      }
+      if (response.model_download_url) {
+        this.modelDownloadUrl = `${this.backendBaseUrl}${response.model_download_url}`;
+        this.$message.success('模型已保存，您可以下载模型文件。');
+      }
+      if (response.scaler_download_url) {
+        this.scalerDownloadUrl = `${this.backendBaseUrl}${response.scaler_download_url}`;
+        this.$message.success('标准化器已保存，您可以下载标准化器文件。');
       }
       this.selectedFile = null;
     },
@@ -379,6 +391,8 @@ export default {
       this.customParams = null;
       this.downloadUrl = '';
       this.reportDownloadUrl = '';
+      this.modelDownloadUrl = '';
+      this.scalerDownloadUrl = '';
       this.predictionstate = false;
       this.chartData = null;
       
@@ -454,15 +468,24 @@ export default {
           
           if (response.data.download_url) {
             this.downloadUrl = `${this.backendBaseUrl}${response.data.download_url}`;
-            this.$message.success('预测完成！您可以下载预测结果。');
+            this.$message.success('预测结果已生成，您可以下载预测结果。');
           } else {
             this.$message.error('预测完成，但未返回下载链接。');
           }
+          
           if (response.data.report_download_url) {
             this.reportDownloadUrl = `${this.backendBaseUrl}${response.data.report_download_url}`;
-            this.$message.success('预测报告已生成，您可以下载报告。');
-          } else {
-            this.$message.error('预测完成，但未返回报告下载链接。');
+            this.$message.success('预测报告已生成，您可以下载评估报告。');
+          }
+          
+          if (response.data.model_download_url) {
+            this.modelDownloadUrl = `${this.backendBaseUrl}${response.data.model_download_url}`;
+            console.log('已更新模型下载链接:', this.modelDownloadUrl);
+          }
+          
+          if (response.data.scaler_download_url) {
+            this.scalerDownloadUrl = `${this.backendBaseUrl}${response.data.scaler_download_url}`;
+            console.log('已更新标准化器下载链接:', this.scalerDownloadUrl);
           }
           
           this.processing = false;
@@ -585,6 +608,20 @@ export default {
         this.reportDownloadUrl = `${this.backendBaseUrl}${reportMatch[1]}`;
         console.log('提取到报告下载链接:', this.reportDownloadUrl);
       }
+      
+      const modelUrlPattern = /model_download_url=([^\s]+)/;
+      const modelMatch = message.match(modelUrlPattern);
+      if (modelMatch && modelMatch[1]) {
+        this.modelDownloadUrl = `${this.backendBaseUrl}${modelMatch[1]}`;
+        console.log('提取到模型下载链接:', this.modelDownloadUrl);
+      }
+      
+      const scalerUrlPattern = /scaler_download_url=([^\s]+)/;
+      const scalerMatch = message.match(scalerUrlPattern);
+      if (scalerMatch && scalerMatch[1]) {
+        this.scalerDownloadUrl = `${this.backendBaseUrl}${scalerMatch[1]}`;
+        console.log('提取到标准化器下载链接:', this.scalerDownloadUrl);
+      }
     },
     clearTimers() {
       if (this.trainingTimeoutCheck) {
@@ -622,6 +659,16 @@ export default {
           if (response.data.report_download_url) {
             this.reportDownloadUrl = `${this.backendBaseUrl}${response.data.report_download_url}`;
             console.log('已更新报告链接:', this.reportDownloadUrl);
+          }
+          
+          if (response.data.model_download_url) {
+            this.modelDownloadUrl = `${this.backendBaseUrl}${response.data.model_download_url}`;
+            console.log('已更新模型下载链接:', this.modelDownloadUrl);
+          }
+          
+          if (response.data.scaler_download_url) {
+            this.scalerDownloadUrl = `${this.backendBaseUrl}${response.data.scaler_download_url}`;
+            console.log('已更新标准化器下载链接:', this.scalerDownloadUrl);
           }
           
           this.logs += `<div class="success-message">[系统消息] 训练已完成，可以下载结果。</div>\n`;
@@ -666,7 +713,9 @@ export default {
         }
         
         if (line.includes('预测文件下载url为:') || 
-            line.includes('训练报告下载url为:')) {
+            line.includes('训练报告下载url为:') ||
+            line.includes('model_download_url=') ||
+            line.includes('scaler_download_url=')) {
           foundCompletionSignal = true;
           this.extractDownloadLinks(line);
           console.log('在日志中找到下载链接:', line);
@@ -694,6 +743,8 @@ export default {
       this.selectedModel = null;
       this.downloadUrl = '';
       this.reportDownloadUrl = '';
+      this.modelDownloadUrl = '';
+      this.scalerDownloadUrl = '';
       this.predictionstate = false;
       this.trainRatio = 0.9;
       this.customParams = null;

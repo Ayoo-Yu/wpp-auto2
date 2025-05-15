@@ -3,8 +3,8 @@ from sqlalchemy.exc import IntegrityError
 from database_config import get_db
 from services.auth_service import (
     authenticate_user, create_user, update_user, get_user_by_id, get_all_users,
-    create_role, get_role_by_id, get_all_roles, create_access_token,
-    log_login_attempt, update_last_login, decode_token, check_permission, get_user_by_username,
+    create_role, get_role_by_id, get_all_roles, create_access_token as create_legacy_token,
+    log_login_attempt, update_last_login, decode_token as decode_legacy_token, check_permission, get_user_by_username,
     verify_password as verify_password_bcrypt
 )
 from utils.password_utils import verify_password, generate_password_hash
@@ -12,10 +12,14 @@ from models import User, Role
 from functools import wraps
 from datetime import timedelta
 from db_session import db_session  # 导入上下文管理器
+# 导入Flask-JWT-Extended
+from flask_jwt_extended import (
+    jwt_required, get_jwt_identity, create_access_token
+)
 
 auth_bp = Blueprint('auth', __name__)
 
-# 中间件：验证JWT令牌
+# 中间件：验证JWT令牌 - 保留旧的实现，但建议使用新的jwt_required装饰器
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -31,7 +35,7 @@ def token_required(f):
         
         # 解码令牌
         try:
-            payload = decode_token(token)
+            payload = decode_legacy_token(token)
             with db_session() as db:
                 current_user = get_user_by_id(db, payload['sub'])
         except Exception as e:
@@ -136,10 +140,15 @@ def login():
             if isinstance(permissions, dict) and 'permissions' in permissions:
                 permissions = permissions['permissions']
             
-            # 返回登录成功响应
+            # 生成JWT令牌
+            access_token = create_access_token(identity=user.id)
+            
+            # 返回登录成功响应，包含JWT令牌
             return jsonify({
                 "message": "登录成功",
+                "access_token": access_token,  # 添加JWT令牌
                 "user": {
+                    "id": user.id,
                     "username": user.username,
                     "full_name": user.full_name,
                     "role": user.role.name if user.role else "未知角色",
@@ -150,18 +159,17 @@ def login():
         print(f"登录异常: {e}")
         return jsonify({"message": "服务器内部错误"}), 500
 
-# 获取当前用户信息
+# 获取当前用户信息 - 使用JWT认证
 @auth_bp.route('/me', methods=['GET'])
+@jwt_required()  # 使用JWT认证保护路由
 def get_current_user():
-    # 从查询参数获取用户名
-    username = request.args.get('username')
-    if not username:
-        return jsonify({"message": "缺少用户名参数"}), 400
+    # 从JWT令牌获取用户ID
+    current_user_id = get_jwt_identity()
     
     try:
         # 从数据库获取用户信息
         with db_session() as db:
-            user = db.query(User).filter(User.username == username).first()
+            user = db.query(User).filter(User.id == current_user_id).first()
             
             if not user:
                 return jsonify({"message": "用户不存在"}), 404
@@ -172,9 +180,9 @@ def get_current_user():
                 "email": user.email,
                 "full_name": user.full_name,
                 "role": {
-                    "id": user.role.id,
-                    "name": user.role.name,
-                    "permissions": user.role.permissions
+                    "id": user.role.id if user.role else None,
+                    "name": user.role.name if user.role else None,
+                    "permissions": user.role.permissions if user.role else None
                 },
                 "last_login": user.last_login,
                 "is_active": user.is_active,
@@ -184,18 +192,30 @@ def get_current_user():
         print(f"获取用户信息异常: {e}")
         return jsonify({"message": "服务器内部错误"}), 500
 
-# 修改密码
+# 修改密码 - 使用JWT认证
 @auth_bp.route('/change-password', methods=['POST'])
+@jwt_required()  # 使用JWT认证保护路由
 def change_password():
     data = request.json
-    if not data or not data.get('username') or not data.get('current_password') or not data.get('new_password'):
+    if not data or not data.get('current_password') or not data.get('new_password'):
         return jsonify({"message": "缺少必要参数"}), 400
+    
+    # 从JWT令牌获取用户ID
+    current_user_id = get_jwt_identity()
     
     try:
         with db_session() as db:
-            user = authenticate_user(db, data['username'], data['current_password'])
-            
+            # 获取当前用户
+            user = db.query(User).filter(User.id == current_user_id).first()
             if not user:
+                return jsonify({"message": "用户不存在"}), 404
+            
+            # 验证当前密码
+            password_valid = verify_password(data['current_password'], user.password_hash)
+            if not password_valid:
+                password_valid = verify_password_bcrypt(data['current_password'], user.password_hash)
+            
+            if not password_valid:
                 return jsonify({"message": "当前密码错误"}), 401
             
             # 密码策略验证
@@ -211,23 +231,23 @@ def change_password():
         print(f"修改密码异常: {e}")
         return jsonify({"message": "服务器内部错误"}), 500
 
-# 获取所有用户
+# 获取所有用户 - 使用JWT认证
 @auth_bp.route('/users', methods=['GET', 'POST'])
+@jwt_required()  # 使用JWT认证保护路由
 def handle_users():
-    # 获取当前操作用户
-    current_username = request.args.get('username') or request.json.get('current_username')
-    
     # GET请求：获取用户列表
     if request.method == 'GET':
-        # 手动进行权限检查
+        # 获取当前用户ID并检查权限
+        current_user_id = get_jwt_identity()
+        
         try:
             with db_session() as db:
-                user = db.query(User).filter(User.username == current_username).first()
-                if not user:
+                current_user = db.query(User).filter(User.id == current_user_id).first()
+                if not current_user:
                     return jsonify({"message": "用户不存在"}), 404
                 
                 # 检查用户是否有管理用户的权限
-                permissions = user.role.permissions
+                permissions = current_user.role.permissions
                 if isinstance(permissions, dict) and 'permissions' in permissions:
                     permissions = permissions['permissions']
                 
@@ -259,15 +279,17 @@ def handle_users():
     
     # POST请求：创建新用户
     elif request.method == 'POST':
-        # 手动进行权限检查
+        # 获取当前用户ID并检查权限
+        current_user_id = get_jwt_identity()
+        
         try:
             with db_session() as db:
-                user = db.query(User).filter(User.username == current_username).first()
-                if not user:
+                current_user = db.query(User).filter(User.id == current_user_id).first()
+                if not current_user:
                     return jsonify({"message": "用户不存在"}), 404
                 
                 # 检查用户是否有管理用户的权限
-                permissions = user.role.permissions
+                permissions = current_user.role.permissions
                 if isinstance(permissions, dict) and 'permissions' in permissions:
                     permissions = permissions['permissions']
                 
@@ -292,8 +314,8 @@ def handle_users():
                         return jsonify({"message": "指定的角色不存在"}), 400
                     
                     # 只有超级管理员可以创建管理员用户
-                    if is_admin_role(role) and not is_super_admin(current_username):
-                        current_user = db.query(User).filter(User.username == current_username).first()
+                    if is_admin_role(role) and not is_super_admin(current_user.username):
+                        current_user = db.query(User).filter(User.id == current_user_id).first()
                         if not current_user or not is_admin_role(current_user.role):
                             return jsonify({"message": "只有超级管理员可以创建管理员用户"}), 403
                 
@@ -319,12 +341,28 @@ def handle_users():
             print(f"创建用户异常: {e}")
             return jsonify({"message": "服务器内部错误"}), 500
 
-# 获取单个用户
+# 获取单个用户 - 使用JWT认证
 @auth_bp.route('/users/<int:user_id>', methods=['GET'])
-@permission_required("manage_users")
+@jwt_required()  # 使用JWT认证代替自定义permission_required
 def get_user(user_id):
+    # 获取当前用户ID并检查权限
+    current_user_id = get_jwt_identity()
+    
     try:
         with db_session() as db:
+            current_user = db.query(User).filter(User.id == current_user_id).first()
+            if not current_user:
+                return jsonify({"message": "用户不存在"}), 404
+            
+            # 检查用户是否有管理用户的权限
+            permissions = current_user.role.permissions
+            if isinstance(permissions, dict) and 'permissions' in permissions:
+                permissions = permissions['permissions']
+            
+            if "manage_users" not in permissions:
+                return jsonify({"message": "权限不足，需要manage_users权限"}), 403
+                
+            # 原get_user的逻辑
             user = db.query(User).filter(User.id == user_id).first()
             
             if not user:
@@ -353,27 +391,39 @@ def is_super_admin(username):
 def is_admin_role(role):
     return role and role.name.lower() in ["admin", "管理员", "系统管理员"]
 
-# 更新用户信息
+# 更新用户信息 - 使用JWT认证
 @auth_bp.route('/users/<int:user_id>', methods=['PUT'])
-@permission_required("manage_users")
+@jwt_required()  # 使用JWT认证保护路由
 def update_user_info(user_id):
     data = request.json
     if not data:
         return jsonify({"message": "缺少更新数据"}), 400
     
+    # 获取当前用户ID并检查权限
+    current_user_id = get_jwt_identity()
+    
     try:
-        # 获取当前操作用户
-        current_username = request.args.get('username') or request.json.get('username')
-        
         with db_session() as db:
+            current_user = db.query(User).filter(User.id == current_user_id).first()
+            if not current_user:
+                return jsonify({"message": "用户不存在"}), 404
+            
+            # 检查用户是否有管理用户的权限
+            permissions = current_user.role.permissions
+            if isinstance(permissions, dict) and 'permissions' in permissions:
+                permissions = permissions['permissions']
+            
+            if "manage_users" not in permissions:
+                return jsonify({"message": "权限不足，需要manage_users权限"}), 403
+                
+            # 原update_user_info的逻辑
             user = db.query(User).filter(User.id == user_id).first()
             
             if not user:
                 return jsonify({"message": "用户不存在"}), 404
             
             # 安全检查：不允许非管理员修改管理员信息
-            current_user = db.query(User).filter(User.username == current_username).first()
-            if is_admin_role(user.role) and not is_super_admin(current_username) and not is_admin_role(current_user.role):
+            if is_admin_role(user.role) and not is_super_admin(current_user.username) and not is_admin_role(current_user.role):
                 return jsonify({"message": "无权修改管理员信息"}), 403
             
             # 更新字段
@@ -392,7 +442,7 @@ def update_user_info(user_id):
             
             if 'is_active' in data:
                 # 只有超级管理员可以停用管理员账户
-                if is_admin_role(user.role) and not is_super_admin(current_username) and not data['is_active']:
+                if is_admin_role(user.role) and not is_super_admin(current_user.username) and not data['is_active']:
                     return jsonify({"message": "无权停用管理员账户"}), 403
                 user.is_active = data['is_active']
             
@@ -402,7 +452,7 @@ def update_user_info(user_id):
                 if not role:
                     return jsonify({"message": "指定的角色不存在"}), 400
                 # 只有超级管理员可以修改用户的角色为管理员
-                if is_admin_role(role) and not is_super_admin(current_username):
+                if is_admin_role(role) and not is_super_admin(current_user.username):
                     return jsonify({"message": "只有超级管理员可以分配管理员角色"}), 403
                 user.role_id = data['role_id']
             
@@ -484,10 +534,8 @@ def reset_user_password(user_id):
 
 # 创建角色
 @auth_bp.route('/roles', methods=['GET', 'POST'])
+@jwt_required()  # 使用JWT认证保护路由
 def handle_roles():
-    # 获取当前操作用户
-    current_username = request.args.get('username') or request.json.get('current_username')
-    
     # GET请求：获取所有角色
     if request.method == 'GET':
         try:
@@ -514,15 +562,17 @@ def handle_roles():
     
     # POST请求：创建角色
     elif request.method == 'POST':
-        # 手动进行权限检查
+        # 获取当前用户ID并检查权限
+        current_user_id = get_jwt_identity()
+        
         try:
             with db_session() as db:
-                user = db.query(User).filter(User.username == current_username).first()
-                if not user:
+                current_user = db.query(User).filter(User.id == current_user_id).first()
+                if not current_user:
                     return jsonify({"message": "用户不存在"}), 404
                 
                 # 检查用户是否有管理角色的权限
-                permissions = user.role.permissions
+                permissions = current_user.role.permissions
                 if isinstance(permissions, dict) and 'permissions' in permissions:
                     permissions = permissions['permissions']
                 

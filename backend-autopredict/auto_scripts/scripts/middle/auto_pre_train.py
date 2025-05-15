@@ -8,21 +8,42 @@ import joblib
 import pandas as pd
 from datetime import datetime, timedelta
 
+# --- Dynamically Add Project Root to sys.path ---
+# Calculate the path to the project root (/app) based on this file's location
+# This file is at /app/auto_scripts/scripts/middle/auto_pre_train.py
+# We need to go up 3 levels to reach /app
+try:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..')) # Correct: Go up 3 levels
+    if project_root not in sys.path:
+        sys.path.insert(0, project_root) # Insert at the beginning
+        logging.info(f"(auto_pre_train) 将项目根目录添加到 sys.path: {project_root}")
+    # --- Debug Logging Start ---
+    print(f"DEBUG: Calculated project_root: {project_root}")
+    print(f"DEBUG: Current sys.path: {sys.path}")
+    logging.info(f"DEBUG: Calculated project_root: {project_root}")
+    logging.info(f"DEBUG: Current sys.path: {sys.path}")
+    # --- Debug Logging End ---
+except Exception as path_e:
+    logging.error(f"(auto_pre_train) 动态计算项目根目录时出错: {path_e}", exc_info=True)
+# --- End Path Modification ---
+
 # 导入预测和训练所需的模块
-from predict import predict
-from data_processor import (
+from predict_middle import predict
+from data_processor_middle import (
     load_data,
     preprocess_data,
     split_data,
     feature_engineering,
     scale_data,
     create_time_window,
-    filter_data_by_date
+    filter_data_by_date,
+    update_training_csv_from_db
 )
-from models import get_lightgbm_params, get_unified_params
-from train import train_and_evaluate, train_multiple_datasets, calculate_model_weights, save_predictions
-from utils import visualize_results
-from config import WINDOW_SIZE, TRAIN_RATIO, LAGS, OUTPUT_DIR_TRAIN, Today, PREC_SV_FOLDER, DATASET_FOLDER, MODEL_FOLDER, OUTPUT_DIR_PRE, AUTO_PRE_TRAIN_LOG_DIR
+from models_middle import get_lightgbm_params, get_unified_params
+from train_middle import train_and_evaluate, train_multiple_datasets, calculate_model_weights, save_predictions
+from utils_middle import visualize_results
+from config_middle import WINDOW_SIZE, TRAIN_RATIO, LAGS, OUTPUT_DIR_TRAIN, Today, PREC_SV_FOLDER, DATASET_FOLDER, MODEL_FOLDER, OUTPUT_DIR_PRE, AUTO_PRE_TRAIN_LOG_DIR
 
 # 创建一个锁用于同步模型文件的访问
 model_lock = Lock()
@@ -142,7 +163,7 @@ def is_model_available(model_folder_today):
     return exists
 
 def train_model(data_file_path, model_folder_today):
-    """执行模型训练和评估"""
+    """执行模型训练和评估 (使用 CSV 文件路径)"""
     print_section("开始模型训练")
     # 配置
     window_size = WINDOW_SIZE
@@ -163,19 +184,27 @@ def train_model(data_file_path, model_folder_today):
     logging.info(f"  - 模型存储路径: {model_folder_today}")
     logging.info(f"输出结果将保存到: {output_dir}")
     
-    # 数据加载
+    # 数据加载 (从 CSV 文件加载)
     print_section("数据加载与预处理")
     print(f"加载数据文件: {data_file_path}")
     logging.info(f"加载数据文件: {data_file_path}")
     logging.info("开始加载和预处理数据...")
-    data = load_data(data_file_path)
+    # Call original load_data with file path
+    data = load_data(data_file_path) 
+
+    # 检查加载的数据是否为空
+    if data.empty:
+        print(f"❌ 从 CSV 文件加载的数据为空或加载失败，无法继续训练: {data_file_path}")
+        logging.error(f"❌ 从 CSV 文件加载的数据为空或加载失败，无法继续训练: {data_file_path}")
+        return # Exit training if no data
+
     print(f"数据加载完成，共 {len(data)} 条记录")
     print(f"数据前5行预览: \n{data.head()}")
     logging.info(f"数据加载完成，共 {len(data)} 条记录")
     logging.info(f"数据前5行预览: \n{data.head()}")
     
     # 使用不同时长的历史数据训练多个模型
-    months_list = [1, 3, 6, 9, 12, None]  # None表示使用全部数据
+    months_list = [None]  # None表示使用全部数据
     
     # 根据数据集的实际时间跨度优化months_list
     if 'Timestamp' in data.columns:
@@ -207,63 +236,56 @@ def train_model(data_file_path, model_folder_today):
         print(f"将使用多种时间跨度的数据训练模型...")
         logging.info(f"将使用多种时间跨度的数据训练模型...")
         # 运行多数据集训练，为每种算法选择最佳模型
-        best_models_info = train_multiple_datasets(data, months_list, train_ratio, lags, window_size, model_folder_today)
+        training_output = train_multiple_datasets(data, months_list, train_ratio, lags, window_size, model_folder_today)
+        # 从返回的字典中获取models和results
+        best_models_info = training_output['models']
+        all_training_results = training_output['results']
         print(f"多数据集训练完成! 已为每种算法选择最佳模型")
         logging.info(f"多数据集训练完成! 已为每种算法选择最佳模型")
-        for algo_type, model_info in best_models_info['models'].items():
+        for algo_type, model_info in best_models_info.items():
             if model_info['model'] is not None:
                 months_desc = f"{model_info['months']}个月" if model_info['months'] else "全部数据"
-                print(f"  - 最佳{algo_type}模型: 使用{months_desc}数据, RMSE={model_info['rmse']:.4f}, K={model_info['k']:.4f}, 评分={model_info['score']:.4f}")
-                logging.info(f"  - 最佳{algo_type}模型: 使用{months_desc}数据, RMSE={model_info['rmse']:.4f}, K={model_info['k']:.4f}, 评分={model_info['score']:.4f}")
+                print(f"  - 最佳{algo_type}模型: 使用{months_desc}数据, 评分={model_info['score']:.4f}")
+                logging.info(f"  - 最佳{algo_type}模型: 使用{months_desc}数据, 评分={model_info['score']:.4f}")
         
-        # 加载过去三天的数据进行权重优化
-        print_section("开始计算模型权重")
-        logging.info("开始计算模型权重")
-        try:
-            # 使用训练数据集中的最后三天数据进行权重优化，而不是从历史文件中查找
-            print(f"从训练数据集中提取最后三天数据进行权重优化")
-            logging.info(f"从训练数据集中提取最后三天数据进行权重优化")
-            
-            # 确保数据中有Timestamp列
-            if 'Timestamp' in data.columns:
-                # 获取原始数据的时间戳转为datetime类型
-                if not pd.api.types.is_datetime64_any_dtype(data['Timestamp']):
-                    data['Timestamp'] = pd.to_datetime(data['Timestamp'])
-                
-                # 计算最后三天的开始时间
-                latest_date = data['Timestamp'].max()
-                three_days_before = latest_date - pd.Timedelta(days=3)
-                
-                # 过滤出最后三天的数据
-                last_three_days_data = data[data['Timestamp'] >= three_days_before]
-                
-                if len(last_three_days_data) >= 24:  # 至少需要一天的数据
-                    print(f"✅ 已从训练数据集提取最后三天数据，共 {len(last_three_days_data)} 条记录")
-                    logging.info(f"✅ 已从训练数据集提取最后三天数据，共 {len(last_three_days_data)} 条记录")
-                    
-                    # 计算最优权重
-                    print(f"开始计算最优模型权重...")
-                    logging.info(f"开始计算最优模型权重...")
-                    weights = calculate_model_weights(best_models_info, last_three_days_data, lags, window_size)
-                    print(f"计算得到的最优权重: {weights}")
-                    logging.info(f"计算得到的最优权重: {weights}")
-                    
-                    # 保存权重到权重文件
-                    weights_file = os.path.join(model_folder_today, 'model_weights.joblib')
-                    joblib.dump(weights, weights_file)
-                    print(f"模型权重已保存到: {weights_file}")
-                    logging.info(f"模型权重已保存到: {weights_file}")
-                else:
-                    print(f"⚠️ 训练数据集中最后三天的数据不足（少于24条），将使用默认权重")
-                    logging.info(f"⚠️ 训练数据集中最后三天的数据不足（少于24条），将使用默认权重")
-            else:
-                print(f"⚠️ 训练数据中没有Timestamp列，无法提取最后三天数据，将使用默认权重")
-                logging.info(f"⚠️ 训练数据中没有Timestamp列，无法提取最后三天数据，将使用默认权重")
-        except Exception as e:
-            print(f"❌ 计算模型权重时出错: {str(e)}")
-            print(f"将使用默认权重: GBDT=0.45, DART=0.1, GOSS=0.45")
-            logging.error(f"❌ 计算模型权重时出错: {str(e)}")
-            logging.info(f"将使用默认权重: GBDT=0.45, DART=0.1, GOSS=0.45")
+        # 新增：选择全局最优模型
+        print_section("选择全局最优模型")
+        logging.info("选择全局最优模型")
+        best_overall_score = float('-inf')
+        best_overall_type = None
+        best_overall_info = None
+
+        for algo_type, model_info in best_models_info.items():
+            # 确保模型信息有效且包含评分
+            if model_info and model_info.get('model') is not None and 'score' in model_info:
+                current_score = model_info['score']
+                # score 越高越好
+                if current_score > best_overall_score:
+                    best_overall_score = current_score
+                    best_overall_type = algo_type
+                    best_overall_info = model_info
+
+        if best_overall_type:
+            print(f"✅ 全局最优模型类型为: {best_overall_type}，评分为: {best_overall_score:.4f}")
+            logging.info(f"✅ 全局最优模型类型为: {best_overall_type}，评分为: {best_overall_score:.4f}")
+
+            # 将最优模型类型写入标记文件，方便预测脚本读取
+            marker_file_path = os.path.join(model_folder_today, 'best_model_type.txt')
+            try:
+                with open(marker_file_path, 'w') as f:
+                    f.write(best_overall_type)
+                print(f"✅ 全局最优模型类型已写入标记文件: {marker_file_path}")
+                logging.info(f"✅ 全局最优模型类型已写入标记文件: {marker_file_path}")
+            except IOError as e:
+                print(f"❌ 写入最优模型标记文件失败: {e}")
+                logging.error(f"❌ 写入最优模型标记文件失败: {e}")
+        else:
+            print(f"❌ 未能确定全局最优模型。")
+            logging.error(f"❌ 未能确定全局最优模型。")
+        
+        # 移除模型权重计算步骤
+        print_section("跳过模型权重计算")
+        logging.info("根据需求跳过模型权重计算步骤，将仅使用单个最佳模型进行预测。")
     
     except Exception as e:
         print_section("多数据集训练失败")
@@ -316,10 +338,23 @@ def train_model(data_file_path, model_folder_today):
         logging.info("开始模型训练与评估")
         print(f"训练3种不同的LightGBM模型: GBDT, DART, GOSS")
         logging.info(f"训练3种不同的LightGBM模型: GBDT, DART, GOSS")
+        
+        # 生成扁平化特征名（用于兼容特征选择机制）
+        original_feature_names = X_train.columns.tolist() if hasattr(X_train, 'columns') else [f'feature_{i}' for i in range(X_train.shape[1])]
+        flat_feature_names = []
+        # 按照时间步（外循环）和特征（内循环）的顺序生成特征名
+        # 这必须与create_flattened_windows_with_indices函数中window.reshape(1, -1)的扁平化顺序一致
+        for i in range(window_size):
+            time_lag_label = window_size - 1 - i  # 从window_size-1到0
+            for name in original_feature_names:
+                flat_feature_names.append(f"{name}_t-{time_lag_label}")
+        
         results_dict = train_and_evaluate(
             X_train_windows, y_train_windows,
             X_val_windows, y_val_windows,
-            params_list, scaler, model_folder_today
+            params_list, scaler, model_folder_today,
+            None, flat_feature_names,  # 添加feature_names参数
+            save_importance=True  # 此处总是保存特征重要性（因为是使用全部数据的传统训练）
         )
         print(f"模型训练与评估完成!")
         logging.info(f"模型训练与评估完成!")
@@ -342,23 +377,26 @@ def train_model(data_file_path, model_folder_today):
         logging.info(f"可视化结果创建完成")
 
 def monitor_training(today_date):
-    """监视训练文件夹并执行训练"""
+    """监视训练过程，并在训练前更新 CSV 文件"""
     print_section("启动训练监视线程")
     logging.info("启动训练监视线程")
-    csv_file = os.path.join(DATASET_FOLDER, f'{today_date}.csv')
+    # Define CSV file path (Use a constant name)
+    # csv_file = os.path.join(DATASET_FOLDER, f'{today_date}.csv') # Old way
+    csv_file = os.path.join(DATASET_FOLDER, 'training_data_middle.csv') # New constant name
     model_folder_today = os.path.join(MODEL_FOLDER, today_date)
     
     # 确保模型文件夹存在
     os.makedirs(model_folder_today, exist_ok=True)
+    # 确保数据集文件夹存在 (如果 update 函数不创建的话)
+    os.makedirs(DATASET_FOLDER, exist_ok=True)
 
-    print(f"训练文件路径: {csv_file}")
+    print(f"训练 CSV 文件路径: {csv_file}") # Log CSV file path
     print(f"模型存储目录: {model_folder_today}")
     print(f"训练完成标志文件: {get_train_flag_file(today_date)}")
-    print(f"开始监视 {DATASET_FOLDER} 文件夹以进行训练...")
-    logging.info(f"训练文件路径: {csv_file}")
+    logging.info(f"训练 CSV 文件路径: {csv_file}")
     logging.info(f"模型存储目录: {model_folder_today}")
     logging.info(f"训练完成标志文件: {get_train_flag_file(today_date)}")
-    logging.info(f"开始监视 {DATASET_FOLDER} 文件夹以进行训练...")
+    logging.info(f"开始监视训练任务 (基于标志文件和 CSV 更新)...")
 
     while True:
         if is_train_done(today_date):
@@ -366,83 +404,205 @@ def monitor_training(today_date):
             logging.info(f"⚠️ 检测到今天的训练已经执行过，跳过...")
             if is_model_available(model_folder_today):
                 model_available.set()
-                print(f"✅ 模型已设置为可用状态")
-                logging.info(f"✅ 模型已设置为可用状态")
+                print(f"✅ (跳过训练后) 模型已设置为可用状态")
+                logging.info(f"✅ (跳过训练后) 模型已设置为可用状态")
+            break # Exit the loop if training is done
+
+        # --- 更新 CSV 文件 --- 
+        print(f"ℹ️ 尝试更新训练 CSV 文件: {csv_file}")
+        logging.info(f"ℹ️ 尝试更新训练 CSV 文件: {csv_file}")
+        update_successful = update_training_csv_from_db(csv_file)
+        
+        if not update_successful:
+            print(f"❌ 更新训练 CSV 文件失败，本次将跳过训练。请检查日志获取详细信息。")
+            logging.error(f"❌ 更新训练 CSV 文件失败，本次将跳过训练。")
+            # Decide whether to break or sleep and retry later
+            # For now, let's just break the loop for this run
+            break 
+        else:
+            print(f"✅ CSV 文件更新检查完成。")
+            logging.info(f"✅ CSV 文件更新检查完成。")
+
+        # --- 执行训练 --- 
+        # Check again if training is done in case it finished while updating CSV
+        if is_train_done(today_date):
+            logging.info("在 CSV 更新后检测到训练已完成，跳过执行训练。")
             break
 
-        if os.path.exists(csv_file):
-            print(f"✅ 发现新的训练文件：{csv_file}，执行训练...")
-            logging.info(f"✅ 发现新的训练文件：{csv_file}，执行训练...")
-            with model_lock:
-                train_model(csv_file, model_folder_today)
-            
-            # 标记训练已完成
-            mark_train_done(today_date)
-            print(f"✅ 训练完成，已创建标志文件")
-            logging.info(f"✅ 训练完成，已创建标志文件")
-            
-            # 验证模型是否可用
-            if is_model_available(model_folder_today):
-                model_available.set()
-                print(f"✅ 模型已成功保存到 {model_folder_today}，模型可用。")
-                logging.info(f"✅ 模型已成功保存到 {model_folder_today}，模型可用。")
-            else:
-                print(f"❌ 模型文件未找到在 {model_folder_today}，模型不可用。")
-                logging.info(f"❌ 模型文件未找到在 {model_folder_today}，模型不可用。")
-            break
-
-        print(f"❌ 未找到训练 CSV 文件: {csv_file}，等待 30 秒后重试...")
-        logging.info(f"❌ 未找到训练 CSV 文件: {csv_file}，等待 30 秒后重试...")
-        time.sleep(30)  # 每30秒检查一次
+        print(f"ℹ️ 今天 ({today_date}) 的训练尚未完成，开始执行训练 (使用 {csv_file})...")
+        logging.info(f"ℹ️ 今天 ({today_date}) 的训练尚未完成，开始执行训练 (使用 {csv_file})...")
+        with model_lock:
+            # Call train_model with the CSV file path
+            train_model(csv_file, model_folder_today)
+        
+        # 标记训练已完成
+        mark_train_done(today_date)
+        print(f"✅ 训练完成，已创建标志文件")
+        logging.info(f"✅ 训练完成，已创建标志文件")
+        
+        # 验证模型是否可用
+        if is_model_available(model_folder_today):
+            model_available.set()
+            print(f"✅ 模型已成功保存到 {model_folder_today}，模型可用。")
+            logging.info(f"✅ 模型已成功保存到 {model_folder_today}，模型可用。")
+        else:
+            print(f"❌ 模型文件未找到在 {model_folder_today}，模型不可用。")
+            logging.info(f"❌ 模型文件未找到在 {model_folder_today}，模型不可用。")
+        break # Exit loop after attempting training
 
 def monitor_prediction(today_date):
-    """监视预测文件夹并执行预测"""
-    print_section("启动预测监视线程")
-    logging.info("启动预测监视线程")
-    csv_file = os.path.join(PREC_SV_FOLDER, f'{today_date}.csv')
-    model_folder_today = os.path.join(MODEL_FOLDER, today_date)
+    """
+    监控预测过程，确保预测任务完成
+    **修改：现在查找并使用明天的预测输入文件**
     
-    # 确保输出目录存在
-    output_dir = os.path.join(OUTPUT_DIR_PRE, today_date)
-    os.makedirs(output_dir, exist_ok=True)
+    参数:
+    today_date: 当前日期，格式为YYYYMMDD
+    """
+    print(f"开始监控预测过程，日期: {today_date} (将预测 {today_date} 的下一天)")
+    logging.info(f"开始监控预测过程，日期: {today_date} (将预测 {today_date} 的下一天)")
+    
+    # 检查今天的预测 *运行* 是否已完成 (使用今天的标志)
+    if is_predict_done(today_date):
+        print(f"今天 ({today_date}) 的预测任务已运行完成，无需再次执行")
+        logging.info(f"今天 ({today_date}) 的预测任务已运行完成，无需再次执行")
+        return
+    
+    # 计算明天的日期字符串
+    try:
+        today_dt = datetime.strptime(today_date, '%Y%m%d')
+        tomorrow_dt = today_dt + timedelta(days=1)
+        tomorrow_date_str = tomorrow_dt.strftime('%Y%m%d')
+        print(f"将查找明天的预测输入文件，日期: {tomorrow_date_str}")
+        logging.info(f"将查找明天的预测输入文件，日期: {tomorrow_date_str}")
+    except ValueError:
+        logging.error(f"无法解析日期: {today_date}，无法确定明天的输入文件名。")
+        return
 
-    print(f"预测数据文件路径: {csv_file}")
-    print(f"模型目录: {model_folder_today}")
-    print(f"预测完成标志文件: {get_predict_flag_file(today_date)}")
-    print(f"开始监视 {PREC_SV_FOLDER} 文件夹以进行预测...")
-    logging.info(f"预测数据文件路径: {csv_file}")
-    logging.info(f"模型目录: {model_folder_today}")
-    logging.info(f"预测完成标志文件: {get_predict_flag_file(today_date)}")
-    logging.info(f"开始监视 {PREC_SV_FOLDER} 文件夹以进行预测...")
-
+    # 等待模型可用 (使用今天的模型)
+    model_folder_today = os.path.join(MODEL_FOLDER, today_date)
+    max_wait_time = 3600  # 最大等待时间，单位秒
+    wait_interval = 60  # 检查间隔，单位秒
+    start_time = time.time()
+    
+    print(f"等待今天的模型目录可用: {model_folder_today}")
+    logging.info(f"等待今天的模型目录可用: {model_folder_today}")
+    
     while True:
+        # 检查是否超时
+        if time.time() - start_time > max_wait_time:
+            print(f"等待模型超时，预测任务终止")
+            logging.error(f"等待模型超时，预测任务终止")
+            return
+        
+        # 再次检查今天的预测 *运行* 是否已完成
         if is_predict_done(today_date):
-            print(f"⚠️ 检测到今天的预测已经执行过，跳过...")
-            logging.info(f"⚠️ 检测到今天的预测已经执行过，跳过...")
-            break
-
-        # 等待模型可用
-        if not (model_available.is_set() or is_model_available(model_folder_today)):
-            print(f"⏳ 未有可用模型，等待模型训练完成...")
-            logging.info(f"⏳ 未有可用模型，等待模型训练完成...")
-            time.sleep(30)
+            print(f"在等待期间，今天 ({today_date}) 的预测任务已完成，退出等待")
+            logging.info(f"在等待期间，今天 ({today_date}) 的预测任务已完成，退出等待")
+            return
+        
+        # 检查模型目录是否存在
+        if not os.path.exists(model_folder_today):
+            print(f"今天的模型目录不存在，等待 {wait_interval} 秒后重试...")
+            logging.info(f"今天的模型目录不存在，等待 {wait_interval} 秒后重试...")
+            time.sleep(wait_interval)
             continue
+        
+        # 使用is_model_available检查是否有模型文件（包括best_models子目录）
+        if not is_model_available(model_folder_today):
+            print(f"今天的模型目录中没有可用的模型文件，等待 {wait_interval} 秒后重试...")
+            logging.info(f"今天的模型目录中没有可用的模型文件，等待 {wait_interval} 秒后重试...")
+            time.sleep(wait_interval)
+            continue
+        
+        # 检查是否有 *明天* 的预测输入文件
+        csv_file = os.path.join(PREC_SV_FOLDER, f"predict_input_{tomorrow_date_str}.csv")
+        if not os.path.exists(csv_file):
+            print(f"明天的预测输入文件 ({tomorrow_date_str}) 不存在，等待 {wait_interval} 秒后重试: {csv_file}")
+            logging.info(f"明天的预测输入文件 ({tomorrow_date_str}) 不存在，等待 {wait_interval} 秒后重试: {csv_file}")
+            time.sleep(wait_interval)
+            continue
+        
+        # 执行预测
+        print(f"✅ 发现明天的预测文件：{csv_file}，使用今天的模型执行预测...")
+        logging.info(f"✅ 发现明天的预测文件：{csv_file}，使用今天的模型执行预测...")
+        
+        # --- 新增：检查生产模型和类型文件 ---
+        production_model_path = os.path.join(model_folder_today, 'best_models', 'production_model.joblib')
+        best_model_type_path = os.path.join(model_folder_today, 'best_model_type.txt')
+        
+        prod_model_exists = os.path.exists(production_model_path)
+        type_file_content = None
+        if os.path.exists(best_model_type_path):
+            try:
+                with open(best_model_type_path, 'r') as f:
+                    type_file_content = f.read().strip()
+            except Exception as e:
+                logging.error(f"读取 best_model_type.txt 文件失败: {e}")
 
-        if os.path.exists(csv_file):
-            print(f"✅ 发现新的预测文件：{csv_file}，执行预测...")
-            logging.info(f"✅ 发现新的预测文件：{csv_file}，执行预测...")
-            with model_lock:
-                predict(csv_file, model_folder_today)
+        if prod_model_exists and type_file_content == "production_model":
+            print("✅ 检测到生产模型 (production_model.joblib) 存在，且类型文件正确标记。预测将优先使用生产模型。")
+            logging.info("✅ 检测到生产模型 (production_model.joblib) 存在，且类型文件正确标记。预测将优先使用生产模型。")
+        elif prod_model_exists and type_file_content != "production_model":
+            print(f"⚠️ 检测到生产模型存在，但类型文件标记为 '{type_file_content}'。预测行为将取决于 predict 函数的内部逻辑。")
+            logging.warning(f"⚠️ 检测到生产模型存在，但类型文件标记为 '{type_file_content}'。预测行为将取决于 predict 函数的内部逻辑。")
+        elif not prod_model_exists and type_file_content == "production_model":
+            print(f"⚠️ 类型文件标记为 'production_model'，但生产模型文件缺失！预测行为将取决于 predict 函数的内部逻辑（可能失败或回退）。")
+            logging.warning(f"⚠️ 类型文件标记为 'production_model'，但生产模型文件缺失！预测行为将取决于 predict 函数的内部逻辑（可能失败或回退）。")
+        else: # not prod_model_exists and type_file_content != "production_model"
+            print(f"ℹ️ 未检测到生产模型，或类型文件标记为 '{type_file_content}'。预测将尝试使用评估阶段的最佳模型。")
+            logging.info(f"ℹ️ 未检测到生产模型，或类型文件标记为 '{type_file_content}'。预测将尝试使用评估阶段的最佳模型。")
+        # --- 检查结束 ---
+
+        # 创建输出目录 (使用今天的日期)
+        output_dir = os.path.join(OUTPUT_DIR_PRE, today_date)
+        os.makedirs(output_dir, exist_ok=True)
+        # 输出文件名仍然使用今天的日期，表示是今天运行的预测
+        output_file = os.path.join(output_dir, f"predict_output_{today_date}.csv") 
+        
+        print(f"输出文件将保存到: {output_file}")
+        logging.info(f"输出文件将保存到: {output_file}")
+        
+        # 调用predict函数 (输入是明天的文件，模型是今天的)
+        predict_success = False  # 用于标记预测是否真的执行了
+        try:
+            # 调用predict函数
+            combined_pred, pred_timestamps = predict(
+                input_file=csv_file,             # 使用明天的输入文件
+                models_dir=model_folder_today, # 使用今天的模型目录
+                output_file=output_file,         # 输出文件基于今天日期
+                window_size=WINDOW_SIZE,
+                lags=LAGS
+            )
             
-            # 标记预测已完成
-            mark_predict_done(today_date)
-            print(f"✅ 预测执行完成")
-            logging.info(f"✅ 预测执行完成")
-            break
-
-        print(f"❌ 未找到预测 CSV 文件: {csv_file}，等待 30 秒后重试...")
-        logging.info(f"❌ 未找到预测 CSV 文件: {csv_file}，等待 30 秒后重试...")
-        time.sleep(30)  # 每30秒检查一次
+            # 检查返回值，只有成功预测才标记完成
+            if combined_pred is not None and pred_timestamps is not None:
+                predict_success = True
+                print(f"✅ 预测成功完成，结果已保存到 {output_file}")
+                logging.info(f"✅ 预测成功完成，结果已保存到 {output_file}")
+            else:
+                print(f"❌ predict 函数未成功返回结果，跳过标记完成")
+                logging.error(f"❌ predict 函数未成功返回结果，跳过标记完成")
+        
+        except Exception as e:
+            print(f"❌ 调用 predict 函数时发生意外错误: {e}")
+            logging.error(f"❌ 调用 predict 函数时发生意外错误: {e}")
+            import traceback
+            traceback.print_exc()
+            logging.error(traceback.format_exc())
+        
+        # 只有在predict函数成功执行后才标记 *今天* 的预测任务完成
+        if predict_success:
+            mark_predict_done(today_date) # 使用今天的日期标记
+            print(f"✅ 今天 ({today_date}) 的预测执行完成")
+            logging.info(f"✅ 今天 ({today_date}) 的预测执行完成")
+        else:
+            print(f"❌ 预测未成功执行或失败，不标记完成")
+            logging.error(f"❌ 预测未成功执行或失败，不标记完成")
+        
+        break  # 无论成功与否，发现文件后都退出循环
+    
+    print(f"预测监控结束 ({today_date})")
+    logging.info(f"预测监控结束 ({today_date})")
 
 def main():
     """主函数，启动训练和预测的监视线程"""

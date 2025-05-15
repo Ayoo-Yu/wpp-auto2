@@ -1,6 +1,14 @@
 <!-- src/components/Layout.vue -->
 <template>
   <el-container class="app-container">
+    <!-- 全局认证加载指示器 -->
+    <div v-if="isAuthLoading" class="auth-loading-overlay">
+      <div class="auth-loading-container">
+        <el-icon class="loading-icon"><Loading /></el-icon>
+        <div class="auth-loading-text">认证状态检查中...</div>
+      </div>
+    </div>
+
     <!-- 背景容器：内联样式根据开关动态控制动画播放状态 -->
     <div class="background-container">
       <div :style="backgroundStyle"></div>
@@ -52,7 +60,7 @@
         </el-menu-item>
 
         <el-menu-item index="/powercompare" v-if="hasPermission('view_all_data')">
-          <el-icon><TrendCharts /></el-icon>
+          <el-icon><Histogram /></el-icon>
           <template #title>功率对比</template>
         </el-menu-item>
         
@@ -101,6 +109,8 @@
 import { ref, computed, provide, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import axiosInstance from '../api/axios'
+import { isAuthReady, isAuthLoading } from '../store/authReady' // 导入认证状态
 
 // 引入 Element Plus 图标
 import {
@@ -111,6 +121,7 @@ import {
   TrendCharts,
   Timer,
   User,
+  Loading
 } from '@element-plus/icons-vue'
 
 export default {
@@ -123,6 +134,7 @@ export default {
     TrendCharts,
     Timer,
     User,
+    Loading,
   },
   setup() {
     const isCollapsed = ref(false)
@@ -172,19 +184,85 @@ export default {
     
     // 获取当前用户信息
     const fetchCurrentUser = async () => {
+      isAuthLoading.value = true; // 开始认证检查
+      isAuthReady.value = false; // 重置认证就绪状态
+      let isAuthenticated = false; // 引入局部变量跟踪验证结果
+      console.log('开始检查认证状态...');
+      
       try {
-        const userStr = localStorage.getItem('user')
-        if (!userStr) {
-          router.push('/login')
-          return
-        }
+        // 检查本地存储中是否有访问令牌
+        const token = localStorage.getItem('accessToken');
+        const userStr = localStorage.getItem('user');
         
-        currentUser.value = JSON.parse(userStr)
+        // 记录当前认证状态
+        console.log('本地存储检查:', { 
+          tokenExists: !!token, 
+          userExists: !!userStr 
+        });
+        
+        // 如果没有令牌或用户信息，不尝试验证
+        if (!token || !userStr) {
+          console.warn('无本地认证信息，不尝试验证');
+          // 清除可能部分存在的认证信息
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('user');
+          // 不在这里跳转，让finally块处理
+        } else {
+          // 尝试解析本地用户数据
+          try {
+            // 尝试加载本地存储的用户信息
+            currentUser.value = JSON.parse(userStr);
+            console.log('本地用户信息已解析:', currentUser.value?.username);
+          } catch (parseError) {
+            console.error('解析本地用户信息失败:', parseError);
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user');
+            currentUser.value = null; // 确保清空
+            // 继续进入finally块
+          }
+          
+          // 如果Token和用户信息都存在，尝试验证Token有效性
+          if (token && currentUser.value) {
+            console.log('本地有Token和用户，尝试调用/api/auth/me验证...');
+            try {
+              await axiosInstance.get('/api/auth/me');
+              console.log('Token验证成功 (通过/api/auth/me)');
+              isAuthenticated = true; // 验证成功！
+            } catch (apiError) {
+              console.error('/api/auth/me验证失败:', apiError.message);
+              // 401错误会被响应拦截器处理（清除Token, 跳转）
+              if (apiError.response && apiError.response.status !== 401) {
+                console.log('/api/auth/me返回非401错误，视为未认证');
+              }
+              // isAuthenticated保持false
+            }
+          } else {
+            console.log('Token或本地用户信息不完整，跳过API验证');
+          }
+        }
       } catch (error) {
-        console.error('获取用户信息失败:', error)
-        // 如果获取用户信息失败，重定向到登录页
-        localStorage.removeItem('user')
-        router.push('/login')
+        console.error('fetchCurrentUser出现意外错误:', error);
+        // 出现意外错误，视为未认证
+        isAuthenticated = false;
+      } finally {
+        // 认证检查流程完成，直接根据验证结果设置状态
+        isAuthReady.value = isAuthenticated;
+        isAuthLoading.value = false;
+        console.log('最终认证状态:', { 
+          isAuthReady: isAuthReady.value, 
+          isAuthLoading: isAuthLoading.value,
+          isAuthenticated: isAuthenticated
+        });
+        
+        // 如果检查完成但未认证，并且当前不在登录页，执行跳转
+        if (!isAuthReady.value && !isAuthLoading.value && router.currentRoute.value.path !== '/login') {
+          console.log('认证检查完成但未通过，且不在登录页，执行跳转...');
+          // 确保Token和用户信息已被清除
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('user');
+          currentUser.value = null;
+          router.push('/login');
+        }
       }
     }
     
@@ -248,24 +326,23 @@ export default {
     
     // 处理退出登录
     const handleLogout = () => {
-      ElMessageBox.confirm(
-        '确定要退出登录吗？',
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).then(() => {
-        // 清除本地存储的令牌和用户信息
+      ElMessageBox.confirm('确定要退出登录吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 清除localStorage中的所有用户相关信息
         localStorage.removeItem('user')
+        
+        // 清除访问令牌 (关键修改)
+        localStorage.removeItem('accessToken')
+        
+        ElMessage.success('已成功退出登录')
         
         // 重定向到登录页
         router.push('/login')
-        
-        ElMessage.success('已退出登录')
       }).catch(() => {
-        // 取消退出
+        // 用户取消操作
       })
     }
     
@@ -285,7 +362,9 @@ export default {
       userInitial,
       userName,
       handleCommand,
-      hasPermission
+      hasPermission,
+      isAuthReady, // 暴露认证状态
+      isAuthLoading // 暴露认证加载状态
     }
   },
 }
@@ -487,6 +566,51 @@ export default {
 
   .username {
     display: none;
+  }
+}
+
+/* 认证加载指示器样式 */
+.auth-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.auth-loading-container {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.auth-loading-text {
+  margin-top: 15px;
+  font-size: 16px;
+  color: #333;
+}
+
+.loading-icon {
+  font-size: 32px;
+  color: #409EFF;
+  animation: rotating 2s linear infinite;
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

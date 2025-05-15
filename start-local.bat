@@ -7,13 +7,16 @@ SET DB_USER=system
 SET DB_PASSWORD=12345678ab
 SET DB_NAME=windpower
 SET MINIO_ENDPOINT=localhost
-SET MINIO_PORT=9000
+SET MINIO_PORT=9900
 
 REM 切换到D盘
 d:
 
 REM 启动后端（在新窗口中运行）
-start cmd /k "chcp 65001 > nul && cd /d D:\my-vue-project\wind-power-forecast\backend && call conda activate env && python app.py"
+start cmd /k "chcp 65001 > nul && cd /d D:\my-vue-project\wind-power-forecast\backend && call conda activate wind-power-env && python app.py"
+
+REM 启动后端（在新窗口中运行）
+start cmd /k "chcp 65001 > nul && cd /d D:\my-vue-project\wind-power-forecast\backend-autopredict && call conda activate wind-power-env && python app.py"
 
 REM 启动前端（在新窗口中运行）
 start cmd /k "chcp 65001 > nul && cd /d D:\my-vue-project\wind-power-forecast\frontend && set NODE_OPTIONS=--trace-deprecation && npm run serve"

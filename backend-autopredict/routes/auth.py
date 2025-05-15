@@ -12,6 +12,7 @@ from models import User, Role
 from functools import wraps
 from datetime import timedelta
 from db_session import db_session  # 导入上下文管理器
+from flask_jwt_extended import jwt_required
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -51,11 +52,13 @@ def permission_required(required_permission):
             # 检查请求参数中是否有username
             username = request.args.get('username')
             if not username:
-                # 检查JSON数据中是否有username
-                json_data = request.get_json(silent=True)
-                if json_data and 'username' in json_data:
-                    username = json_data.get('username')
-                else:
+                # 只有非GET请求才尝试从请求体中获取JSON数据
+                if request.method != 'GET':
+                    # 检查JSON数据中是否有username
+                    json_data = request.get_json(silent=True)
+                    if json_data and 'username' in json_data:
+                        username = json_data.get('username')
+                if not username:
                     print(f"权限检查失败：缺少用户名参数，要求权限: {required_permission}")
                     return jsonify({"message": "未提供用户名，无法验证权限"}), 403
             
@@ -494,6 +497,7 @@ def create_role():
 
 # 获取所有角色
 @auth_bp.route('/roles', methods=['GET'])
+@jwt_required()  # 使用JWT认证保护路由
 def get_roles():
     try:
         with db_session() as db:

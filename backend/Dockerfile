@@ -46,7 +46,7 @@ RUN conda env create -f environment.yml && conda clean --all --yes
 ENV PATH /opt/conda/envs/wind-power-env/bin:$PATH
 
 # 安装Gunicorn和gevent
-RUN pip install gunicorn gevent
+RUN pip install gunicorn gevent flask-jwt-extended
 
 # 复制alembic迁移配置 (从项目根目录复制)
 COPY migration /app/migration/

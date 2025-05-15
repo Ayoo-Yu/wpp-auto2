@@ -8,19 +8,24 @@ import sys
 import shutil
 import traceback
 import uuid
+import threading
+from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from database_config import Base, get_db
 from db_session import db_session  # 导入上下文管理器
 from db_models import TaskHistory
+from config import Config  # 导入Config类
 
 # 全局状态字典，其他代码依赖这个变量
 prediction_status = {
-    'ultra_short': False,
     'short': False,
-    'medium': False
+    'medium': False,
+    'supershort': False
 }
+# 添加线程锁以确保线程安全
+status_lock = threading.Lock()
 
 # 获取当前文件所在目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -33,22 +38,16 @@ else:
     # 本地开发环境
     base_dir = os.path.abspath(os.path.join(current_dir, '../..'))
 
-# 使用相对于应用根目录的路径
+# 从Config类中获取脚本路径
 scripts = {
-    'ultra_short': os.path.join(base_dir, 'auto_scripts', 'scripts', 'supershort', 'scheduler_supershort.py'),
-    'short': os.path.join(base_dir, 'auto_scripts', 'scripts', 'short', 'scheduler_short.py'),
-    'medium': os.path.join(base_dir, 'auto_scripts', 'scripts', 'middle', 'scheduler_middle.py')
-}
-
-# 额外定义超短期预测的两个脚本路径
-ultra_short_scripts = {
-    'training': os.path.join(base_dir, 'auto_scripts', 'scripts', 'supershort', 'scheduler_supershort.py'),
-    'prediction': os.path.join(base_dir, 'auto_scripts', 'scripts', 'supershort', 'scheduler_predict.py')
+    'short': Config.SCRIPT_PATHS.get('short'),
+    'medium': Config.SCRIPT_PATHS.get('medium'),
+    'supershort': Config.SCRIPT_PATHS.get('supershort')
 }
 
 # 检查脚本是否存在
 for name, path in scripts.items():
-    if os.path.exists(path):
+    if path and os.path.exists(path):
         print(f"✅ 脚本存在: {name} -> {path}")
     else:
         print(f"❌ 脚本不存在: {name} -> {path}")
@@ -64,30 +63,45 @@ for name, path in scripts.items():
                 scripts[name] = loc
                 break
 
-# 定义日志目录路径
-log_dirs = {
-    'ultra_short': {
-        'base': os.path.join(base_dir, 'auto_scripts', 'scripts', 'supershort', 'logs'),
-        'train': os.path.join(base_dir, 'auto_scripts', 'scripts', 'supershort', 'logs', 'auto_train'),
-        'predict': os.path.join(base_dir, 'auto_scripts', 'scripts', 'supershort', 'logs', 'scheduler_predict'),
-        'param': os.path.join(base_dir, 'auto_scripts', 'scripts', 'supershort', 'logs', 'param_optimizer')
-    },
-    'short': {
-        'base': os.path.join(base_dir, 'auto_scripts', 'scripts', 'short', 'logs'),
-        'train': os.path.join(base_dir, 'auto_scripts', 'scripts', 'short', 'logs', 'auto_pre_train'),
-        'param': os.path.join(base_dir, 'auto_scripts', 'scripts', 'short', 'logs', 'param_optimizer')
-    },
-    'medium': {
-        'base': os.path.join(base_dir, 'auto_scripts', 'scripts', 'middle', 'logs'),
-        'train': os.path.join(base_dir, 'auto_scripts', 'scripts', 'middle', 'logs', 'auto_pre_train'),
-        'param': os.path.join(base_dir, 'auto_scripts', 'scripts', 'middle', 'logs', 'param_optimizer')
-    }
-}
+# 使用配置中定义的日志目录路径
+log_dirs = Config.LOG_DIRS
 
 # 确保所有日志目录都存在
 for type_dirs in log_dirs.values():
     for dir_path in type_dirs.values():
         os.makedirs(dir_path, exist_ok=True)
+
+# 根据操作系统动态确定 Python 解释器路径
+def get_python_interpreter():
+    """
+    根据当前操作系统环境动态确定Python解释器路径
+    
+    Returns:
+        str: 适合当前平台的Python解释器路径
+    """
+    if sys.platform.startswith('linux'):
+        # 假设在 Linux/Docker 环境中，使用固定的 Conda 环境路径
+        interpreter = '/opt/conda/envs/wind-power-env/bin/python'
+        print(f"检测到 Linux/Docker 环境，使用Python解释器: {interpreter}")
+        return interpreter
+    elif sys.platform.startswith('win'):
+        # 在 Windows 开发环境中，优先使用当前Python解释器
+        interpreter = sys.executable
+        print(f"检测到 Windows 环境，使用当前Python解释器: {interpreter}")
+        return interpreter
+    elif sys.platform.startswith('darwin'):
+        # macOS环境，与Windows类似
+        interpreter = sys.executable
+        print(f"检测到 macOS 环境，使用当前Python解释器: {interpreter}")
+        return interpreter
+    else:
+        # 其他未知操作系统，使用系统默认Python
+        print(f"未知的操作系统平台 '{sys.platform}'，使用系统默认'python'")
+        return 'python'
+
+# 初始化时获取Python解释器路径
+python_interpreter = get_python_interpreter()
+print(f"初始化完成，将使用Python解释器: {python_interpreter}")
 
 # 改进PM2路径检测
 def find_pm2_path():
@@ -162,18 +176,71 @@ def safe_pm2_command(cmd_args, timeout=30, capture_output=True):
     full_cmd = [pm2_cmd] + cmd_args
     try:
         print(f"执行命令: {' '.join(full_cmd)}")
+        
+        # Special handling for 'pm2 logs' encoding
+        is_logs_command = 'logs' in cmd_args and cmd_args[0].lower() == 'logs' # More specific check
+
         if capture_output:
-            result = subprocess.run(
-                full_cmd,
-                capture_output=True,
-                text=True,
-                encoding='utf-8',
-                errors='replace',
-                timeout=timeout,
-                check=True
-            )
-            return True, result
-        else:
+            if is_logs_command:
+                # Get raw bytes for logs to handle encoding manually
+                # print(f"DEBUG: Executing logs command, getting raw bytes: {' '.join(full_cmd)}")
+                proc = subprocess.run(
+                    full_cmd,
+                    capture_output=True,
+                    timeout=timeout,
+                    check=False # Check manually after decoding
+                )
+                # Attempt to decode stdout and stderr
+                stdout_decoded, stderr_decoded = "", ""
+                if proc.stdout:
+                    try:
+                        stdout_decoded = proc.stdout.decode('utf-8')
+                    except UnicodeDecodeError:
+                        try:
+                            # print("DEBUG: UTF-8 decode failed for stdout, trying GBK...")
+                            stdout_decoded = proc.stdout.decode('gbk') 
+                        except UnicodeDecodeError:
+                            # print("DEBUG: GBK decode failed for stdout, trying latin-1...")
+                            stdout_decoded = proc.stdout.decode('latin-1', errors='replace')
+                if proc.stderr:
+                    try:
+                        stderr_decoded = proc.stderr.decode('utf-8')
+                    except UnicodeDecodeError:
+                        try:
+                            # print("DEBUG: UTF-8 decode failed for stderr, trying GBK...")
+                            stderr_decoded = proc.stderr.decode('gbk')
+                        except UnicodeDecodeError:
+                            # print("DEBUG: GBK decode failed for stderr, trying latin-1...")
+                            stderr_decoded = proc.stderr.decode('latin-1', errors='replace')
+                
+                # Mimic subprocess.CompletedProcess structure for consistent handling
+                class DecodedProcessResult:
+                    def __init__(self, stdout_text, stderr_text, return_code):
+                        self.stdout = stdout_text
+                        self.stderr = stderr_text
+                        self.returncode = return_code
+                
+                decoded_result = DecodedProcessResult(stdout_decoded, stderr_decoded, proc.returncode)
+                
+                if proc.returncode != 0:
+                    # print(f"DEBUG: Logs command failed with exit code {proc.returncode}. stderr: {stderr_decoded}")
+                    # Re-raise a CalledProcessError-like exception or return a failure indicator
+                    # For simplicity with current structure, we return False and the decoded result (which contains stderr)
+                    return False, decoded_result # Error message will be constructed by caller based on this
+
+                return True, decoded_result
+            else: # Original behavior for other commands
+                result = subprocess.run(
+                    full_cmd,
+                    capture_output=True,
+                    text=True,
+                    encoding='utf-8',
+                    errors='replace',
+                    timeout=timeout,
+                    check=True
+                )
+                return True, result
+        else: # Not capturing output
             result = subprocess.run(
                 full_cmd,
                 timeout=timeout,
@@ -192,6 +259,56 @@ def safe_pm2_command(cmd_args, timeout=30, capture_output=True):
         error_msg = f"命令执行异常: {str(e)}\n{traceback.format_exc()}"
         print(error_msg)
         return False, error_msg
+
+# 添加周期性更新PM2状态的函数
+def update_pm2_status_periodically():
+    """周期性查询PM2并更新全局状态字典"""
+    print(f"[{datetime.datetime.now()}] 后台任务：正在更新PM2状态...")
+    local_status = {}  # 先操作局部变量
+    
+    success, result = safe_pm2_command(['jlist'])  # 调用一次jlist
+    processes = []
+    if success:
+        output = result.stdout.strip() if result.stdout else ''
+        if output:
+            try:
+                processes = json.loads(output)
+                if not isinstance(processes, list):
+                    print(f"警告: PM2 jlist 输出不是预期的列表格式")
+                    processes = []
+            except json.JSONDecodeError as e:
+                print(f"警告: 解析PM2 jlist输出失败: {e}")
+                processes = []
+    else:
+        print(f"后台任务：执行pm2 jlist失败: {result}")
+        # 如果命令失败，保留原状态
+        return
+    
+    # 根据找到的进程计算状态
+    for key, script_path in scripts.items():
+        script_basename = os.path.basename(script_path)
+        is_online = any(
+            (script_path in proc.get('pm2_env', {}).get('pm_exec_path', '') or 
+             script_basename == proc.get('pm2_env', {}).get('name', ''))
+            and proc.get('pm2_env', {}).get('status', '') == "online"
+            for proc in processes
+        )
+        local_status[key] = is_online
+    
+    # 安全地更新全局字典
+    with status_lock:  # 获取锁
+        global prediction_status
+        prediction_status.update(local_status)  # 更新全局状态
+    
+    print(f"[{datetime.datetime.now()}] 后台任务：PM2状态已更新: {prediction_status}")
+
+# 初始化后台调度器
+scheduler = BackgroundScheduler(daemon=True)  # daemon=True确保主程序退出时调度器也退出
+# 每10秒运行一次更新函数 (可根据需要调整)
+scheduler.add_job(update_pm2_status_periodically, 'interval', seconds=10, id='pm2_status_updater')
+# 确保应用退出时关闭调度器
+import atexit
+atexit.register(lambda: scheduler.shutdown())
 
 def query_pm2_state(script_path):
     """
@@ -236,7 +353,7 @@ def record_task_history(task_type, action, status, details=None, user=None):
     """记录任务操作历史
     
     Args:
-        task_type: 任务类型 (ultra_short, short, medium)
+        task_type: 任务类型 (supershort, short, medium)
         action: 操作类型 (start, stop, delete, schedule, etc.)
         status: 操作状态 (success, failed)
         details: 操作详情，可选
@@ -266,43 +383,23 @@ def record_task_history(task_type, action, status, details=None, user=None):
 # 新建蓝图，所有接口的 URL 前缀为 /api
 autopredict_bp = Blueprint('autopredict', __name__)
 
+# 启动后台任务调度器
+# 应用启动时首先执行一次更新
+update_pm2_status_periodically()
+# 启动调度器
+scheduler.start()
+print(f"[{datetime.datetime.now()}] PM2状态监控后台任务已启动")
+
 # 获取预测任务状态，同时更新全局字典 prediction_status
 @autopredict_bp.route('/status', methods=['GET'])
 def get_status():
     try:
-        success, result = safe_pm2_command(['jlist'])
-        if not success:
-            # 如果PM2命令执行失败 (例如 PM2 未安装或服务未启动)
-            print(f"获取PM2状态失败，PM2命令执行出错: {result}")
-            # 返回当前默认状态，前端可能需要处理这种情况
-            return jsonify(prediction_status) 
-            
-        output = result.stdout.strip() if result.stdout else ''
+        # 使用线程锁安全地获取当前状态的副本
+        with status_lock:
+            current_status = prediction_status.copy()
         
-        processes = [] # 初始化为空列表
-        if output: # 仅在输出不为空时尝试解析
-            try:
-                processes = json.loads(output)
-                # 确保 processes 是一个列表
-                if not isinstance(processes, list):
-                    print(f"警告: PM2 jlist 输出不是预期的列表格式: {output}")
-                    processes = []
-            except json.JSONDecodeError as e:
-                # 如果解析失败，记录警告并视为空列表
-                print(f"警告: 解析 PM2 jlist 输出失败: {e}. 输出内容: '{output}'")
-                processes = []
-            
-        # 更新每个预测任务的状态
-        for key, script_path in scripts.items():
-            script_basename = os.path.basename(script_path)
-            prediction_status[key] = any(
-                (script_path in proc.get('pm2_env', {}).get('pm_exec_path', '') or 
-                 script_basename == proc.get('pm2_env', {}).get('name', ''))
-                and proc.get('pm2_env', {}).get('status', '') == "online"
-                for proc in processes
-            )
-            
-        return jsonify(prediction_status)
+        # 直接返回缓存的状态，不再每次请求都执行pm2 jlist
+        return jsonify(current_status)
     except Exception as e:
         error_msg = f"获取状态时出错: {str(e)}\n{traceback.format_exc()}"
         print(error_msg)
@@ -329,13 +426,12 @@ def start_prediction():
     
     # 先检查进程是否已经运行
     if query_pm2_state(script_path):
-        prediction_status[prediction_type] = True
+        with status_lock:  # 获取锁
+            prediction_status[prediction_type] = True
         record_task_history(prediction_type, 'start', 'success', f'进程已在运行中: {process_name}')
         return jsonify({'message': f'{prediction_type} 预测任务已经在运行', 'status': True})
     
-    # 正确的Python解释器路径
-    python_interpreter = '/opt/conda/envs/wind-power-env/bin/python'
-    
+    # 使用动态确定的Python解释器路径
     success, result = safe_pm2_command(['start', script_path, '--name', process_name, '--interpreter', python_interpreter])
     
     if success:
@@ -344,7 +440,8 @@ def start_prediction():
         if verify_success:
             # 再次检查进程状态
             if query_pm2_state(script_path):
-                prediction_status[prediction_type] = True
+                with status_lock:  # 获取锁
+                    prediction_status[prediction_type] = True
                 record_task_history(prediction_type, 'start', 'success', f'进程启动成功: {process_name}')
                 return jsonify({
                     'message': f'{prediction_type} 预测任务已启动',
@@ -381,78 +478,32 @@ def stop_prediction():
         return jsonify({'error': '无效的预测类型'}), 400
     
     try:
-        if prediction_type == 'ultra_short':
-            # 停止超短期预测的两个脚本
-            results = []
+        # 正常停止单个脚本
+        script_path = scripts[prediction_type]
+        script_name = os.path.basename(script_path)
+        
+        success, result = safe_pm2_command(['stop', script_name])
             
-            # 停止训练脚本
-            training_script = ultra_short_scripts['training']
-            training_name = os.path.basename(training_script)
-            training_success, training_result = safe_pm2_command(['stop', training_name])
-            
-            if training_success:
-                results.append(f'训练脚本({training_name})停止成功')
-            else:
-                results.append(f'训练脚本停止失败: {training_result}')
-            
-            # 停止预测脚本
-            prediction_script = ultra_short_scripts['prediction']
-            prediction_name = os.path.basename(prediction_script)
-            prediction_success, prediction_result = safe_pm2_command(['stop', prediction_name])
-            
-            if prediction_success:
-                results.append(f'预测脚本({prediction_name})停止成功')
-            else:
-                results.append(f'预测脚本停止失败: {prediction_result}')
-            
-            # 只要有一个成功停止，就更新状态
-            if training_success or prediction_success:
+        if success:
+            with status_lock:  # 获取锁
                 prediction_status[prediction_type] = False
-                # 更新全局状态
-                _update_prediction_status()
-                
-                message = ' & '.join(results)
-                record_task_history(prediction_type, 'stop', 'success', message)
-                
-                return jsonify({
-                    'message': '超短期预测任务已停止',
-                    'details': message
-                })
-            else:
-                # 两个都失败
-                error_msg = ' & '.join(results)
-                record_task_history(prediction_type, 'stop', 'failed', error_msg)
-                
-                return jsonify({
-                    'error': '停止超短期预测任务失败',
-                    'details': error_msg
-                }), 500
+            # 更新全局状态
+            _update_prediction_status()
+            
+            message = f'{script_name} 已停止'
+            record_task_history(prediction_type, 'stop', 'success', message)
+            
+            return jsonify({
+                'message': f'{prediction_type}预测任务已停止'
+            })
         else:
-            # 正常停止单个脚本
-            script_path = scripts[prediction_type]
-            script_name = os.path.basename(script_path)
+            error_msg = f'停止任务失败: {result}'
+            record_task_history(prediction_type, 'stop', 'failed', error_msg)
             
-            success, result = safe_pm2_command(['stop', script_name])
-            
-            if success:
-                prediction_status[prediction_type] = False
-                # 更新全局状态
-                _update_prediction_status()
-                
-                message = f'{script_name} 已停止'
-                record_task_history(prediction_type, 'stop', 'success', message)
-                
-                return jsonify({
-                    'message': f'{prediction_type}预测任务已停止'
-                })
-            else:
-                error_msg = f'停止任务失败: {result}'
-                record_task_history(prediction_type, 'stop', 'failed', error_msg)
-                
-                return jsonify({
-                    'error': '停止预测任务失败',
-                    'details': str(result)
-                }), 500
+            return jsonify({
+                'error': '停止预测任务失败',
+                'details': str(result)
+            }), 500
     except Exception as e:
         error_msg = f'停止预测任务异常: {str(e)}'
         record_task_history(prediction_type, 'stop', 'failed', error_msg)
@@ -490,15 +541,15 @@ def schedule_restart():
     if not stop_success:
         print(f"警告: 无法停止现有进程 {process_name}, 将尝试继续设置定时任务")
     
-    # 正确的Python解释器路径
-    python_interpreter = '/opt/conda/envs/wind-power-env/bin/python'
+    # 使用动态确定的Python解释器路径
     
     # 启动带定时重启的任务
     cron_expression = f'0 {time_obj.minute} {time_obj.hour} * * *'
     success, result = safe_pm2_command(['start', script_path, '--name', process_name, '--cron', cron_expression, '--interpreter', python_interpreter])
     
     if success:
-        prediction_status[prediction_type] = True
+        with status_lock:  # 获取锁
+            prediction_status[prediction_type] = True
         record_task_history(
             prediction_type, 
             'schedule', 
@@ -520,78 +571,31 @@ def delete_prediction():
         return jsonify({'error': '无效的预测类型'}), 400
     
     try:
-        if prediction_type == 'ultra_short':
-            # 删除超短期预测的两个脚本
-            results = []
-            
-            # 删除训练脚本
-            training_script = ultra_short_scripts['training']
-            training_name = os.path.basename(training_script)
-            training_success, training_result = safe_pm2_command(['delete', training_name])
-            
-            if training_success:
-                results.append(f'训练脚本({training_name})已从PM2删除')
-            else:
-                results.append(f'训练脚本删除失败: {training_result}')
-            
-            # 删除预测脚本
-            prediction_script = ultra_short_scripts['prediction']
-            prediction_name = os.path.basename(prediction_script)
-            prediction_success, prediction_result = safe_pm2_command(['delete', prediction_name])
-            
-            if prediction_success:
-                results.append(f'预测脚本({prediction_name})已从PM2删除')
-            else:
-                results.append(f'预测脚本删除失败: {prediction_result}')
-            
-            # 只要有一个成功删除，就更新状态
-            if training_success or prediction_success:
+        script_path = scripts[prediction_type]
+        script_name = os.path.basename(script_path)
+        
+        success, result = safe_pm2_command(['delete', script_name])
+        
+        if success:
+            with status_lock:  # 获取锁
                 prediction_status[prediction_type] = False
-                # 更新全局状态
-                _update_prediction_status()
-                
-                message = ' & '.join(results)
-                record_task_history(prediction_type, 'delete', 'success', message)
-                
-                return jsonify({
-                    'message': '超短期预测任务已从PM2删除',
-                    'details': message
-                })
-            else:
-                # 两个都失败
-                error_msg = ' & '.join(results)
-                record_task_history(prediction_type, 'delete', 'failed', error_msg)
-                
-                return jsonify({
-                    'error': '从PM2删除超短期预测任务失败',
-                    'details': error_msg
-                }), 500
+            # 更新全局状态
+            _update_prediction_status()
+            
+            message = f'{script_name} 已从PM2删除'
+            record_task_history(prediction_type, 'delete', 'success', message)
+            
+            return jsonify({
+                'message': f'{prediction_type}预测任务已从PM2删除'
+            })
         else:
-            # 正常删除单个脚本
-            script_path = scripts[prediction_type]
-            script_name = os.path.basename(script_path)
+            error_msg = f'删除任务失败: {result}'
+            record_task_history(prediction_type, 'delete', 'failed', error_msg)
             
-            success, result = safe_pm2_command(['delete', script_name])
-            
-            if success:
-                prediction_status[prediction_type] = False
-                # 更新全局状态
-                _update_prediction_status()
-                
-                message = f'{script_name} 已从PM2删除'
-                record_task_history(prediction_type, 'delete', 'success', message)
-                
-                return jsonify({
-                    'message': f'{prediction_type}预测任务已从PM2删除'
-                })
-            else:
-                error_msg = f'删除任务失败: {result}'
-                record_task_history(prediction_type, 'delete', 'failed', error_msg)
-                
-                return jsonify({
-                    'error': '从PM2删除预测任务失败',
-                    'details': str(result)
-                }), 500
+            return jsonify({
+                'error': '从PM2删除预测任务失败',
+                'details': str(result)
+            }), 500
     except Exception as e:
         error_msg = f'删除预测任务异常: {str(e)}'
         record_task_history(prediction_type, 'delete', 'failed', error_msg)
@@ -762,22 +766,22 @@ def get_logs():
             
             # 查找日志文件
             log_files = []
-            if log_type == 'train':
-                # 训练日志格式可能是 YYYYMMDD.log 或包含日期的其他格式
+            if prediction_type == 'supershort':
+                if log_type == 'train':
+                    # 超短期训练日志文件名格式: YYYYMMDD_train_supershort.log
+                    # date_str 来自前端，已经是 YYYYMMDD 格式
+                    log_files = glob.glob(os.path.join(log_dir, f"{date_str}_train_supershort.log"))
+                elif log_type == 'predict':
+                    # 超短期预测日志文件名格式: YYYYMMDD_predict_supershort.log
+                    # Logs are in an 'auto_predict' subdirectory
+                    log_files = glob.glob(os.path.join(log_dir, f"{date_str}_predict_supershort.log"))
+                # 'main' type for supershort is handled by PM2 logs section above
+            elif log_type == 'train': # For short and medium
+                # 训练日志格式可能是 YYYYMMDD.log 或包含日期的其他格式 (维持旧逻辑)
                 log_files = glob.glob(os.path.join(log_dir, f"{date_str}*.log"))
+                # For short/medium, also consider the _train_done.flag logic if needed for disambiguation
+                # The existing logic for train_flag_path for short/medium seems okay to keep as is.
                 train_flag_path = os.path.join(log_dir, f"{date_str}_train_done.flag")
-                
-                # 如果找不到日志但有完成标志文件，则尝试查找最近的可能相关日志
-                if not log_files and os.path.exists(train_flag_path):
-                    # 尝试用更宽松的模式查找日期相近的日志
-                    year_month = date_str[:6]  # 提取年月
-                    month_logs = glob.glob(os.path.join(log_dir, f"{year_month}*.log"))
-                    if month_logs:
-                        # 找到最接近但不超过所选日期的日志文件
-                        filtered_logs = [log for log in month_logs 
-                                        if os.path.basename(log).split('_')[0] <= date_str]
-                        if filtered_logs:
-                            log_files = [max(filtered_logs, key=lambda x: os.path.basename(x).split('_')[0])]
             elif log_type == 'predict':
                 # 预测日志格式
                 log_files = glob.glob(os.path.join(log_dir, f"{date_str}*.log"))
@@ -791,9 +795,9 @@ def get_logs():
                     else:
                         # 默认参数优化日
                         param_opt_day_map = {
-                            'ultra_short': 5,  # 周六
                             'short': 4,        # 周五
-                            'medium': 3        # 周四
+                            'medium': 3,       # 周四
+                            'supershort': 6    # 周日
                         }
                         param_opt_day = param_opt_day_map.get(prediction_type, 5)
                     
@@ -930,14 +934,22 @@ def _update_prediction_status():
             processes = json.loads(output)
             
         # 更新每个预测任务的状态
+        local_status = {}
         for key, script_path in scripts.items():
             script_basename = os.path.basename(script_path)
-            prediction_status[key] = any(
+            is_online = any(
                 (script_path in proc.get('pm2_env', {}).get('pm_exec_path', '') or 
                  script_basename == proc.get('pm2_env', {}).get('name', ''))
                 and proc.get('pm2_env', {}).get('status', '') == "online"
                 for proc in processes
             )
+            local_status[key] = is_online
+        
+        # 安全地更新全局字典
+        with status_lock:  # 获取锁
+            global prediction_status
+            prediction_status.update(local_status)
+        
         return True
     except Exception as e:
         error_msg = f"更新状态时出错: {str(e)}\n{traceback.format_exc()}"
@@ -1004,9 +1016,9 @@ def get_task_status():
     else:
         # 默认参数优化日
         param_opt_day_map = {
-            'ultra_short': 5,  # 周六
             'short': 4,        # 周五
-            'medium': 3        # 周四
+            'medium': 3,       # 周四
+            'supershort': 6    # 周日
         }
         param_opt_day = param_opt_day_map.get(prediction_type, 5)
     
@@ -1075,7 +1087,7 @@ def get_task_status():
             status['paramOptTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(param_flag_path)).strftime('%Y-%m-%d %H:%M:%S')
         
         # 检查预测任务状态
-        if prediction_type == 'ultra_short':
+        if prediction_type == 'supershort':
             # 超短期预测需要检查预测日志
             predict_log_dir = log_dirs[prediction_type]['predict']
             
@@ -1105,16 +1117,44 @@ def get_task_status():
                  latest_log = max(date_logs, key=os.path.getmtime)
                  status['predictionTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(latest_log)).strftime('%Y-%m-%d %H:%M:%S')
 
-
             # 只有当天才检查PM2进程状态，并用来判断是否 "运行中"
             if is_today:
-                 predict_script = ultra_short_scripts['prediction']
-                 predict_online = query_pm2_state(predict_script)
-                 # 如果PM2在线，且完成次数不足，则状态为运行中 (prediction=True, count < 96)
-                 # 如果PM2不在线，则状态依赖于完成次数
-                 if predict_online and status['predictionCount'] < 96:
-                     status['prediction'] = True # Mark as 'running'
+                predict_online = query_pm2_state(scripts[prediction_type])
+                if predict_online and status['predictionCount'] < 96:
+                    status['prediction'] = True # Mark as 'running'
+        elif prediction_type == 'supershort':
+            # 超短超期预测需要检查预测日志
+            predict_log_dir = log_dirs[prediction_type]['predict']
+            
+            # 查找指定日期的所有日志文件 (用于获取最新时间)
+            date_logs = glob.glob(os.path.join(predict_log_dir, f"{date_str}*.log"))
 
+            # 通过检查auto_predict目录下的flag文件来计算预测完成次数和状态
+            predict_flag_dir = os.path.join(log_dirs[prediction_type]['base'], 'auto_predict')
+            predict_done_flags = []
+            if os.path.exists(predict_flag_dir):
+                # 查找指定日期的所有预测完成标志文件
+                predict_done_flags = glob.glob(os.path.join(predict_flag_dir, f"predict_{date_str}*.flag"))
+                status['predictionCount'] = len(predict_done_flags)
+            else:
+                status['predictionCount'] = 0 # Default to 0 if flag dir doesn't exist
+
+            # 超短超期预测每15分钟一次，一天应该有96次
+            status['prediction'] = status['predictionCount'] >= 96
+
+            if status['predictionCount'] > 0:
+                # If any prediction was done, get the time of the latest flag
+                latest_flag = max(predict_done_flags, key=os.path.getmtime)
+                status['predictionTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(latest_flag)).strftime('%Y-%m-%d %H:%M:%S')
+            elif date_logs: # Fallback to log time if no flags but logs exist
+                latest_log = max(date_logs, key=os.path.getmtime)
+                status['predictionTime'] = datetime.datetime.fromtimestamp(os.path.getmtime(latest_log)).strftime('%Y-%m-%d %H:%M:%S')
+                
+            # 只有当天才检查PM2进程状态，并用来判断是否 "运行中"
+            if is_today:
+                predict_online = query_pm2_state(scripts[prediction_type])
+                if predict_online and status['predictionCount'] < 96:
+                    status['prediction'] = True # Mark as 'running'
         else: # short and medium
             # 短期和中期预测查找完成标志文件
             # predict_flag_dir = os.path.join(log_dirs[prediction_type]['base'], 'predictions') # 旧逻辑：错误的目录假设
@@ -1151,7 +1191,7 @@ def get_task_status():
                     if script_online:
                          status['prediction'] = True # 任务状态是存在的 (运行中)
                          # predictionCompleted 保持 False
-        
+
         # --- 添加调试日志 ---
         print(f"DEBUG: Final status for {prediction_type} on {date_str}: {status}")
         # --- 结束调试日志 ---
@@ -1159,68 +1199,4 @@ def get_task_status():
     except Exception as e:
         print(f"获取任务状态失败: {str(e)}")
         return jsonify({'error': '获取任务状态失败', 'details': str(e)}), 500
-
-# 添加启动超短期预测的特殊接口
-@autopredict_bp.route('/start_ultra', methods=['POST'])
-def start_ultra_short():
-    try:
-        data = request.json
-        options = data.get('options', {})
-        
-        # 检查选项
-        start_training = options.get('training', True)
-        start_prediction = options.get('prediction', True)
-        
-        if not start_training and not start_prediction:
-            return jsonify({'error': '至少需要选择一个脚本启动'}), 400
-        
-        results = []
-        
-        # 正确的Python解释器路径
-        python_interpreter = '/opt/conda/envs/wind-power-env/bin/python'
-        
-        # 启动训练脚本
-        if start_training:
-            training_script = ultra_short_scripts['training']
-            success, result = safe_pm2_command([
-                'start', 
-                training_script, 
-                '--name', os.path.basename(training_script),
-                '--interpreter', python_interpreter
-            ])
-            
-            if success:
-                results.append('训练脚本启动成功')
-                prediction_status['ultra_short'] = True
-            else:
-                results.append(f'训练脚本启动失败: {result}')
-        
-        # 启动预测脚本
-        if start_prediction:
-            prediction_script = ultra_short_scripts['prediction']
-            success, result = safe_pm2_command([
-                'start', 
-                prediction_script, 
-                '--name', os.path.basename(prediction_script),
-                '--interpreter', python_interpreter
-            ])
-            
-            if success:
-                results.append('预测脚本启动成功')
-                prediction_status['ultra_short'] = True
-            else:
-                results.append(f'预测脚本启动失败: {result}')
-        
-        # 记录操作历史
-        message = ' '.join(results)
-        record_task_history('ultra_short', 'start', 'success', message)
-        
-        return jsonify({
-            'message': '超短期预测任务启动成功',
-            'details': message
-        })
-    except Exception as e:
-        error_msg = f'启动超短期预测失败: {str(e)}'
-        record_task_history('ultra_short', 'start', 'failed', error_msg)
-        return jsonify({'error': error_msg}), 500
 

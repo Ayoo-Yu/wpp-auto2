@@ -10,12 +10,15 @@ from database_config import Base, engine, minio_client
 from config import Config, MINIO_CONFIG
 from s3_error import S3Error
 from db_models import Dataset
-from datetime import datetime
+from datetime import datetime,timedelta
 from services.file_service import allowed_file, save_uploaded_file
 import os
 from db_session import db_session
 from connection_middleware import register_middleware
 from sqlalchemy import text
+# 导入JWT扩展
+from flask_jwt_extended import JWTManager
+
 # 加载环境变量
 load_dotenv()
 
@@ -43,7 +46,7 @@ if not is_running_in_docker():
     if not os.environ.get('MINIO_ENDPOINT'):
         os.environ['MINIO_ENDPOINT'] = 'localhost'
     if not os.environ.get('MINIO_PORT'):
-        os.environ['MINIO_PORT'] = '9000'
+        os.environ['MINIO_PORT'] = '9900'
 
 from logging_config import configure_logging
 # 导入会话管理模块和连接中间件
@@ -52,6 +55,15 @@ from connection_middleware import register_middleware
 
 app = Flask(__name__, static_folder='./static')
 app.config.from_object(Config)
+
+# --- JWT配置 ---
+# 设置JWT密钥，优先从环境变量获取
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "wind-power-forecast-secret-key")
+# 设置令牌过期时间（12小时）
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=12)
+# 初始化JWTManager
+jwt = JWTManager(app)
+# --- JWT配置结束 ---
 
 # 配置 CORS，允许所有跨域请求
 CORS(app, resources={r"/*": {
@@ -85,6 +97,8 @@ from routes.power_compare import bp as power_compare_bp
 from routes.auth import auth_bp  # 导入认证蓝图
 from routes.user import user_bp  # 导入用户路由蓝图
 from routes.example_route import example_bp  # 导入示例路由
+# 新增：导入特征上传蓝图
+from routes.feature_upload import feature_upload_bp
 
 # app.register_blueprint(upload_bp, url_prefix='/')
 app.register_blueprint(modeltrain_bp, url_prefix='/')
@@ -99,6 +113,21 @@ app.register_blueprint(power_compare_bp)
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(user_bp, url_prefix='/api/user')  # 注册用户路由蓝图，使用 /api/user 前缀
 app.register_blueprint(example_bp, url_prefix='/api/example')  # 注册示例路由
+# 新增：注册特征上传蓝图
+app.register_blueprint(feature_upload_bp)
+
+# 添加JWT错误处理
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return jsonify({"message": "令牌已过期，请重新登录"}), 401
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return jsonify({"message": "无效的令牌"}), 401
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    return jsonify({"message": "缺少认证令牌"}), 401
 
 # 添加健康检查端点
 @app.route('/health', methods=['GET'])
@@ -489,7 +518,7 @@ def upload_scaler():
     
 @app.errorhandler(413)
 def request_entity_too_large(error):
-    return jsonify({'error': 'File too large (max 200MB)'}), 413
+    return jsonify({'error': 'File too large (max 500MB)'}), 413
 
 @socketio.on('connect')
 def handle_connect():

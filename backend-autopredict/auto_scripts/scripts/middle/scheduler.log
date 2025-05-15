@@ -23,3 +23,1422 @@
 2025-03-22 12:47:02,754 - 检测到20250322的预测已经执行过 (标志文件: ./logs/auto_pre_train\20250322_predict_done.flag)
 2025-03-22 12:47:32,756 - 检测到20250322的训练已经执行过 (标志文件: ./logs/auto_pre_train\20250322_train_done.flag)
 2025-03-22 12:47:32,758 - 检测到20250322的预测已经执行过 (标志文件: ./logs/auto_pre_train\20250322_predict_done.flag)
+2025-04-28 01:23:23,105 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 01:23:23,105 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 01:23:23,105 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 01:23:23,105 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 01:23:23,105 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 01:23:23,105 - 当前时间: 2025-04-28 01:23:23, 星期: 周一
+2025-04-28 01:23:23,106 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 10:18:44,026 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:18:44,026 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 10:18:44,026 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 10:18:44,027 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 10:18:44,027 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 10:18:44,027 - 当前时间: 2025-04-28 10:18:44, 星期: 周一
+2025-04-28 10:18:44,027 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 10:18:44,027 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:18:44,027 - 执行 auto_pre_train.py
+2025-04-28 10:18:44,027 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:18:44,027 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:18:47,477 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:18:47,478 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:18:47,478 - 命令执行失败，返回码: 1
+2025-04-28 10:18:47,478 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:19:17,485 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:19:17,485 - 执行 auto_pre_train.py
+2025-04-28 10:19:17,485 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:19:17,485 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:19:20,807 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:19:20,807 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:19:20,807 - 命令执行失败，返回码: 1
+2025-04-28 10:19:20,807 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:19:50,815 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:19:50,817 - 执行 auto_pre_train.py
+2025-04-28 10:19:50,817 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:19:50,817 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:19:54,242 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:19:54,242 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:19:54,242 - 命令执行失败，返回码: 1
+2025-04-28 10:19:54,242 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:20:24,244 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:20:24,244 - 执行 auto_pre_train.py
+2025-04-28 10:20:24,244 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:20:24,244 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:20:27,740 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:20:27,740 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:20:27,740 - 命令执行失败，返回码: 1
+2025-04-28 10:20:27,740 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:20:57,756 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:20:57,756 - 执行 auto_pre_train.py
+2025-04-28 10:20:57,756 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:20:57,756 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:21:01,074 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:21:01,074 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:21:01,074 - 命令执行失败，返回码: 1
+2025-04-28 10:21:01,074 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:21:31,075 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:21:31,075 - 执行 auto_pre_train.py
+2025-04-28 10:21:31,075 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:21:31,076 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:21:34,608 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:21:34,608 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:21:34,608 - 命令执行失败，返回码: 1
+2025-04-28 10:21:34,608 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:22:04,616 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:22:04,616 - 执行 auto_pre_train.py
+2025-04-28 10:22:04,616 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:22:04,616 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:22:08,052 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:22:08,052 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:22:08,052 - 命令执行失败，返回码: 1
+2025-04-28 10:22:08,052 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:22:38,060 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:22:38,060 - 执行 auto_pre_train.py
+2025-04-28 10:22:38,061 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:22:38,061 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:22:41,450 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:22:41,450 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:22:41,450 - 命令执行失败，返回码: 1
+2025-04-28 10:22:41,450 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:23:11,451 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:23:11,451 - 执行 auto_pre_train.py
+2025-04-28 10:23:11,451 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:23:11,451 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:23:14,890 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:23:14,890 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:23:14,890 - 命令执行失败，返回码: 1
+2025-04-28 10:23:14,890 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:23:44,892 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:23:44,892 - 执行 auto_pre_train.py
+2025-04-28 10:23:44,892 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:23:44,892 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:23:48,246 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:23:48,246 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:23:48,246 - 命令执行失败，返回码: 1
+2025-04-28 10:23:48,246 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:24:18,247 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:24:18,247 - 执行 auto_pre_train.py
+2025-04-28 10:24:18,247 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:24:18,247 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:24:21,613 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:24:21,614 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:24:21,614 - 命令执行失败，返回码: 1
+2025-04-28 10:24:21,614 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:24:51,628 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:24:51,628 - 执行 auto_pre_train.py
+2025-04-28 10:24:51,628 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:24:51,628 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:24:54,999 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:24:54,999 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:24:54,999 - 命令执行失败，返回码: 1
+2025-04-28 10:24:54,999 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:25:25,013 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:25:25,013 - 执行 auto_pre_train.py
+2025-04-28 10:25:25,013 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:25:25,013 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:25:28,396 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:25:28,396 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:25:28,396 - 命令执行失败，返回码: 1
+2025-04-28 10:25:28,396 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:25:58,412 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:25:58,412 - 执行 auto_pre_train.py
+2025-04-28 10:25:58,413 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:25:58,413 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:26:01,943 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend\auto_scripts\models\middlemodel
+
+
+2025-04-28 10:26:01,943 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+ImportError: cannot import name 'predict' from 'predict' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 10:26:01,943 - 命令执行失败，返回码: 1
+2025-04-28 10:26:01,943 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 10:26:31,948 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:26:31,948 - 执行 auto_pre_train.py
+2025-04-28 10:26:31,948 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:26:31,948 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:31:05,850 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:31:05,850 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 10:31:05,850 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 10:31:05,851 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 10:31:05,851 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 10:31:05,851 - 当前时间: 2025-04-28 10:31:05, 星期: 周一
+2025-04-28 10:31:05,851 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 10:31:05,852 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:31:05,852 - 执行 auto_pre_train.py
+2025-04-28 10:31:05,852 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:31:05,852 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:36:31,457 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:36:31,458 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 10:36:31,458 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 10:36:31,458 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 10:36:31,458 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 10:36:31,458 - 当前时间: 2025-04-28 10:36:31, 星期: 周一
+2025-04-28 10:36:31,458 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 10:36:31,458 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:36:31,458 - 执行 auto_pre_train.py
+2025-04-28 10:36:31,458 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:36:31,458 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:42:28,667 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:42:28,667 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 10:42:28,667 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 10:42:28,667 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 10:42:28,667 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 10:42:28,667 - 当前时间: 2025-04-28 10:42:28, 星期: 周一
+2025-04-28 10:42:28,668 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 10:42:28,668 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:42:28,668 - 执行 auto_pre_train.py
+2025-04-28 10:42:28,668 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:42:28,668 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:51:27,833 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:51:27,833 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 10:51:27,833 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 10:51:27,833 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 10:51:27,833 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 10:51:27,833 - 当前时间: 2025-04-28 10:51:27, 星期: 周一
+2025-04-28 10:51:27,833 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 10:51:27,834 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:51:27,834 - 执行 auto_pre_train.py
+2025-04-28 10:51:27,834 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:51:27,834 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:58:30,719 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:58:30,720 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 10:58:30,720 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 10:58:30,720 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 10:58:30,720 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 10:58:30,720 - 当前时间: 2025-04-28 10:58:30, 星期: 周一
+2025-04-28 10:58:30,720 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 10:58:30,720 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:58:30,721 - 执行 auto_pre_train.py
+2025-04-28 10:58:30,721 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:58:30,721 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:59:19,688 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:59:19,688 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 10:59:19,688 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 10:59:19,689 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 10:59:19,689 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 10:59:19,689 - 当前时间: 2025-04-28 10:59:19, 星期: 周一
+2025-04-28 10:59:19,689 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 10:59:19,689 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 10:59:19,689 - 执行 auto_pre_train.py
+2025-04-28 10:59:19,689 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 10:59:19,689 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 11:03:10,338 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 11:03:10,338 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 11:03:10,338 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 11:03:10,338 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 11:03:10,338 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 11:03:10,338 - 当前时间: 2025-04-28 11:03:10, 星期: 周一
+2025-04-28 11:03:10,338 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 11:03:10,339 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 11:03:10,339 - 执行 auto_pre_train.py
+2025-04-28 11:03:10,339 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 11:03:10,339 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 11:36:57,201 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 11:36:57,201 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 11:36:57,202 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 11:36:57,202 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 11:36:57,202 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 11:36:57,202 - 当前时间: 2025-04-28 11:36:57, 星期: 周一
+2025-04-28 11:36:57,202 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 11:36:57,202 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 11:36:57,202 - 执行 auto_pre_train.py
+2025-04-28 11:36:57,202 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 11:36:57,202 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:02:21,454 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:02:21,454 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 12:02:21,454 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 12:02:21,454 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 12:02:21,454 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 12:02:21,454 - 当前时间: 2025-04-28 12:02:21, 星期: 周一
+2025-04-28 12:02:21,454 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 12:02:21,455 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 12:02:21,455 - 执行 auto_pre_train.py
+2025-04-28 12:02:21,455 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:02:21,455 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:03:33,070 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:03:33,070 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 12:03:33,070 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 12:03:33,070 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 12:03:33,070 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 12:03:33,071 - 当前时间: 2025-04-28 12:03:33, 星期: 周一
+2025-04-28 12:03:33,071 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 12:03:33,071 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 12:03:33,072 - 执行 auto_pre_train.py
+2025-04-28 12:03:33,072 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:03:33,072 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:10:15,056 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:10:15,057 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 12:10:15,057 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 12:10:15,057 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 12:10:15,057 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 12:10:15,057 - 当前时间: 2025-04-28 12:10:15, 星期: 周一
+2025-04-28 12:10:15,057 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 12:10:15,057 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 12:10:15,057 - 执行 auto_pre_train.py
+2025-04-28 12:10:15,057 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:10:15,057 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:23:39,735 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:23:39,735 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 12:23:39,735 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 12:23:39,735 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 12:23:39,735 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 12:23:39,735 - 当前时间: 2025-04-28 12:23:39, 星期: 周一
+2025-04-28 12:23:39,735 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 12:23:39,736 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 12:23:39,736 - 执行 auto_pre_train.py
+2025-04-28 12:23:39,736 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:23:39,736 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:34:19,646 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:34:19,646 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 12:34:19,646 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 12:34:19,646 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 12:34:19,646 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 12:34:19,646 - 当前时间: 2025-04-28 12:34:19, 星期: 周一
+2025-04-28 12:34:19,646 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 12:34:19,647 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 12:34:19,647 - 执行 auto_pre_train.py
+2025-04-28 12:34:19,647 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:34:19,647 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:57:19,668 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:57:19,668 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 12:57:19,668 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 12:57:19,668 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 12:57:19,668 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 12:57:19,668 - 当前时间: 2025-04-28 12:57:19, 星期: 周一
+2025-04-28 12:57:19,668 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 12:57:19,668 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 12:57:19,669 - 执行 auto_pre_train.py
+2025-04-28 12:57:19,669 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 12:57:19,669 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 13:27:17,608 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 13:27:17,608 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 13:27:17,608 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 13:27:17,608 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 13:27:17,608 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 13:27:17,608 - 当前时间: 2025-04-28 13:27:17, 星期: 周一
+2025-04-28 13:27:17,609 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 13:27:17,609 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 13:27:17,609 - 执行 auto_pre_train.py
+2025-04-28 13:27:17,609 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 13:27:17,609 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 13:34:34,861 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 13:34:34,861 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 13:34:34,861 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 13:34:34,861 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 13:34:34,862 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 13:34:34,862 - 当前时间: 2025-04-28 13:34:34, 星期: 周一
+2025-04-28 13:34:34,862 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 13:34:34,862 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 13:34:34,862 - 执行 auto_pre_train.py
+2025-04-28 13:34:34,862 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 13:34:34,862 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 13:39:19,550 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 13:39:19,551 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 13:39:19,551 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 13:39:19,551 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 13:39:19,551 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 13:39:19,551 - 当前时间: 2025-04-28 13:39:19, 星期: 周一
+2025-04-28 13:39:19,551 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 13:39:19,551 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 13:39:19,551 - 执行 auto_pre_train.py
+2025-04-28 13:39:19,551 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 13:39:19,551 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 13:53:43,891 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 13:53:43,891 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 13:53:43,891 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 13:53:43,891 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 13:53:43,892 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 13:53:43,892 - 当前时间: 2025-04-28 13:53:43, 星期: 周一
+2025-04-28 13:53:43,892 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 13:53:43,892 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 13:53:43,892 - 执行 auto_pre_train.py
+2025-04-28 13:53:43,892 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 13:53:43,892 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:08:56,785 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:08:56,785 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 14:08:56,785 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 14:08:56,785 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 14:08:56,785 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 14:08:56,785 - 当前时间: 2025-04-28 14:08:56, 星期: 周一
+2025-04-28 14:08:56,785 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 14:08:56,786 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 14:08:56,786 - 执行 auto_pre_train.py
+2025-04-28 14:08:56,786 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:08:56,786 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:09:38,700 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:09:38,700 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 14:09:38,700 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 14:09:38,700 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 14:09:38,700 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 14:09:38,700 - 当前时间: 2025-04-28 14:09:38, 星期: 周一
+2025-04-28 14:09:38,700 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 14:09:38,700 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 14:09:38,701 - 执行 auto_pre_train.py
+2025-04-28 14:09:38,701 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:09:38,701 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:26:58,597 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:26:58,597 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 14:26:58,597 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 14:26:58,597 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 14:26:58,598 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 14:26:58,598 - 当前时间: 2025-04-28 14:26:58, 星期: 周一
+2025-04-28 14:26:58,598 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 14:26:58,598 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 14:26:58,598 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 14:26:58,598 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 14:26:58,598 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 14:26:58,598 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 14:26:58,598 - 执行 auto_pre_train.py
+2025-04-28 14:26:58,598 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:26:58,598 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:27:30,880 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:27:30,880 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 14:27:30,880 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 14:27:30,880 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 14:27:30,880 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 14:27:30,880 - 当前时间: 2025-04-28 14:27:30, 星期: 周一
+2025-04-28 14:27:30,880 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 14:27:30,880 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 14:27:30,881 - 执行 auto_pre_train.py
+2025-04-28 14:27:30,881 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:27:30,881 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:32:54,163 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:32:54,163 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 14:32:54,163 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 14:32:54,163 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 14:32:54,163 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 14:32:54,163 - 当前时间: 2025-04-28 14:32:54, 星期: 周一
+2025-04-28 14:32:54,163 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 14:32:54,164 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 14:32:54,164 - 执行 auto_pre_train.py
+2025-04-28 14:32:54,164 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:32:54,164 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:32:54,165 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:32:54,166 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 14:32:54,166 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 14:32:54,166 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 14:32:54,166 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 14:32:54,166 - 当前时间: 2025-04-28 14:32:54, 星期: 周一
+2025-04-28 14:32:54,166 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 14:32:54,166 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 14:32:54,166 - 执行 auto_pre_train.py
+2025-04-28 14:32:54,166 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:32:54,166 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:34:46,741 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:34:46,741 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 14:34:46,741 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 14:34:46,752 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 14:34:46,752 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 14:34:46,752 - 当前时间: 2025-04-28 14:34:46, 星期: 周一
+2025-04-28 14:34:46,752 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 14:34:46,753 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 14:34:46,753 - 执行 auto_pre_train.py
+2025-04-28 14:34:46,753 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:34:46,753 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:42:52,172 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:42:52,172 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 14:42:52,172 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 14:42:52,172 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 14:42:52,173 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 14:42:52,173 - 当前时间: 2025-04-28 14:42:52, 星期: 周一
+2025-04-28 14:42:52,173 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 14:42:52,173 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 14:42:52,173 - 执行 auto_pre_train.py
+2025-04-28 14:42:52,173 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:42:52,173 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:50:50,170 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:50:50,170 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 14:50:50,170 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 14:50:50,171 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 14:50:50,171 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 14:50:50,171 - 当前时间: 2025-04-28 14:50:50, 星期: 周一
+2025-04-28 14:50:50,171 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 14:50:50,171 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 14:50:50,172 - 执行 auto_pre_train.py
+2025-04-28 14:50:50,172 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 14:50:50,172 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 15:06:09,509 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 15:06:09,510 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 15:06:09,510 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 15:06:09,510 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 15:06:09,510 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 15:06:09,510 - 当前时间: 2025-04-28 15:06:09, 星期: 周一
+2025-04-28 15:06:09,510 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 15:06:09,510 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 15:06:09,510 - 执行 auto_pre_train.py
+2025-04-28 15:06:09,510 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 15:06:09,510 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 15:23:38,110 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 15:23:38,110 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 15:23:38,110 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 15:23:38,110 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 15:23:38,110 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 15:23:38,110 - 当前时间: 2025-04-28 15:23:38, 星期: 周一
+2025-04-28 15:23:38,110 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 15:23:38,111 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 15:23:38,111 - 执行 auto_pre_train.py
+2025-04-28 15:23:38,111 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 15:23:38,111 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 15:57:14,838 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 15:57:14,838 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 15:57:14,838 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 15:57:14,838 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 15:57:14,839 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 15:57:14,839 - 当前时间: 2025-04-28 15:57:14, 星期: 周一
+2025-04-28 15:57:14,839 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 15:57:14,839 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 15:57:14,839 - 执行 auto_pre_train.py
+2025-04-28 15:57:14,839 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 15:57:14,839 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:06:58,375 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:06:58,375 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 16:06:58,375 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 16:06:58,375 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 16:06:58,375 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 16:06:58,375 - 当前时间: 2025-04-28 16:06:58, 星期: 周一
+2025-04-28 16:06:58,375 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 16:06:58,375 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 16:06:58,376 - 执行 auto_pre_train.py
+2025-04-28 16:06:58,376 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:06:58,376 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:18:31,150 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:18:31,151 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 16:18:31,151 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 16:18:31,151 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 16:18:31,151 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 16:18:31,151 - 当前时间: 2025-04-28 16:18:31, 星期: 周一
+2025-04-28 16:18:31,152 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:18:31,152 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 16:18:31,152 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:18:31,153 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 16:18:31,153 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:18:31,153 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 16:18:31,153 - 执行 auto_pre_train.py
+2025-04-28 16:18:31,153 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:18:31,153 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:23:16,946 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:23:16,946 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 16:23:16,946 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 16:23:16,946 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 16:23:16,946 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 16:23:16,946 - 当前时间: 2025-04-28 16:23:16, 星期: 周一
+2025-04-28 16:23:16,947 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:23:16,947 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 16:23:16,947 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:23:16,947 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 16:23:16,947 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:23:16,947 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 16:23:16,947 - 执行 auto_pre_train.py
+2025-04-28 16:23:16,947 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:23:16,947 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:39:11,222 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:39:11,222 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 16:39:11,222 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 16:39:11,222 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 16:39:11,222 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 16:39:11,222 - 当前时间: 2025-04-28 16:39:11, 星期: 周一
+2025-04-28 16:39:11,223 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:39:11,223 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 16:39:11,223 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:39:11,223 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 16:39:11,223 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:39:11,223 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 16:39:11,223 - 执行 auto_pre_train.py
+2025-04-28 16:39:11,223 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:39:11,223 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:39:14,244 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\models\middlemodel
+
+
+2025-04-28 16:39:14,244 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py", line 15, in <module>
+    from config import LAGS, OUTPUT_DIR_PRE, Today, FEATURE_IMPORTANCE_DIR
+ImportError: cannot import name 'FEATURE_IMPORTANCE_DIR' from 'config' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\config.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 16:39:14,244 - 命令执行失败，返回码: 1
+2025-04-28 16:39:14,244 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 16:39:44,250 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:39:44,250 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 16:39:44,250 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:39:44,250 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 16:39:44,251 - 执行 auto_pre_train.py
+2025-04-28 16:39:44,251 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:39:44,251 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:39:47,169 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\models\middlemodel
+
+
+2025-04-28 16:39:47,169 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py", line 15, in <module>
+    from config import LAGS, OUTPUT_DIR_PRE, Today, FEATURE_IMPORTANCE_DIR
+ImportError: cannot import name 'FEATURE_IMPORTANCE_DIR' from 'config' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\config.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 16:39:47,169 - 命令执行失败，返回码: 1
+2025-04-28 16:39:47,169 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 16:40:33,548 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:40:33,548 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 16:40:33,548 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 16:40:33,548 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 16:40:33,548 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 16:40:33,548 - 当前时间: 2025-04-28 16:40:33, 星期: 周一
+2025-04-28 16:40:33,549 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:40:33,549 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 16:40:33,549 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:40:33,549 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 16:40:33,549 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:40:33,549 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 16:40:33,549 - 执行 auto_pre_train.py
+2025-04-28 16:40:33,549 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:40:33,549 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:40:36,444 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\models\middlemodel
+
+
+2025-04-28 16:40:36,444 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py", line 15, in <module>
+    from config import LAGS, OUTPUT_DIR_PRE, Today, FEATURE_IMPORTANCE_DIR
+ImportError: cannot import name 'FEATURE_IMPORTANCE_DIR' from 'config' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\config.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 16:40:36,444 - 命令执行失败，返回码: 1
+2025-04-28 16:40:36,444 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 16:41:25,039 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:41:25,039 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 16:41:25,039 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 16:41:25,039 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 16:41:25,039 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 16:41:25,039 - 当前时间: 2025-04-28 16:41:25, 星期: 周一
+2025-04-28 16:41:25,039 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:41:25,039 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 16:41:25,039 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:41:25,039 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 16:41:25,039 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:41:25,040 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 16:41:25,040 - 执行 auto_pre_train.py
+2025-04-28 16:41:25,040 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:41:25,040 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:41:28,057 - 命令输出: BASE_DIR: D:\my-vue-project\wind-power-forecast
+OUTPUT_DIR_PRE: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\results\middleresult
+OUTPUT_DIR_TRAIN: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\train_predictions\middle_predictions
+PREC_SV_FOLDER: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\precsv\middlecsv
+DATASET_FOLDER: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\dataset\dataset_middle
+MODEL_FOLDER: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\models\middlemodel
+
+
+2025-04-28 16:41:28,057 - 命令错误: Traceback (most recent call last):
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py", line 12, in <module>
+    from predict import predict
+  File "D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\predict.py", line 15, in <module>
+    from config import LAGS, OUTPUT_DIR_PRE, Today, FEATURE_IMPORTANCE_DIR
+ImportError: cannot import name 'FEATURE_IMPORTANCE_DIR' from 'config' (D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\config.py)
+
+ERROR conda.cli.main_run:execute(125): `conda run python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py` failed. (See above for error)
+
+2025-04-28 16:41:28,057 - 命令执行失败，返回码: 1
+2025-04-28 16:41:28,057 - auto_pre_train.py 执行失败，退出码: 1
+2025-04-28 16:45:27,822 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:45:27,822 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 16:45:27,822 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 16:45:27,822 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 16:45:27,822 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 16:45:27,823 - 当前时间: 2025-04-28 16:45:27, 星期: 周一
+2025-04-28 16:45:27,823 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:45:27,823 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 16:45:27,823 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:45:27,823 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 16:45:27,823 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:45:27,823 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 16:45:27,823 - 执行 auto_pre_train.py
+2025-04-28 16:45:27,823 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:45:27,823 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:50:27,266 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:50:27,266 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 16:50:27,266 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 16:50:27,266 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 16:50:27,266 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 16:50:27,266 - 当前时间: 2025-04-28 16:50:27, 星期: 周一
+2025-04-28 16:50:27,267 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:50:27,267 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 16:50:27,267 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:50:27,267 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 16:50:27,267 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:50:27,267 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 16:50:27,267 - 执行 auto_pre_train.py
+2025-04-28 16:50:27,267 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:50:27,267 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:53:28,111 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:53:28,111 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 16:53:28,111 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 16:53:28,111 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 16:53:28,111 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 16:53:28,111 - 当前时间: 2025-04-28 16:53:28, 星期: 周一
+2025-04-28 16:53:28,112 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:53:28,112 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 16:53:28,112 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:53:28,112 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 16:53:28,112 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:53:28,112 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 16:53:28,112 - 执行 auto_pre_train.py
+2025-04-28 16:53:28,112 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:53:28,112 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:55:15,381 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:55:15,381 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 16:55:15,381 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 16:55:15,381 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 16:55:15,381 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 16:55:15,382 - 当前时间: 2025-04-28 16:55:15, 星期: 周一
+2025-04-28 16:55:15,382 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:55:15,382 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 16:55:15,382 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:55:15,382 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 16:55:15,382 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:55:15,382 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 16:55:15,382 - 执行 auto_pre_train.py
+2025-04-28 16:55:15,382 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:55:15,382 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:58:43,480 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:58:43,481 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 16:58:43,481 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 16:58:43,481 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 16:58:43,481 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 16:58:43,481 - 当前时间: 2025-04-28 16:58:43, 星期: 周一
+2025-04-28 16:58:43,482 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:58:43,482 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 16:58:43,482 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:58:43,482 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 16:58:43,482 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 16:58:43,482 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 16:58:43,483 - 执行 auto_pre_train.py
+2025-04-28 16:58:43,483 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 16:58:43,483 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 17:06:07,893 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 17:06:07,893 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 17:06:07,894 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 17:06:07,894 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 17:06:07,894 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 17:06:07,894 - 当前时间: 2025-04-28 17:06:07, 星期: 周一
+2025-04-28 17:06:07,894 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 17:06:07,894 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 17:06:07,894 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 17:06:07,894 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 17:06:07,894 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 17:06:07,895 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 17:06:07,895 - 执行 auto_pre_train.py
+2025-04-28 17:06:07,895 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 17:06:07,895 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 18:42:03,895 - 命令输出: If submitted, this report will be used by core maintainers to improve
+future releases of conda.
+Would you like conda to send this report to the core maintainers? [y/N]: 
+2025-04-28 18:42:03,900 - 命令错误: 
+# >>>>>>>>>>>>>>>>>>>>>> ERROR REPORT <<<<<<<<<<<<<<<<<<<<<<
+
+    Traceback (most recent call last):
+      File "D:\Anaconda\Lib\site-packages\conda\exception_handler.py", line 18, in __call__
+        return func(*args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^
+      File "D:\Anaconda\Lib\site-packages\conda\cli\main.py", line 61, in main_subshell
+        exit_code = do_call(args, parser)
+                    ^^^^^^^^^^^^^^^^^^^^^
+      File "D:\Anaconda\Lib\site-packages\conda\cli\conda_argparse.py", line 205, in do_call
+        result = getattr(module, func_name)(args, parser)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "D:\Anaconda\Lib\site-packages\conda\cli\main_run.py", line 118, in execute
+        print(response.stdout, file=sys.stdout)
+    UnicodeEncodeError: 'gbk' codec can't encode character '\ufffd' in position 695: illegal multibyte sequence
+
+`$ D:\Anaconda\Scripts\conda-script.py run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py`
+
+  environment variables:
+                 CIO_TEST=<not set>
+                CONDA_BAT=D:\Anaconda\condabin\conda.bat
+        CONDA_DEFAULT_ENV=D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+                CONDA_EXE=D:\Anaconda\Scripts\conda.exe
+               CONDA_EXES="D:\Anaconda\Scripts\conda.exe"
+             CONDA_PREFIX=D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+    CONDA_PROMPT_MODIFIER=(D:\my-vue-project\wind-power-forecast\backend\wind-power-env)
+         CONDA_PYTHON_EXE=D:\Anaconda\python.exe
+               CONDA_ROOT=D:\Anaconda
+              CONDA_SHLVL=1
+           CURL_CA_BUNDLE=<not set>
+                 HOMEPATH=\Users\Administrator
+               LD_PRELOAD=<not set>
+                     PATH=D:\my-vue-project\wind-power-forecast\backend\wind-power-env;D:\my-
+                          vue-project\wind-power-forecast\backend\wind-power-
+                          env\Library\mingw-w64\bin;D:\my-vue-project\wind-power-
+                          forecast\backend\wind-power-env\Library\usr\bin;D:\my-vue-
+                          project\wind-power-forecast\backend\wind-power-env\Library\bin;D:\my-
+                          vue-project\wind-power-forecast\backend\wind-power-env\Scripts;D:\my-
+                          vue-project\wind-power-forecast\backend\wind-power-
+                          env\bin;D:\Anaconda\condabin;C:\Program
+                          Files\Python312\Scripts;C:\Program Files\Python312;C:\WINDOWS\system32
+                          ;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerS
+                          hell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files (x86)\NVIDIA
+                          Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA
+                          NvDLISR;C:\Program Files\Microsoft SQL
+                          Server\150\Tools\Binn;C:\Program Files\dotnet;C:\Program
+                          Files\Git\cmd;C:\Program Files\nodejs;C:\Program Files\Docker\Docker\r
+                          esources\bin;D:\Anaconda\Scripts;C:\Users\Administrator\AppData\Roamin
+                          g\npm\node_modules\pm2\bin;C:\Users\Administrator\AppData\Local\Micros
+                          oft\WindowsApps;D:\java-
+                          11.0.1\bin;C:\Users\Administrator\AppData\Roaming\npm;C:\Users\Adminis
+                          trator\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Administr
+                          ator\AppData\Local\GitHubDesktop\bin;C:\Users\Administrator\AppData\Lo
+                          cal\Programs\cursor\resources\app\bin
+          PM_ERR_LOG_PATH=C:\Users\Administrator\.pm2\logs\scheduler-middle.py-error.log
+             PM_EXEC_PATH=D:\my-vue-project\wind-power-forecast\backend-
+                          autopredict\auto_scripts\scripts\middle\scheduler_middle.py
+          PM_OUT_LOG_PATH=C:\Users\Administrator\.pm2\logs\scheduler-middle.py-out.log
+              PM_PID_PATH=C:\Users\Administrator\.pm2\pids\scheduler-middle.py-0.pid
+             PSMODULEPATH=C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\Windows
+                          PowerShell\v1.0\Modules
+         PYTHONUNBUFFERED=1
+       REQUESTS_CA_BUNDLE=<not set>
+            SSL_CERT_FILE=D:\my-vue-project\wind-power-forecast\backend\wind-power-
+                          env\Library\ssl\cacert.pem
+
+     active environment : wind-power-env
+    active env location : D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+            shell level : 1
+       user config file : C:\Users\Administrator\.condarc
+ populated config files : C:\Users\Administrator\.condarc
+          conda version : 24.11.3
+    conda-build version : 24.1.2
+         python version : 3.11.7.final.0
+                 solver : libmamba (default)
+       virtual packages : __archspec=1=skylake
+                          __conda=24.11.3=0
+                          __cuda=12.4=0
+                          __win=0=0
+       base environment : D:\Anaconda  (read only)
+      conda av data dir : D:\Anaconda\etc\conda
+  conda av metadata url : None
+           channel URLs : https://repo.anaconda.com/pkgs/main/win-64
+                          https://repo.anaconda.com/pkgs/main/noarch
+                          https://repo.anaconda.com/pkgs/r/win-64
+                          https://repo.anaconda.com/pkgs/r/noarch
+                          https://repo.anaconda.com/pkgs/msys2/win-64
+                          https://repo.anaconda.com/pkgs/msys2/noarch
+          package cache : D:\Anaconda\pkgs
+                          C:\Users\Administrator\.conda\pkgs
+                          C:\Users\Administrator\AppData\Local\conda\conda\pkgs
+       envs directories : D:\my-vue-project\wind-power-forecast\backend
+                          C:\Users\Administrator\.conda\envs
+                          D:\Anaconda\envs
+                          C:\Users\Administrator\AppData\Local\conda\conda\envs
+               platform : win-64
+             user-agent : conda/24.11.3 requests/2.32.3 CPython/3.11.7 Windows/10 Windows/10.0.19045 solver/libmamba conda-libmamba-solver/24.1.0 libmambapy/1.5.6
+          administrator : False
+             netrc file : None
+           offline mode : False
+
+
+An unexpected error has occurred. Conda has prepared the above report.
+If you suspect this error is being caused by a malfunctioning plugin,
+consider using the --no-plugins option to turn off plugins.
+
+Example: conda --no-plugins install <package>
+
+Alternatively, you can set the CONDA_NO_PLUGINS environment variable on
+the command line to run the command without plugins enabled.
+
+Example: CONDA_NO_PLUGINS=true conda install <package>
+
+
+2025-04-28 18:42:03,901 - 命令执行失败，返回码: 1073807364
+2025-04-28 18:42:03,901 - auto_pre_train.py 执行失败，退出码: 1073807364
+2025-04-28 19:02:52,691 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:02:52,691 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 19:02:52,691 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 19:02:52,691 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 19:02:52,691 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 19:02:52,691 - 当前时间: 2025-04-28 19:02:52, 星期: 周一
+2025-04-28 19:02:52,691 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 19:02:52,692 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 19:02:52,692 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 19:02:52,692 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 19:02:52,692 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 19:02:52,692 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 19:02:52,692 - 执行 auto_pre_train.py
+2025-04-28 19:02:52,692 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:02:52,692 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:21:45,623 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:21:45,623 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 19:21:45,623 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 19:21:45,623 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 19:21:45,623 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 19:21:45,623 - 当前时间: 2025-04-28 19:21:45, 星期: 周一
+2025-04-28 19:21:45,623 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 19:21:45,624 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 19:21:45,624 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 19:21:45,624 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 19:21:45,625 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 19:21:45,625 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 19:21:45,625 - 执行 auto_pre_train.py
+2025-04-28 19:21:45,626 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:21:45,626 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:31:50,789 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:31:50,789 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 19:31:50,789 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 19:31:50,790 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 19:31:50,790 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 19:31:50,790 - 当前时间: 2025-04-28 19:31:50, 星期: 周一
+2025-04-28 19:31:50,790 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 19:31:50,790 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 19:31:50,791 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 19:31:50,791 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 19:31:50,791 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 19:31:50,791 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 19:31:50,791 - 执行 auto_pre_train.py
+2025-04-28 19:31:50,791 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:31:50,791 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:54:27,237 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:54:27,238 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 19:54:27,238 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 19:54:27,238 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 19:54:27,238 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 19:54:27,238 - 当前时间: 2025-04-28 19:54:27, 星期: 周一
+2025-04-28 19:54:27,238 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 19:54:27,238 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 19:54:27,238 - 执行 auto_pre_train.py
+2025-04-28 19:54:27,238 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:54:27,238 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:54:58,329 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:54:58,330 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 19:54:58,330 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 19:54:58,330 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 19:54:58,330 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 19:54:58,330 - 当前时间: 2025-04-28 19:54:58, 星期: 周一
+2025-04-28 19:54:58,330 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 19:54:58,330 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 19:54:58,330 - 执行 auto_pre_train.py
+2025-04-28 19:54:58,330 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:54:58,330 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:56:18,792 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:56:18,792 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 19:56:18,792 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 19:56:18,792 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 19:56:18,793 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 19:56:18,793 - 当前时间: 2025-04-28 19:56:18, 星期: 周一
+2025-04-28 19:56:18,793 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 19:56:18,793 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 19:56:18,793 - 执行 auto_pre_train.py
+2025-04-28 19:56:18,793 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 19:56:18,793 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 20:02:16,821 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 20:02:16,822 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 20:02:16,822 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 20:02:16,822 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 20:02:16,822 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 20:02:16,822 - 当前时间: 2025-04-28 20:02:16, 星期: 周一
+2025-04-28 20:02:16,822 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 20:02:16,822 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 20:02:16,822 - 执行 auto_pre_train.py
+2025-04-28 20:02:16,822 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 20:02:16,822 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:09:58,579 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:09:58,580 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 21:09:58,580 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 21:09:58,581 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 21:09:58,581 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 21:09:58,581 - 当前时间: 2025-04-28 21:09:58, 星期: 周一
+2025-04-28 21:09:58,581 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 21:09:58,581 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 21:09:58,581 - 执行 auto_pre_train.py
+2025-04-28 21:09:58,581 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:09:58,581 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:13:17,631 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:13:17,631 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 21:13:17,631 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 21:13:17,631 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 21:13:17,632 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 21:13:17,632 - 当前时间: 2025-04-28 21:13:17, 星期: 周一
+2025-04-28 21:13:17,632 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-28 21:13:17,632 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-28 21:13:17,632 - 执行 auto_pre_train.py
+2025-04-28 21:13:17,632 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:13:17,632 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:19:28,672 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:19:28,672 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 21:19:28,673 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 21:19:28,673 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 21:19:28,673 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 21:19:28,673 - 当前时间: 2025-04-28 21:19:28, 星期: 周一
+2025-04-28 21:19:28,673 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 21:19:28,673 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 21:19:28,673 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 21:19:28,673 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 21:19:28,673 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 21:19:28,673 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 21:19:28,673 - 执行 auto_pre_train.py
+2025-04-28 21:19:28,673 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:19:28,673 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:47:18,573 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:47:18,574 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 21:47:18,574 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 21:47:18,574 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 21:47:18,574 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 21:47:18,574 - 当前时间: 2025-04-28 21:47:18, 星期: 周一
+2025-04-28 21:47:18,574 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 21:47:18,575 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 21:47:18,575 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 21:47:18,575 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 21:47:18,575 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 21:47:18,575 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 21:47:18,575 - 执行 auto_pre_train.py
+2025-04-28 21:47:18,575 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:47:18,575 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:54:39,846 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:54:39,846 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 21:54:39,846 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 21:54:39,846 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 21:54:39,846 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 21:54:39,846 - 当前时间: 2025-04-28 21:54:39, 星期: 周一
+2025-04-28 21:54:39,847 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 21:54:39,847 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 21:54:39,847 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 21:54:39,847 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 21:54:39,847 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 21:54:39,847 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 21:54:39,847 - 执行 auto_pre_train.py
+2025-04-28 21:54:39,847 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 21:54:39,847 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 22:26:55,401 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 22:26:55,401 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 22:26:55,401 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 22:26:55,401 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 22:26:55,401 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 22:26:55,401 - 当前时间: 2025-04-28 22:26:55, 星期: 周一
+2025-04-28 22:26:55,401 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 22:26:55,406 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 22:26:55,406 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 22:26:55,406 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 22:26:55,406 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 22:26:55,406 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 22:26:55,406 - 执行 auto_pre_train.py
+2025-04-28 22:26:55,406 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 22:26:55,406 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 22:27:22,773 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 22:27:22,773 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 22:27:22,773 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 22:27:22,773 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 22:27:22,774 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 22:27:22,774 - 当前时间: 2025-04-28 22:27:22, 星期: 周一
+2025-04-28 22:27:22,774 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 22:27:22,774 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 22:27:22,774 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 22:27:22,774 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 22:27:22,774 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 22:27:22,774 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 22:27:22,774 - 执行 auto_pre_train.py
+2025-04-28 22:27:22,774 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 22:27:22,775 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 23:14:06,884 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 23:14:06,884 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 23:14:06,884 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 23:14:06,884 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 23:14:06,884 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 23:14:06,884 - 当前时间: 2025-04-28 23:14:06, 星期: 周一
+2025-04-28 23:14:06,884 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 23:14:06,885 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 23:14:06,885 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 23:14:06,885 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 23:14:06,885 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 23:14:06,885 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 23:14:06,885 - 执行 auto_pre_train.py
+2025-04-28 23:14:06,885 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 23:14:06,885 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 23:22:09,109 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 23:22:09,109 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 23:22:09,109 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 23:22:09,109 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 23:22:09,109 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 23:22:09,109 - 当前时间: 2025-04-28 23:22:09, 星期: 周一
+2025-04-28 23:22:09,110 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 23:22:09,110 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 23:22:09,110 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 23:22:09,111 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 23:22:09,111 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 23:22:09,112 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 23:22:09,112 - 执行 auto_pre_train.py
+2025-04-28 23:22:09,112 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 23:22:09,112 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 23:22:33,954 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 23:22:33,954 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 23:22:33,954 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 23:22:33,954 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 23:22:33,955 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 23:22:33,955 - 当前时间: 2025-04-28 23:22:33, 星期: 周一
+2025-04-28 23:22:33,955 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 23:22:33,956 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 23:22:33,956 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 23:22:33,956 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 23:22:33,956 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 23:22:33,956 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 23:22:33,956 - 执行 auto_pre_train.py
+2025-04-28 23:22:33,956 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 23:22:33,956 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 23:24:11,304 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 23:24:11,304 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-28 23:24:11,304 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-28 23:24:11,304 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-28 23:24:11,304 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-28 23:24:11,304 - 当前时间: 2025-04-28 23:24:11, 星期: 周一
+2025-04-28 23:24:11,305 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 23:24:11,305 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-28 23:24:11,305 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 23:24:11,305 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-28 23:24:11,305 - 检测到20250428的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250428_train_done.flag)
+2025-04-28 23:24:11,305 - 今天(20250428)的训练已执行，但预测尚未完成
+2025-04-28 23:24:11,305 - 执行 auto_pre_train.py
+2025-04-28 23:24:11,305 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-28 23:24:11,305 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 00:16:46,881 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 00:16:46,881 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-29 00:16:46,881 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-29 00:16:46,881 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-29 00:16:46,881 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-29 00:16:46,881 - 当前时间: 2025-04-29 00:16:46, 星期: 周二
+2025-04-29 00:16:46,881 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-29 00:18:48,064 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 00:18:48,064 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-29 00:18:48,064 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-29 00:18:48,064 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-29 00:18:48,064 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-29 00:18:48,064 - 当前时间: 2025-04-29 00:18:48, 星期: 周二
+2025-04-29 00:18:48,064 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 00:18:48,064 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-29 00:19:39,791 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 00:19:39,792 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-29 00:19:39,792 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-29 00:19:39,792 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-29 00:19:39,792 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-29 00:19:39,792 - 当前时间: 2025-04-29 00:19:39, 星期: 周二
+2025-04-29 00:19:39,792 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 00:19:39,793 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-29 00:19:39,793 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 00:19:39,793 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-29 00:19:39,793 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 00:19:39,793 - 今天(20250429)的训练已执行，但预测尚未完成
+2025-04-29 00:19:39,793 - 执行 auto_pre_train.py
+2025-04-29 00:19:39,793 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 00:19:39,793 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 00:20:39,596 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 00:20:39,596 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-29 00:20:39,596 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-29 00:20:39,596 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-29 00:20:39,596 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-29 00:20:39,596 - 当前时间: 2025-04-29 00:20:39, 星期: 周二
+2025-04-29 00:20:39,596 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 00:20:39,597 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-29 00:20:39,597 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 00:20:39,597 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-29 00:20:39,597 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 00:20:39,597 - 今天(20250429)的训练已执行，但预测尚未完成
+2025-04-29 00:20:39,597 - 执行 auto_pre_train.py
+2025-04-29 00:20:39,597 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 00:20:39,597 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:08:00,092 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:08:00,092 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-29 15:08:00,093 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-29 15:08:00,093 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-29 15:08:00,093 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-29 15:08:00,093 - 当前时间: 2025-04-29 15:08:00, 星期: 周二
+2025-04-29 15:08:00,093 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-29 15:08:00,093 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-29 15:08:00,093 - 执行 auto_pre_train.py
+2025-04-29 15:08:00,093 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:08:00,093 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:10:39,250 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:10:39,251 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-29 15:10:39,251 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-29 15:10:39,251 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-29 15:10:39,251 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-29 15:10:39,251 - 当前时间: 2025-04-29 15:10:39, 星期: 周二
+2025-04-29 15:10:39,251 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-29 15:10:39,251 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-29 15:10:39,251 - 执行 auto_pre_train.py
+2025-04-29 15:10:39,251 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:10:39,251 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:19:47,980 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:19:47,981 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-29 15:19:47,981 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-29 15:19:47,981 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-29 15:19:47,981 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-29 15:19:47,981 - 当前时间: 2025-04-29 15:19:47, 星期: 周二
+2025-04-29 15:19:47,981 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-29 15:19:47,981 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-29 15:19:47,981 - 执行 auto_pre_train.py
+2025-04-29 15:19:47,981 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:19:47,981 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:28:32,840 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:28:32,840 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-29 15:28:32,840 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-29 15:28:32,840 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-29 15:28:32,840 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-29 15:28:32,840 - 当前时间: 2025-04-29 15:28:32, 星期: 周二
+2025-04-29 15:28:32,840 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 15:28:32,841 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-29 15:28:32,841 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 15:28:32,841 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-29 15:28:32,842 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 15:28:32,842 - 今天(20250429)的训练已执行，但预测尚未完成
+2025-04-29 15:28:32,842 - 执行 auto_pre_train.py
+2025-04-29 15:28:32,842 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:28:32,842 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:41:43,883 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:41:43,884 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-29 15:41:43,884 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-29 15:41:43,884 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-29 15:41:43,884 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-29 15:41:43,884 - 当前时间: 2025-04-29 15:41:43, 星期: 周二
+2025-04-29 15:41:43,884 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-29 15:41:43,884 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-29 15:41:43,885 - 执行 auto_pre_train.py
+2025-04-29 15:41:43,885 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:41:43,885 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:50:01,248 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:50:01,248 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-29 15:50:01,248 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-29 15:50:01,248 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-29 15:50:01,248 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-29 15:50:01,248 - 当前时间: 2025-04-29 15:50:01, 星期: 周二
+2025-04-29 15:50:01,249 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 15:50:01,249 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-29 15:50:01,249 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 15:50:01,249 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-29 15:50:01,249 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 15:50:01,249 - 今天(20250429)的训练已执行，但预测尚未完成
+2025-04-29 15:50:01,253 - 执行 auto_pre_train.py
+2025-04-29 15:50:01,253 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 15:50:01,253 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 16:00:42,759 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 16:00:42,759 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-29 16:00:42,759 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-29 16:00:42,759 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-29 16:00:42,760 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-29 16:00:42,760 - 当前时间: 2025-04-29 16:00:42, 星期: 周二
+2025-04-29 16:00:42,760 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 16:00:42,760 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-29 16:00:42,760 - 当前时间: 2025-04-29 16:00:42, 星期: 周二
+2025-04-29 16:00:42,760 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 16:00:42,760 - 当前任务状态: 训练预测任务已执行=True, 参数优化任务已执行=False
+2025-04-29 16:00:42,760 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 16:00:42,760 - 检测到 2:00 预测未执行，立即补救运行 auto_pre_train.py
+2025-04-29 16:00:42,760 - 检测到20250429的训练已经执行过 (标志文件: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\logs\auto_pre_train\20250429_train_done.flag)
+2025-04-29 16:00:42,760 - 今天(20250429)的训练已执行，但预测尚未完成
+2025-04-29 16:00:42,761 - 执行 auto_pre_train.py
+2025-04-29 16:00:42,761 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-29 16:00:42,761 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-30 19:29:45,953 - auto_pre_train脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-30 19:29:45,953 - param_optimizer脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\param_optimizer.py
+2025-04-30 19:29:45,953 - 检测到 Windows 环境，使用当前激活的Conda环境: D:\my-vue-project\wind-power-forecast\backend\wind-power-env
+2025-04-30 19:29:45,953 - 将使用以下命令执行Python脚本: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python
+2025-04-30 19:29:45,953 - 定时任务启动成功，每周四 1:00 运行参数优化，每天 2:00 运行 auto_pre_train.py
+2025-04-30 19:29:45,953 - 当前时间: 2025-04-30 19:29:45, 星期: 周三
+2025-04-30 19:29:45,953 - 当前任务状态: 训练预测任务已执行=False, 参数优化任务已执行=False
+2025-04-30 19:29:45,953 - 检测到 2:00 训练和预测均未执行，立即补救运行 auto_pre_train.py
+2025-04-30 19:29:45,954 - 执行 auto_pre_train.py
+2025-04-30 19:29:45,954 - 使用脚本路径: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py
+2025-04-30 19:29:45,954 - 执行命令: conda run -p D:\my-vue-project\wind-power-forecast\backend\wind-power-env python D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\middle\auto_pre_train.py

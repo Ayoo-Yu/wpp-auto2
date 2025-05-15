@@ -8,6 +8,10 @@ from config import Config
 import os
 from connection_middleware import register_middleware
 from sqlalchemy import text
+# 导入JWT扩展
+from flask_jwt_extended import JWTManager
+from datetime import timedelta
+
 # 加载环境变量
 load_dotenv()
 
@@ -35,12 +39,21 @@ if not is_running_in_docker():
     if not os.environ.get('MINIO_ENDPOINT'):
         os.environ['MINIO_ENDPOINT'] = 'localhost'
     if not os.environ.get('MINIO_PORT'):
-        os.environ['MINIO_PORT'] = '9000'
+        os.environ['MINIO_PORT'] = '9900'
 
 from logging_config import configure_logging
 
 app = Flask(__name__, static_folder='./static')
 app.config.from_object(Config)
+
+# --- JWT配置 ---
+# 设置JWT密钥，与backend服务使用相同的密钥
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "wind-power-forecast-secret-key")
+# 设置与backend服务相同的令牌过期时间（12小时）
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=12)
+# 初始化JWTManager
+jwt = JWTManager(app)
+# --- JWT配置结束 ---
 
 # 配置 CORS，允许所有跨域请求
 CORS(app, resources={r"/*": {
@@ -67,6 +80,19 @@ from routes.auth import auth_bp  # 保留认证蓝图
 app.register_blueprint(autopredict_bp, url_prefix='/api')
 app.register_blueprint(autotask_bp, url_prefix='/')
 app.register_blueprint(auth_bp, url_prefix='/api/auth')  # 认证是必要的
+
+# 添加JWT错误处理
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return jsonify({"message": "令牌已过期，请重新登录"}), 401
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return jsonify({"message": "无效的令牌"}), 401
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    return jsonify({"message": "缺少认证令牌"}), 401
 
 # 添加健康检查路由
 @app.route('/health', methods=['GET'])

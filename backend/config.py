@@ -16,7 +16,7 @@ DB_NAME = os.environ.get('DB_NAME', 'windpower')
 
 # MinIO配置
 MINIO_ENDPOINT = os.environ.get('MINIO_ENDPOINT', 'minio')
-MINIO_PORT = os.environ.get('MINIO_PORT', '9000')
+MINIO_PORT = os.environ.get('MINIO_PORT', '9900')
 MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY', 'minioadmin')
 MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY', 'minioadmin')
 MINIO_SECURE = os.environ.get('MINIO_SECURE', 'False').lower() == 'true'
@@ -61,7 +61,7 @@ class Config:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
     DOWNLOAD_FOLDER = os.path.join(BASE_DIR, 'forecasts')
-    MAX_CONTENT_LENGTH = 200 * 1024 * 1024  # 200MB
+    MAX_CONTENT_LENGTH = 500 * 1024 * 1024  # 500MB
     ALLOWED_EXTENSIONS = {'csv', 'xlsx', 'xls', 'pkl', 'json', 'joblib', 'h5', 'hdf5', 'pb', 'pt', 'pth'}
 
     KINGBASE_CONFIG = {

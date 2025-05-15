@@ -3,7 +3,7 @@ from data_processor import load_data, preprocess_data, split_data, feature_engin
 from models import get_lightgbm_params
 from train import train_and_evaluate, save_predictions
 from utils import visualize_results
-from config import WINDOW_SIZE, TRAIN_RATIO, LAGS,OUTPUT_DIR_TRAIN,Today,PREC_SV_FOLDER,MODEL_FOLDER,OUTPUT_DIR_PRE
+from config_middle import WINDOW_SIZE, TRAIN_RATIO, LAGS,OUTPUT_DIR_TRAIN,Today,PREC_SV_FOLDER,MODEL_FOLDER,OUTPUT_DIR_PRE
 import os
 import time
 

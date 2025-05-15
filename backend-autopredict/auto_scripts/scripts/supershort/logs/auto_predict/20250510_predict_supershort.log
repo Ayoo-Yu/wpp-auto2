@@ -1,0 +1,166 @@
+2025-05-10 15:40:58,889 - INFO - predict_supershort.py:482 - Running predict_supershort.py directly...
+2025-05-10 15:40:58,889 - INFO - predict_supershort.py:258 - Starting prediction cycle at UTC: 2025-05-10 07:40:58
+2025-05-10 15:40:58,889 - INFO - predict_supershort.py:267 -   Current processing slot starts at: 2025-05-10 07:30
+2025-05-10 15:40:58,889 - INFO - predict_supershort.py:268 -   First prediction target time UTC: 2025-05-10 08:00
+2025-05-10 15:40:58,889 - INFO - predict_supershort.py:269 -   Expected wp_true timestamp UTC: 2025-05-10 07:30
+2025-05-10 15:40:58,890 - INFO - predict_supershort.py:270 -   Earliest historical data needed UTC: 2025-05-10 03:00
+2025-05-10 15:40:58,890 - INFO - predict_supershort.py:271 -   Last prediction target time UTC: 2025-05-10 11:45
+2025-05-10 15:40:58,891 - INFO - predict_supershort.py:283 - Input CSV D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\predict_inputs\model_input_target_202505101600.csv not found. Fetching data from database to create it.
+2025-05-10 15:40:58,891 - INFO - predict_supershort.py:191 - Waiting for wp_true for timestamp: 2025-05-10 07:30:00+00:00
+2025-05-10 15:40:58,891 - INFO - predict_supershort.py:208 - Attempt 1: Checking for wp_true for 2025-05-10 07:30:00+00:00 (wait until 2025-05-10 07:43:00+00:00)...
+2025-05-10 15:41:28,931 - INFO - predict_supershort.py:208 - Attempt 2: Checking for wp_true for 2025-05-10 07:30:00+00:00 (wait until 2025-05-10 07:43:00+00:00)...
+2025-05-10 15:41:58,938 - INFO - predict_supershort.py:208 - Attempt 3: Checking for wp_true for 2025-05-10 07:30:00+00:00 (wait until 2025-05-10 07:43:00+00:00)...
+2025-05-10 15:42:28,943 - INFO - predict_supershort.py:208 - Attempt 4: Checking for wp_true for 2025-05-10 07:30:00+00:00 (wait until 2025-05-10 07:43:00+00:00)...
+2025-05-10 16:02:43,639 - INFO - predict_supershort.py:482 - Running predict_supershort.py directly...
+2025-05-10 16:02:43,639 - INFO - predict_supershort.py:258 - Starting prediction cycle at UTC: 2025-05-10 08:02:43
+2025-05-10 16:02:43,639 - INFO - predict_supershort.py:267 -   Current processing slot starts at: 2025-05-10 08:00
+2025-05-10 16:02:43,640 - INFO - predict_supershort.py:268 -   First prediction target time UTC: 2025-05-10 08:30
+2025-05-10 16:02:43,640 - INFO - predict_supershort.py:269 -   Expected wp_true timestamp UTC: 2025-05-10 08:00
+2025-05-10 16:02:43,640 - INFO - predict_supershort.py:270 -   Earliest historical data needed UTC: 2025-05-10 03:30
+2025-05-10 16:02:43,640 - INFO - predict_supershort.py:271 -   Last prediction target time UTC: 2025-05-10 12:15
+2025-05-10 16:02:43,641 - INFO - predict_supershort.py:350 - Loading model input from CSV: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\predict_inputs\model_input_target_202505101630.csv
+2025-05-10 16:02:43,822 - INFO - predict_supershort.py:360 - Successfully loaded 8532 rows from D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\predict_inputs\model_input_target_202505101630.csv. Shape: (8532, 331)
+2025-05-10 16:02:43,823 - WARNING - predict_supershort.py:363 - Loaded CSV D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\predict_inputs\model_input_target_202505101630.csv has 8532 rows, but expected 36 based on configuration.
+2025-05-10 16:02:43,823 - INFO - predict_supershort.py:377 - Starting general preprocessing on the 36-row input...
+2025-05-10 16:02:43,892 - INFO - predict_supershort.py:380 - General preprocessing complete.
+2025-05-10 16:02:43,892 - INFO - predict_supershort.py:383 - Applying ffill to 'wp_true' in the 36-row input...
+2025-05-10 16:02:43,892 - WARNING - predict_supershort.py:233 - 'wp_true' column not found in data for ffill. Creating it with NaNs.
+2025-05-10 16:02:43,892 - INFO - predict_supershort.py:385 - 'wp_true' ffill complete.
+2025-05-10 16:02:43,906 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 2 ==========
+2025-05-10 16:02:44,125 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 3 ==========
+2025-05-10 16:02:44,258 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 4 ==========
+2025-05-10 16:02:44,426 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 5 ==========
+2025-05-10 16:02:44,547 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 6 ==========
+2025-05-10 16:02:44,670 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 7 ==========
+2025-05-10 16:02:44,785 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 8 ==========
+2025-05-10 16:02:44,917 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 9 ==========
+2025-05-10 16:02:45,043 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 10 ==========
+2025-05-10 16:02:45,184 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 11 ==========
+2025-05-10 16:02:45,311 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 12 ==========
+2025-05-10 16:02:45,429 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 13 ==========
+2025-05-10 16:02:45,557 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 14 ==========
+2025-05-10 16:02:45,686 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 15 ==========
+2025-05-10 16:02:45,803 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 16 ==========
+2025-05-10 16:02:45,944 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 17 ==========
+2025-05-10 16:02:46,058 - INFO - predict_supershort.py:455 - Successfully loaded states for 16 models out of 16 expected.
+2025-05-10 16:02:46,060 - INFO - predict_supershort.py:466 - Saved consolidated prediction results to: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\prediction_results\pred_output_20250510160243_target_202505101630.csv
+2025-05-10 16:02:46,060 - INFO - predict_supershort.py:470 - Prediction cycle completed for first target UTC: 2025-05-10 08:30
+
+2025-05-10 16:09:21,535 - INFO - predict_supershort.py:482 - Running predict_supershort.py directly...
+2025-05-10 16:09:21,536 - INFO - predict_supershort.py:258 - Starting prediction cycle at UTC: 2025-05-10 08:09:21
+2025-05-10 16:09:21,536 - INFO - predict_supershort.py:267 -   Current processing slot starts at: 2025-05-10 08:00
+2025-05-10 16:09:21,536 - INFO - predict_supershort.py:268 -   First prediction target time UTC: 2025-05-10 08:30
+2025-05-10 16:09:21,536 - INFO - predict_supershort.py:269 -   Expected wp_true timestamp UTC: 2025-05-10 08:00
+2025-05-10 16:09:21,536 - INFO - predict_supershort.py:270 -   Earliest historical data needed UTC: 2025-05-10 03:30
+2025-05-10 16:09:21,536 - INFO - predict_supershort.py:271 -   Last prediction target time UTC: 2025-05-10 12:15
+2025-05-10 16:09:21,537 - INFO - predict_supershort.py:350 - Loading model input from CSV: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\predict_inputs\model_input_target_202505101630.csv
+2025-05-10 16:09:21,695 - INFO - predict_supershort.py:360 - Successfully loaded 7392 rows from D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\predict_inputs\model_input_target_202505101630.csv. Shape: (7392, 332)
+2025-05-10 16:09:21,696 - WARNING - predict_supershort.py:363 - Loaded CSV D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\predict_inputs\model_input_target_202505101630.csv has 7392 rows, but expected 36 based on configuration.
+2025-05-10 16:09:21,696 - INFO - predict_supershort.py:377 - Starting general preprocessing on the 36-row input...
+2025-05-10 16:09:21,755 - INFO - predict_supershort.py:380 - General preprocessing complete.
+2025-05-10 16:09:21,755 - INFO - predict_supershort.py:383 - Applying ffill to 'wp_true' in the 36-row input...
+2025-05-10 16:09:21,755 - INFO - predict_supershort.py:248 - No NaNs found in 'wp_true' column before ffill.
+2025-05-10 16:09:21,755 - INFO - predict_supershort.py:385 - 'wp_true' ffill complete.
+2025-05-10 16:09:21,760 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 2 ==========
+2025-05-10 16:09:22,036 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 3 ==========
+2025-05-10 16:09:22,205 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 4 ==========
+2025-05-10 16:09:22,396 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 5 ==========
+2025-05-10 16:09:22,567 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 6 ==========
+2025-05-10 16:09:22,737 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 7 ==========
+2025-05-10 16:09:22,904 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 8 ==========
+2025-05-10 16:09:23,064 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 9 ==========
+2025-05-10 16:09:23,248 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 10 ==========
+2025-05-10 16:09:23,416 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 11 ==========
+2025-05-10 16:09:23,592 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 12 ==========
+2025-05-10 16:09:23,763 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 13 ==========
+2025-05-10 16:09:23,932 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 14 ==========
+2025-05-10 16:09:24,122 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 15 ==========
+2025-05-10 16:09:24,305 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 16 ==========
+2025-05-10 16:09:24,481 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 17 ==========
+2025-05-10 16:09:24,652 - INFO - predict_supershort.py:455 - Successfully loaded states for 16 models out of 16 expected.
+2025-05-10 16:09:24,659 - INFO - predict_supershort.py:466 - Saved consolidated prediction results to: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\prediction_results\pred_output_20250510160921_target_202505101630.csv
+2025-05-10 16:09:24,659 - INFO - predict_supershort.py:470 - Prediction cycle completed for first target UTC: 2025-05-10 08:30
+
+2025-05-10 16:12:28,041 - INFO - predict_supershort.py:482 - Running predict_supershort.py directly...
+2025-05-10 16:12:28,041 - INFO - predict_supershort.py:258 - Starting prediction cycle at UTC: 2025-05-10 08:12:28
+2025-05-10 16:12:28,041 - INFO - predict_supershort.py:267 -   Current processing slot starts at: 2025-05-10 08:00
+2025-05-10 16:12:28,041 - INFO - predict_supershort.py:268 -   First prediction target time UTC: 2025-05-10 08:30
+2025-05-10 16:12:28,042 - INFO - predict_supershort.py:269 -   Expected wp_true timestamp UTC: 2025-05-10 08:00
+2025-05-10 16:12:28,042 - INFO - predict_supershort.py:270 -   Earliest historical data needed UTC: 2025-05-10 03:30
+2025-05-10 16:12:28,042 - INFO - predict_supershort.py:271 -   Last prediction target time UTC: 2025-05-10 12:15
+2025-05-10 16:12:28,042 - INFO - predict_supershort.py:350 - Loading model input from CSV: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\predict_inputs\model_input_target_202505101630.csv
+2025-05-10 16:12:28,198 - INFO - predict_supershort.py:360 - Successfully loaded 7392 rows from D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\predict_inputs\model_input_target_202505101630.csv. Shape: (7392, 332)
+2025-05-10 16:12:28,199 - WARNING - predict_supershort.py:363 - Loaded CSV D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\predict_inputs\model_input_target_202505101630.csv has 7392 rows, but expected 36 based on configuration.
+2025-05-10 16:12:28,199 - INFO - predict_supershort.py:377 - Starting general preprocessing on the 36-row input...
+2025-05-10 16:12:28,258 - INFO - predict_supershort.py:380 - General preprocessing complete.
+2025-05-10 16:12:28,258 - INFO - predict_supershort.py:383 - Applying ffill to 'wp_true' in the 36-row input...
+2025-05-10 16:12:28,259 - INFO - predict_supershort.py:248 - No NaNs found in 'wp_true' column before ffill.
+2025-05-10 16:12:28,259 - INFO - predict_supershort.py:385 - 'wp_true' ffill complete.
+2025-05-10 16:12:28,263 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 2 ==========
+2025-05-10 16:12:28,520 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 3 ==========
+2025-05-10 16:12:28,687 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 4 ==========
+2025-05-10 16:12:28,879 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 5 ==========
+2025-05-10 16:12:29,052 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 6 ==========
+2025-05-10 16:12:29,229 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 7 ==========
+2025-05-10 16:12:29,398 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 8 ==========
+2025-05-10 16:12:29,568 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 9 ==========
+2025-05-10 16:12:29,751 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 10 ==========
+2025-05-10 16:12:29,915 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 11 ==========
+2025-05-10 16:12:30,082 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 12 ==========
+2025-05-10 16:12:30,250 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 13 ==========
+2025-05-10 16:12:30,423 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 14 ==========
+2025-05-10 16:12:30,609 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 15 ==========
+2025-05-10 16:12:30,774 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 16 ==========
+2025-05-10 16:12:30,942 - INFO - predict_supershort.py:410 - 
+========== Predicting for Horizon (Shift) = 17 ==========
+2025-05-10 16:12:31,118 - INFO - predict_supershort.py:455 - Successfully loaded states for 16 models out of 16 expected.
+2025-05-10 16:12:31,120 - INFO - predict_supershort.py:466 - Saved consolidated prediction results to: D:\my-vue-project\wind-power-forecast\backend-autopredict\auto_scripts\scripts\supershort\prediction_results\pred_output_20250510161228_target_202505101630.csv
+2025-05-10 16:12:31,121 - INFO - predict_supershort.py:470 - Prediction cycle completed for first target UTC: 2025-05-10 08:30
+

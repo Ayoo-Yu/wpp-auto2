@@ -69,7 +69,7 @@ log_dirs = {
     'ultra_short': {
         'base': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'supershort', 'logs'),
         'train': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'supershort', 'logs', 'auto_train'),
-        'predict': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'supershort', 'logs', 'scheduler_predict'),
+        'predict': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'supershort', 'logs', 'auto_predict'),
         'param': os.path.join(base_dir, 'backend', 'auto_scripts', 'scripts', 'supershort', 'logs', 'param_optimizer')
     },
     'short': {
@@ -734,7 +734,7 @@ def get_logs():
                     warning_msg = '无法获取完整日志，仅显示错误日志'
                     record_task_history(prediction_type, 'logs', 'warning', warning_msg)
                     return jsonify({
-                        'logs': f"警告: {warning_msg}:\n{error_result.stdout if hasattr(error_result, 'stdout') else '没有错误日志'}"
+                        'logs': f"警告: {warning_msg}:\\n{error_result.stdout if hasattr(error_result, 'stdout') else '没有错误日志'}"
                     })
                 else:
                     error_msg = '获取日志失败'
@@ -750,22 +750,38 @@ def get_logs():
                     }), 500
         else:
             # 从对应的日志目录读取文件
-            log_dir = log_dirs[prediction_type].get(log_type)
-            if not log_dir:
-                return jsonify({'error': f'无效的日志类型: {log_type}'}), 400
+            resolved_log_dir_path = None
+            if prediction_type == 'ultra_short' and log_type == 'predict':
+                # Special handling for ultra_short's "predict" logs, which are in the 'auto_predict' subdirectory
+                base_log_dir_for_us = log_dirs[prediction_type].get('base')
+                if base_log_dir_for_us:
+                    resolved_log_dir_path = os.path.join(base_log_dir_for_us, 'auto_predict')
+                else:
+                    record_task_history(prediction_type, 'logs', 'failed', "Base log directory for 'ultra_short' not configured.")
+                    return jsonify({'error': f"Base log directory for 'ultra_short' not configured."}), 500
+            else:
+                # Standard lookup for other cases
+                resolved_log_dir_path = log_dirs[prediction_type].get(log_type)
+
+            if not resolved_log_dir_path:
+                record_task_history(prediction_type, 'logs', 'failed', f'无效的日志配置 for type: {prediction_type}, logType: {log_type}')
+                return jsonify({'error': f'无效的日志配置 for type: {prediction_type}, logType: {log_type}'}), 400
             
-            # 查找日志文件
+            if not os.path.isdir(resolved_log_dir_path): # Check if the resolved directory exists
+                record_task_history(prediction_type, 'logs', 'failed', f'日志目录 {resolved_log_dir_path} 不存在 for {log_type}')
+                return jsonify({'logs': f'日志目录 {os.path.basename(resolved_log_dir_path)} 不存在或无法访问。'})
+
             log_files = []
             if log_type == 'train':
                 # 训练日志格式可能是 YYYYMMDD.log 或包含日期的其他格式
-                log_files = glob.glob(os.path.join(log_dir, f"{date_str}*.log"))
-                train_flag_path = os.path.join(log_dir, f"{date_str}_train_done.flag")
+                log_files = glob.glob(os.path.join(resolved_log_dir_path, f"{date_str}*.log"))
+                train_flag_path = os.path.join(resolved_log_dir_path, f"{date_str}_train_done.flag")
                 
                 # 如果找不到日志但有完成标志文件，则尝试查找最近的可能相关日志
                 if not log_files and os.path.exists(train_flag_path):
                     # 尝试用更宽松的模式查找日期相近的日志
                     year_month = date_str[:6]  # 提取年月
-                    month_logs = glob.glob(os.path.join(log_dir, f"{year_month}*.log"))
+                    month_logs = glob.glob(os.path.join(resolved_log_dir_path, f"{year_month}*.log"))
                     if month_logs:
                         # 找到最接近但不超过所选日期的日志文件
                         filtered_logs = [log for log in month_logs 
@@ -773,8 +789,8 @@ def get_logs():
                         if filtered_logs:
                             log_files = [max(filtered_logs, key=lambda x: os.path.basename(x).split('_')[0])]
             elif log_type == 'predict':
-                # 预测日志格式
-                log_files = glob.glob(os.path.join(log_dir, f"{date_str}*.log"))
+                # 预测日志格式 (ultra_short predict now uses resolved_log_dir_path pointing to .../auto_predict)
+                log_files = glob.glob(os.path.join(resolved_log_dir_path, f"{date_str}*.log"))
             elif log_type == 'param':
                 # 参数优化日志 - 根据param_opt_day计算正确的周期
                 try:
@@ -809,19 +825,19 @@ def get_logs():
                     param_opt_date = selected_date - datetime.timedelta(days=days_diff)
                     param_opt_date_str = param_opt_date.strftime('%Y%m%d')
                     
-                    # 查找参数优化完成标志文件
-                    param_flag_path = os.path.join(log_dir, f"{param_opt_date_str}_param_opt_done.flag")
+                    # 查找参数优化完成标志文件 (using resolved_log_dir_path)
+                    param_flag_path = os.path.join(resolved_log_dir_path, f"{param_opt_date_str}_param_opt_done.flag")
                     
                     # 如果找不到精确日期的标志文件，尝试查找当周的标志文件（兼容现有逻辑）
                     if not os.path.exists(param_flag_path):
                         # 计算该参数优化日所在周的周一
                         param_opt_monday = param_opt_date - datetime.timedelta(days=param_opt_date.weekday())
                         monday_str = param_opt_monday.strftime('%Y%m%d')
-                        param_flag_path = os.path.join(log_dir, f"{monday_str}_param_opt_done.flag")
+                        param_flag_path = os.path.join(resolved_log_dir_path, f"{monday_str}_param_opt_done.flag")
                     
                     if os.path.exists(param_flag_path):
                         # 存在标志文件，先尝试查找精确日期的日志
-                        date_logs = glob.glob(os.path.join(log_dir, f"{param_opt_date_str}*.log"))
+                        date_logs = glob.glob(os.path.join(resolved_log_dir_path, f"{param_opt_date_str}*.log"))
                         if date_logs:
                             # 找到了精确日期的日志
                             log_files = date_logs
@@ -829,21 +845,21 @@ def get_logs():
                             # 尝试查找该周的参数优化日志
                             monday = param_opt_date - datetime.timedelta(days=param_opt_date.weekday())
                             monday_str = monday.strftime('%Y%m%d')
-                            week_logs = glob.glob(os.path.join(log_dir, f"{monday_str}*.log"))
+                            week_logs = glob.glob(os.path.join(resolved_log_dir_path, f"{monday_str}*.log"))
                             if week_logs:
                                 log_files = week_logs
                             else:
                                 # 尝试查找该月的所有参数优化日志
                                 year_month = param_opt_date_str[:6]  # 提取年月
-                                month_logs = glob.glob(os.path.join(log_dir, f"{year_month}*.log"))
+                                month_logs = glob.glob(os.path.join(resolved_log_dir_path, f"{year_month}*.log"))
                                 if month_logs:
                                     # 找到最接近参数优化日期的日志
                                     closest_log = None
                                     min_diff = float('inf')
                                     for log in month_logs:
-                                        log_date_str = os.path.basename(log).split('.')[0][:8]
+                                        log_date_str_from_file = os.path.basename(log).split('.')[0][:8]
                                         try:
-                                            log_date = datetime.datetime.strptime(log_date_str, '%Y%m%d')
+                                            log_date = datetime.datetime.strptime(log_date_str_from_file, '%Y%m%d')
                                             diff = abs((param_opt_date - log_date).days)
                                             if diff < min_diff:
                                                 min_diff = diff
@@ -858,8 +874,8 @@ def get_logs():
                     return jsonify({'error': f'日期格式无效: {date_str}'}), 400
             
             if not log_files:
-                record_task_history(prediction_type, 'logs', 'failed', f'未找到{date_str}的{log_type}类型日志文件')
-                return jsonify({'logs': f'未找到{date_str}的{log_type}日志文件'})
+                record_task_history(prediction_type, 'logs', 'failed', f'未找到{date_str}的{log_type}类型日志文件 at {resolved_log_dir_path}')
+                return jsonify({'logs': f'未找到{date_str}的{log_type}日志文件 (目录: {os.path.basename(resolved_log_dir_path)})'})
             
             # 读取最新的日志文件
             latest_log = max(log_files, key=os.path.getmtime)

@@ -1,0 +1,69 @@
+2025-05-11 18:58:11,338 - INFO - train_supershort.py:73 - 开始更新本地训练数据集 CSV...
+2025-05-11 18:58:11,338 - INFO - data_processor_supershort.py:153 - Starting to check and update supershort training CSV: /app/auto_scripts/scripts/supershort/datasets/training_data_supershort.csv
+2025-05-11 18:58:13,447 - INFO - data_processor_supershort.py:174 - Latest timestamp in existing supershort CSV '/app/auto_scripts/scripts/supershort/datasets/training_data_supershort.csv': 2025-01-29 23:45:00
+2025-05-11 18:58:13,447 - INFO - data_processor_supershort.py:189 - Querying TrainPreShort for new supershort data...
+2025-05-11 18:58:13,841 - INFO - data_processor_supershort.py:198 - Retrieved 0 new records from TrainPreShort for supershort CSV.
+2025-05-11 18:58:13,841 - INFO - data_processor_supershort.py:200 - Querying ActualPower for new supershort data...
+2025-05-11 18:58:13,859 - INFO - data_processor_supershort.py:211 - Retrieved 7392 new records from ActualPower for supershort CSV.
+2025-05-11 18:58:13,859 - INFO - data_processor_supershort.py:221 - No new data found in database to add to supershort CSV (or one table was empty).
+2025-05-11 18:58:13,860 - INFO - train_supershort.py:93 - 从本地CSV文件加载训练数据: /app/auto_scripts/scripts/supershort/datasets/training_data_supershort.csv
+2025-05-11 18:58:15,667 - INFO - train_supershort.py:98 - 成功从CSV加载 67104 条记录用于训练。
+2025-05-11 18:58:15,667 - INFO - train_supershort.py:117 - 开始预处理训练数据...
+2025-05-11 18:58:16,433 - INFO - train_supershort.py:123 - 训练数据预处理完成。
+2025-05-11 18:58:16,452 - INFO - train_supershort.py:127 - 
+数据总量 (预处理后): 67104
+2025-05-11 18:58:16,452 - INFO - train_supershort.py:128 - 训练集大小: 67104 (使用全部加载和预处理后的数据)
+2025-05-11 18:58:16,453 - INFO - train_supershort.py:137 - 模型将保存到: /app/auto_scripts/scripts/supershort/saved_models
+2025-05-11 18:58:16,453 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 2 ==========
+2025-05-11 18:58:29,097 - INFO - train_supershort.py:158 - Shift=2 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_2
+2025-05-11 18:58:29,097 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 3 ==========
+2025-05-11 18:58:42,066 - INFO - train_supershort.py:158 - Shift=3 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_3
+2025-05-11 18:58:42,067 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 4 ==========
+2025-05-11 18:58:56,430 - INFO - train_supershort.py:158 - Shift=4 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_4
+2025-05-11 18:58:56,430 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 5 ==========
+2025-05-11 18:59:09,678 - INFO - train_supershort.py:158 - Shift=5 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_5
+2025-05-11 18:59:09,678 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 6 ==========
+2025-05-11 18:59:20,789 - INFO - train_supershort.py:158 - Shift=6 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_6
+2025-05-11 18:59:20,789 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 7 ==========
+2025-05-11 18:59:32,717 - INFO - train_supershort.py:158 - Shift=7 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_7
+2025-05-11 18:59:32,717 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 8 ==========
+2025-05-11 18:59:44,643 - INFO - train_supershort.py:158 - Shift=8 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_8
+2025-05-11 18:59:44,644 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 9 ==========
+2025-05-11 18:59:58,024 - INFO - train_supershort.py:158 - Shift=9 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_9
+2025-05-11 18:59:58,024 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 10 ==========
+2025-05-11 19:00:12,906 - INFO - train_supershort.py:158 - Shift=10 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_10
+2025-05-11 19:00:12,906 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 11 ==========
+2025-05-11 19:00:25,937 - INFO - train_supershort.py:158 - Shift=11 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_11
+2025-05-11 19:00:25,937 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 12 ==========
+2025-05-11 19:00:39,916 - INFO - train_supershort.py:158 - Shift=12 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_12
+2025-05-11 19:00:39,916 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 13 ==========
+2025-05-11 19:01:02,476 - INFO - train_supershort.py:158 - Shift=13 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_13
+2025-05-11 19:01:02,476 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 14 ==========
+2025-05-11 19:01:16,088 - INFO - train_supershort.py:158 - Shift=14 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_14
+2025-05-11 19:01:16,088 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 15 ==========
+2025-05-11 19:01:28,783 - INFO - train_supershort.py:158 - Shift=15 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_15
+2025-05-11 19:01:28,783 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 16 ==========
+2025-05-11 19:01:43,071 - INFO - train_supershort.py:158 - Shift=16 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_16
+2025-05-11 19:01:43,071 - INFO - train_supershort.py:145 - 
+========== 开始处理训练 Horizon (Shift) = 17 ==========
+2025-05-11 19:01:59,744 - INFO - train_supershort.py:158 - Shift=17 的模型成功训练并保存到 /app/auto_scripts/scripts/supershort/saved_models/shift_17
+2025-05-11 19:01:59,744 - INFO - train_supershort.py:166 - 
+========== 训练过程完成 ==========
+2025-05-11 19:01:59,744 - INFO - train_supershort.py:167 - 总共成功训练并保存了 16 个模型。
+2025-05-11 19:01:59,744 - INFO - train_supershort.py:175 - 成功训练并保存了所有预期的 16/16 个模型。
+2025-05-11 19:01:59,745 - INFO - train_supershort.py:180 - TRAIN_SUPERSHORT.PY SCRIPT IS TRULY FINISHING NOW AND EXITING.

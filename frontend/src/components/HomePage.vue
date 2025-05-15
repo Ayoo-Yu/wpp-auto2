@@ -16,7 +16,7 @@
             <div class="icon-wrapper">
               <el-icon><DataAnalysis /></el-icon>
             </div>
-            <h3>风电功率预测模型训练</h3>
+            <h3>功率预测模型训练</h3>
             <p>通过先进的算法进行高效的模型训练，提升预测准确度。</p>
             <el-button 
               type="primary" 
@@ -35,7 +35,7 @@
             <div class="icon-wrapper">
               <el-icon><TrendCharts /></el-icon>
             </div>
-            <h3>基于现有模型的风电功率预测</h3>
+            <h3>风电功率预测</h3>
             <p>通过精确的算法进行未来功率的预测，助力决策制定。</p>
             <el-button 
               type="primary" 
@@ -54,8 +54,8 @@
             <div class="icon-wrapper">
               <el-icon><PieChart /></el-icon>
             </div>
-            <h3>风电功率自动化预测管理</h3>
-            <p>实现三类风电功率预测，包括短期、中期、长期预测。</p>
+            <h3>功率自动化预测</h3>
+            <p>实现三类风电功率每日预测，包括超短期、短期、中期预测。</p>
             <el-button 
               type="primary" 
               class="learn-more-btn"
@@ -66,10 +66,29 @@
             </el-button>
           </div>
         </div>
+
+        <!-- 功率对比 -->
+        <div class="feature-card">
+          <div class="card-content">
+            <div class="icon-wrapper">
+              <el-icon><Histogram /></el-icon>
+            </div>
+            <h3>数据可视化</h3>
+            <p>对比不同时间段的预测数据，开展数据可视化与分析。</p>
+            <el-button 
+              type="primary" 
+              class="learn-more-btn"
+              @click="urljump('http://localhost:8080/powercompare')"
+            >
+              了解更多
+              <el-icon class="arrow-icon"><ArrowRight /></el-icon>
+            </el-button>
+          </div>
+        </div>
       </div>
 
       <!-- 图表展示区域 -->
-      <div class="chart-section">
+      <!-- <div class="chart-section">
         <div class="section-header">
           <h2>风电功率月度变化</h2>
           <p class="section-subtitle">实时监控风电场发电情况</p>
@@ -77,7 +96,7 @@
         <div class="chart-container">
           <canvas id="powerChart"></canvas>
         </div>
-      </div>
+      </div> -->
 
       <!-- 底部区域 -->
       <footer class="footer">
@@ -90,7 +109,9 @@
 <script>
 import { onMounted, ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import Chart from 'chart.js/auto'
+// import Chart from 'chart.js/auto'
+// Import BarChart if it's a specific component and not globally registered
+// import { BarChart } from '@element-plus/icons-vue' // Example import
 
 export default {
   name: 'HomePage',
@@ -121,48 +142,48 @@ export default {
     }))
 
     onMounted(() => {
-      const ctx = document.getElementById('powerChart').getContext('2d')
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
-          datasets: [{
-            label: '风电功率 (MW)',
-            data: [12, 19, 3, 5, 2, 3, 6, 8, 13, 20, 18, 22],
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor:'rgba(54, 162, 235, 1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.5
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            title: {
-              display: true,
-            }
-          },
-          scales: {
-            y: { 
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: '功率 (MW)'
-              }
-            },
-            x: {
-              title: {
-                display: true,
-                text: '月份'
-              }
-            }
-          }
-        }
-      })
+      // const ctx = document.getElementById('powerChart').getContext('2d')
+      // new Chart(ctx, {
+      //   type: 'line',
+      //   data: {
+      //     labels: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+      //     datasets: [{
+      //       label: '风电功率 (MW)',
+      //       data: [12, 19, 3, 5, 2, 3, 6, 8, 13, 20, 18, 22],
+      //       backgroundColor: 'rgba(54, 162, 235, 0.2)',
+      //       borderColor:'rgba(54, 162, 235, 1)',
+      //       borderWidth: 2,
+      //       fill: true,
+      //       tension: 0.5
+      //     }]
+      //   },
+      //   options: {
+      //     responsive: true,
+      //     plugins: {
+      //       legend: {
+      //         position: 'top',
+      //       },
+      //       title: {
+      //         display: true,
+      //       }
+      //     },
+      //     scales: {
+      //       y: { 
+      //         beginAtZero: true,
+      //         title: {
+      //           display: true,
+      //           text: '功率 (MW)'
+      //         }
+      //       },
+      //       x: {
+      //         title: {
+      //           display: true,
+      //           text: '月份'
+      //         }
+      //       }
+      //     }
+      //   }
+      // })
     })
 
     return {
@@ -251,7 +272,8 @@ export default {
 
 .features-section {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* Updated to handle 4 cards in a 1x4 layout on larger screens */
+  grid-template-columns: repeat(4, 1fr); 
   gap: 40px;
   padding: 0 40px;
   max-width: 1440px;
@@ -316,6 +338,23 @@ export default {
   color: #9941C8;
 }
 
+/* Styling for the new 4th card - using a new color scheme */
+.feature-card:nth-child(4) .icon-wrapper {
+  background: linear-gradient(135deg, #FF9500 0%, #FFB340 100%); /* Orange gradient */
+}
+
+.feature-card:nth-child(4)::before {
+  color: #FF9500; /* Orange color for pseudo-element */
+}
+
+.feature-card:nth-child(4) .learn-more-btn {
+  color: #FF9500; /* Orange color for button text */
+}
+
+.feature-card:nth-child(4) .learn-more-btn:hover {
+  color: #E68600; /* Darker orange on hover */
+}
+
 .feature-card:nth-child(1):hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 48px rgba(0, 119, 237, 0.12);
@@ -329,6 +368,11 @@ export default {
 .feature-card:nth-child(3):hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 48px rgba(175, 82, 222, 0.12);
+}
+
+.feature-card:nth-child(4):hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 48px rgba(255, 149, 0, 0.12); /* Shadow color for the 4th card */
 }
 
 .icon-wrapper {
@@ -386,7 +430,7 @@ export default {
   transform: translateX(4px);
 }
 
-.chart-section {
+/* .chart-section {
   background: none;
   padding: 60px;
   border-radius: 30px;
@@ -417,7 +461,7 @@ export default {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 30px;
   border: none;
-}
+} */
 
 .footer {
   text-align: center;
@@ -429,7 +473,7 @@ export default {
 /* 响应式设计 */
 @media (max-width: 1200px) {
   .features-section {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* Stays 2x2 for medium screens */
   }
 }
 

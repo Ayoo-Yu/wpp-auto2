@@ -55,56 +55,103 @@ def feature_engineering(X_train, X_val, lags):
     """
     特征工程：特征组合、滞后特征等
     """
-    n_points = len([col for col in X_train.columns if col.startswith('ws10_')])
-    combined_features = {}
-    wind_speeds_10 = [f'ws10_{i}' for i in range(1, n_points+1)]
-    wind_speeds_100 = [f'ws100_{i}' for i in range(1, n_points+1)]
-    wind_speeds_200 = [f'ws200_{i}' for i in range(1, n_points+1)]
+    # Attempt to identify wind speed columns, default to empty lists if not found
+    ws10_cols = [col for col in X_train.columns if col.startswith('ws10_')]
+    ws100_cols = [col for col in X_train.columns if col.startswith('ws100_')]
+    ws200_cols = [col for col in X_train.columns if col.startswith('ws200_')]
+
+    wind_speeds_10 = sorted(ws10_cols) # Sort to ensure consistent feature naming if order matters
+    wind_speeds_100 = sorted(ws100_cols)
+    wind_speeds_200 = sorted(ws200_cols)
     
-    # 生成高度10和100的风速差异特征
-    for wind_speeds in [wind_speeds_100, wind_speeds_200]:
-        for i in range(len(wind_speeds)):
-            for j in range(i + 1, len(wind_speeds)):
-                combined_features[f'{wind_speeds[i]}_{wind_speeds[j]}_diff1'] = X_train[wind_speeds[i]] - X_train[wind_speeds[j]]
+    combined_features_train = {}
+    
+    # 生成高度100和200的风速差异特征
+    # This loop iterates first with wind_speeds_100, then with wind_speeds_200
+    for current_wind_speeds in [wind_speeds_100, wind_speeds_200]:
+        if not current_wind_speeds: # Skip if no columns for this height
+            continue
+        for i in range(len(current_wind_speeds)):
+            for j in range(i + 1, len(current_wind_speeds)):
+                col_i = current_wind_speeds[i]
+                col_j = current_wind_speeds[j]
+                if col_i in X_train.columns and col_j in X_train.columns:
+                    combined_features_train[f'{col_i}_{col_j}_diff1'] = X_train[col_i] - X_train[col_j]
     
     # 生成高度10和200的风速差异特征
-    for wind_speeds in [wind_speeds_10, wind_speeds_200]:
-        for i in range(len(wind_speeds)):
-            for j in range(i + 1, len(wind_speeds)):
-                combined_features[f'{wind_speeds[i]}_{wind_speeds[j]}_diff2'] = X_train[wind_speeds[i]] - X_train[wind_speeds[j]]
+    # This loop iterates first with wind_speeds_10, then with wind_speeds_200
+    for current_wind_speeds in [wind_speeds_10, wind_speeds_200]:
+        if not current_wind_speeds: # Skip if no columns for this height
+            continue
+        for i in range(len(current_wind_speeds)):
+            for j in range(i + 1, len(current_wind_speeds)):
+                col_i = current_wind_speeds[i]
+                col_j = current_wind_speeds[j]
+                if col_i in X_train.columns and col_j in X_train.columns:
+                     combined_features_train[f'{col_i}_{col_j}_diff2'] = X_train[col_i] - X_train[col_j]
     
     # 引入滞后风速特征
-    lag_features = {}
-    for lag in range(1, lags):  # 使用前3小时的滞后特征
-        for col in wind_speeds_10 + wind_speeds_100 + wind_speeds_200:
-            lag_features[f'{col}_lag{lag}'] = X_train[col].shift(lag)
+    lag_features_train = {}
+    all_present_wind_speeds = wind_speeds_10 + wind_speeds_100 + wind_speeds_200
     
-    combined_features_df = pd.DataFrame(combined_features)
-    lag_features_df = pd.DataFrame(lag_features)
+    if all_present_wind_speeds: # Only proceed if there are any wind speed columns
+        for lag in range(1, lags):
+            for col in all_present_wind_speeds:
+                if col in X_train.columns: # Double check, though they should be from X_train.columns
+                    lag_features_train[f'{col}_lag{lag}'] = X_train[col].shift(lag)
     
-    X_train = pd.concat([X_train, combined_features_df, lag_features_df], axis=1).dropna()
+    dataframes_to_concat_train = [X_train]
+    if combined_features_train:
+        combined_features_df_train = pd.DataFrame(combined_features_train, index=X_train.index)
+        dataframes_to_concat_train.append(combined_features_df_train)
+    if lag_features_train:
+        lag_features_df_train = pd.DataFrame(lag_features_train, index=X_train.index)
+        dataframes_to_concat_train.append(lag_features_df_train)
+    
+    if len(dataframes_to_concat_train) > 1:
+        X_train = pd.concat(dataframes_to_concat_train, axis=1).dropna()
     
     # 对验证集进行相同的特征工程处理
     combined_features_val = {}
     lag_features_val = {}
-    for wind_speeds in [wind_speeds_100, wind_speeds_200]:
-        for i in range(len(wind_speeds)):
-            for j in range(i + 1, len(wind_speeds)):
-                combined_features_val[f'{wind_speeds[i]}_{wind_speeds[j]}_diff1'] = X_val[wind_speeds[i]] - X_val[wind_speeds[j]]
+
+    # Replicate for validation set - using the same column lists derived from X_train
+    for current_wind_speeds in [wind_speeds_100, wind_speeds_200]:
+        if not current_wind_speeds:
+            continue
+        for i in range(len(current_wind_speeds)):
+            for j in range(i + 1, len(current_wind_speeds)):
+                col_i = current_wind_speeds[i]
+                col_j = current_wind_speeds[j]
+                if col_i in X_val.columns and col_j in X_val.columns:
+                    combined_features_val[f'{col_i}_{col_j}_diff1'] = X_val[col_i] - X_val[col_j]
     
-    for wind_speeds in [wind_speeds_10, wind_speeds_200]:
-        for i in range(len(wind_speeds)):
-            for j in range(i + 1, len(wind_speeds)):
-                combined_features_val[f'{wind_speeds[i]}_{wind_speeds[j]}_diff2'] = X_val[wind_speeds[i]] - X_val[wind_speeds[j]]
+    for current_wind_speeds in [wind_speeds_10, wind_speeds_200]:
+        if not current_wind_speeds:
+            continue
+        for i in range(len(current_wind_speeds)):
+            for j in range(i + 1, len(current_wind_speeds)):
+                col_i = current_wind_speeds[i]
+                col_j = current_wind_speeds[j]
+                if col_i in X_val.columns and col_j in X_val.columns:
+                    combined_features_val[f'{col_i}_{col_j}_diff2'] = X_val[col_i] - X_val[col_j]
     
-    for lag in range(1, lags):
-        for col in wind_speeds_10 + wind_speeds_100 + wind_speeds_200:
-            lag_features_val[f'{col}_lag{lag}'] = X_val[col].shift(lag)
+    if all_present_wind_speeds:
+        for lag in range(1, lags):
+            for col in all_present_wind_speeds:
+                if col in X_val.columns:
+                    lag_features_val[f'{col}_lag{lag}'] = X_val[col].shift(lag)
     
-    combined_features_df_val = pd.DataFrame(combined_features_val)
-    lag_features_df_val = pd.DataFrame(lag_features_val)
+    dataframes_to_concat_val = [X_val]
+    if combined_features_val:
+        combined_features_df_val = pd.DataFrame(combined_features_val, index=X_val.index)
+        dataframes_to_concat_val.append(combined_features_df_val)
+    if lag_features_val:
+        lag_features_df_val = pd.DataFrame(lag_features_val, index=X_val.index)
+        dataframes_to_concat_val.append(lag_features_df_val)
     
-    X_val = pd.concat([X_val, combined_features_df_val, lag_features_df_val], axis=1).dropna()
+    if len(dataframes_to_concat_val) > 1:
+        X_val = pd.concat(dataframes_to_concat_val, axis=1).dropna()
     
     return X_train, X_val
 

@@ -99,7 +99,7 @@ EOL
 # 计算worker数量：(2 * CPU核心数) + 1
 CORES=$(grep -c ^processor /proc/cpuinfo)
 # 为了测试，我们将worker数量设置为4，避免系统资源过度消耗
-WORKERS=4
+WORKERS=3
 echo "系统检测到 $CORES 个CPU核心，将启动 $WORKERS 个Gunicorn工作进程"
 
 # 启动应用

@@ -43,7 +43,7 @@
             <el-button 
               :icon="Refresh" 
               circle 
-              @click="fetchUsers"
+              @click="fetchData"
               :loading="loading"
             ></el-button>
           </el-tooltip>
@@ -322,7 +322,7 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, watchEffect } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
   Plus, 
@@ -335,6 +335,7 @@ import {
   Key 
 } from '@element-plus/icons-vue'
 import { getUsers, createUser, updateUser, deleteUser, resetUserPassword, getRoles } from '../api/auth'
+import { isAuthReady, isAuthLoading } from '../store/authReady' // 导入认证状态
 
 export default {
   name: 'UserManagement',
@@ -548,50 +549,85 @@ export default {
       return false;
     }
     
-    // 获取用户列表
-    const fetchUsers = async () => {
-      if (!currentUsername) {
-        ElMessage.error('获取当前用户信息失败，请重新登录')
-        return
+    // 获取用户和角色数据
+    const fetchData = async () => {
+      if (!isAuthReady.value) {
+        console.warn('认证未就绪，暂不获取用户数据');
+        return; // 如果认证未就绪，则不执行获取
       }
       
-      loading.value = true
+      loading.value = true;
+      console.log('认证已就绪，开始串行获取用户和角色数据...');
       try {
-        const data = await getUsers(currentUsername)
-        users.value = data
-        // 用户列表更新后重置分页到第一页
-        currentPage.value = 1
+        // 改为串行获取数据，先获取用户，再获取角色
+        console.log('第一步: 开始获取用户列表...');
+        await fetchUsersInternal();
+        
+        console.log('第二步: 开始获取角色列表...');
+        await fetchRolesInternal();
+        
+        console.log('用户和角色数据获取完成 (串行)');
       } catch (error) {
-        console.error('获取用户列表失败:', error)
-        ElMessage.error('获取用户列表失败')
+        // 错误已在内部函数处理
+        console.error('获取用户/角色数据时出错 (串行):', error);
       } finally {
-        loading.value = false
+        loading.value = false;
       }
-    }
+    };
     
-    // 获取角色列表
-    const fetchRoles = async () => {
-      if (!currentUsername) {
-        ElMessage.error('获取当前用户信息失败，请重新登录')
-        return
-      }
-      
-      loadingRoles.value = true
+    // 内部获取用户函数
+    const fetchUsersInternal = async () => {
       try {
-        const data = await getRoles(currentUsername)
-        roles.value = data
+        console.log('内部函数: 开始获取用户列表...');
+        const data = await getUsers();
+        console.log('成功获取用户列表, 数量:', data.length);
+        users.value = data;
+        currentPage.value = 1;
+      } catch (error) {
+        console.error('获取用户列表失败 (内部):', error);
+        // ElMessage已由Axios拦截器处理401，这里可以处理其他错误
+        if (!error.response || error.response.status !== 401) {
+          ElMessage.error('获取用户列表失败: ' + (error.response?.data?.message || '未知错误'));
+        }
+        throw error; // 抛出错误让Promise.all知道失败了
+      }
+    };
+    
+    // 内部获取角色函数
+    const fetchRolesInternal = async () => {
+      try {
+        console.log('内部函数: 开始获取角色列表...');
+        const data = await getRoles();
+        console.log('成功获取角色列表, 数量:', data.length);
+        roles.value = data;
         
         // 检查是否获取到角色列表
         if (!data || data.length === 0) {
-          ElMessage.warning('未获取到任何角色信息，请先创建角色')
+          ElMessage.warning('未获取到任何角色信息，请先创建角色');
         }
       } catch (error) {
-        console.error('获取角色列表失败:', error)
-        ElMessage.error('获取角色列表失败: ' + (error.response?.data?.message || '服务器错误'))
-      } finally {
-        loadingRoles.value = false
+        console.error('获取角色列表失败 (内部):', error);
+        if (!error.response || error.response.status !== 401) {
+          ElMessage.error('获取角色列表失败: ' + (error.response?.data?.message || '服务器错误'));
+        }
+        throw error; // 抛出错误
       }
-    }
+    };
+    
+    // 使用watchEffect监听认证状态变化
+    watchEffect(() => {
+      console.log(`watchEffect: isAuthLoading=${isAuthLoading.value}, isAuthReady=${isAuthReady.value}`);
+      if (!isAuthLoading.value && isAuthReady.value) {
+        // 当认证检查完成(loading=false)且认证成功(ready=true)时
+        fetchData();
+      } else if (!isAuthLoading.value && !isAuthReady.value) {
+        // 认证检查完成但未认证成功，可以清空列表或显示提示
+        console.log('认证未通过，不加载用户数据');
+        users.value = [];
+        roles.value = [];
+      }
+      // 如果isAuthLoading为true，等待检查完成
+    });
     
     // 格式化日期
     const formatDate = (dateStr) => {
@@ -689,11 +725,6 @@ export default {
     
     // 处理切换用户状态
     const handleToggleStatus = async (user) => {
-      if (!currentUsername) {
-        ElMessage.error('获取当前用户信息失败，请重新登录')
-        return
-      }
-      
       // 不允许禁用系统管理员，除非当前用户是超级管理员
       if (isAdminRole(user.role)) {
         if (!isSuperAdmin()) {
@@ -721,10 +752,10 @@ export default {
         
         await updateUser(user.id, {
           is_active: !user.is_active
-        }, currentUsername)
+        })
         
         ElMessage.success(`${user.is_active ? '禁用' : '启用'}用户成功`)
-        fetchUsers()
+        fetchData()
       } catch (error) {
         if (error !== 'cancel') {
           console.error('操作失败:', error)
@@ -752,11 +783,6 @@ export default {
     
     // 提交用户表单
     const handleSubmitUser = async () => {
-      if (!currentUsername) {
-        ElMessage.error('获取当前用户信息失败，请重新登录')
-        return
-      }
-      
       if (!userForm.value) return
       
       await userForm.value.validate(async (valid) => {
@@ -792,7 +818,7 @@ export default {
               email: userFormData.email,
               role_id: userFormData.role_id,
               is_active: userFormData.is_active
-            }, currentUsername)
+            })
             
             ElMessage.success('更新用户成功')
           } else {
@@ -804,13 +830,13 @@ export default {
               email: userFormData.email,
               role_id: userFormData.role_id,
               is_active: userFormData.is_active
-            }, currentUsername)
+            })
             
             ElMessage.success('创建用户成功')
           }
           
           showUserDialog.value = false
-          fetchUsers()
+          fetchData()
         } catch (error) {
           console.error('提交用户表单失败:', error)
           
@@ -839,11 +865,6 @@ export default {
     
     // 提交重置密码表单
     const handleSubmitResetPassword = async () => {
-      if (!currentUsername) {
-        ElMessage.error('获取当前用户信息失败，请重新登录')
-        return
-      }
-      
       if (!resetPasswordForm.value) return
       
       await resetPasswordForm.value.validate(async (valid) => {
@@ -852,7 +873,7 @@ export default {
         resettingPassword.value = true
         
         try {
-          await resetUserPassword(currentUserId.value, resetPasswordFormData.password, currentUsername)
+          await resetUserPassword(currentUserId.value, resetPasswordFormData.password)
           
           ElMessage.success('重置密码成功')
           showResetPasswordDialog.value = false
@@ -867,11 +888,6 @@ export default {
     
     // 处理删除用户
     const handleDelete = async (user) => {
-      if (!currentUsername) {
-        ElMessage.error('获取当前用户信息失败，请重新登录')
-        return
-      }
-      
       // 不允许删除系统管理员，除非当前用户是超级管理员
       if (isAdminRole(user.role)) {
         if (!isSuperAdmin()) {
@@ -897,10 +913,10 @@ export default {
           }
         )
         
-        await deleteUser(user.id, currentUsername)
+        await deleteUser(user.id)
         
         ElMessage.success('删除用户成功')
-        fetchUsers()
+        fetchData()
       } catch (error) {
         if (error !== 'cancel') {
           console.error('删除用户失败:', error)
@@ -967,8 +983,7 @@ export default {
     
     // 生命周期钩子
     onMounted(() => {
-      fetchUsers()
-      fetchRoles()
+      console.log('UserManagement组件已挂载，等待认证状态就绪...');
     })
     
     return {

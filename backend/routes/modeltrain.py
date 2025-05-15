@@ -11,6 +11,7 @@ from werkzeug.utils import secure_filename
 from database_config import minio_client, SessionLocal
 from models import Model, EvaluationMetrics, TrainingRecord
 import uuid
+import tempfile
 # 预测蓝图
 modeltrain_bp = Blueprint('modeltrain', __name__)
 
@@ -220,7 +221,9 @@ def train_model():
             "status": "completed",
             "message": "训练已完成",
             "end_time": datetime.datetime.now().isoformat(),
-            "download_url": f"/download/{forecast_filename}"
+            "download_url": f"/download/{forecast_filename}",
+            "model_download_url": f"/download-model?model_version={model_version}",
+            "scaler_download_url": f"/download-scaler?model_version={model_version}"
         }
         
         if report_filename:
@@ -241,7 +244,9 @@ def train_model():
 
     return jsonify({
         'download_url': download_url,
-        'report_download_url': report_download_url
+        'report_download_url': report_download_url,
+        'model_download_url': f"/download-model?model_version={model_version}",
+        'scaler_download_url': f"/download-scaler?model_version={model_version}"
     }), 200
 
 # 新增接口：获取 daily_metrics.csv 文件
@@ -271,60 +276,164 @@ def get_daily_metrics():
     # 返回 CSV 文件内容给前端
     return send_file(daily_metrics_path, mimetype='text/csv', as_attachment=False)
 
-@modeltrain_bp.route('/check-training-status', methods=['GET'])
-def check_training_status():
-    """检查训练状态的接口
-    
-    根据file_id查询训练状态和结果链接
+@modeltrain_bp.route('/download-model', methods=['GET'])
+def download_model():
     """
-    file_id = request.args.get('file_id')
+    下载训练好的模型文件
+    """
+    model_version = request.args.get('model_version')
     
-    if not file_id:
-        return jsonify({"error": "缺少file_id参数"}), 400
+    if not model_version:
+        return jsonify({"error": "缺少model_version参数"}), 400
     
-    # 从状态字典中获取该训练任务的状态
-    status_info = training_status.get(file_id, {})
-    
-    # 如果找不到状态记录，尝试检查文件是否存在
-    if not status_info:
-        # 查找是否有对应的结果文件
-        forecast_pattern = f"forecast_train_test_{file_id}_*.csv"
-        report_pattern = f"report_train_test_{file_id}_*.txt"
+    try:
+        # 从数据库获取模型信息
+        db = SessionLocal()
+        model = db.query(Model).filter(Model.model_name == model_version).first()
         
-        forecast_files = glob.glob(os.path.join(current_app.config['FORECAST_FOLDER'], forecast_pattern))
-        report_files = glob.glob(os.path.join(current_app.config['FORECAST_FOLDER'], report_pattern))
+        if not model:
+            return jsonify({"error": f"未找到指定的模型: {model_version}"}), 404
         
-        if forecast_files or report_files:
-            # 文件存在，说明训练已完成
-            status_info = {
-                "status": "completed",
-                "message": "训练已完成"
-            }
+        # 从MinIO获取模型文件
+        model_object_name = model.model_path
+        
+        # 创建临时文件
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.joblib')
+        temp_file.close()
+        
+        # 下载模型文件到临时文件
+        minio_client.fget_object(
+            "wind-models",
+            model_object_name,
+            temp_file.name
+        )
+        
+        current_app.logger.info(f"从MinIO下载模型文件: {model_object_name}")
+        
+        # 设置下载文件名
+        download_filename = f"wind_model_{model_version}.joblib"
+        
+        # 发送文件给客户端
+        return send_file(
+            temp_file.name,
+            mimetype='application/octet-stream',
+            as_attachment=True,
+            download_name=download_filename
+        )
+    except Exception as e:
+        current_app.logger.error(f"模型文件下载失败: {e}")
+        return jsonify({"error": f"模型文件下载失败: {str(e)}"}), 500
+    finally:
+        if 'db' in locals():
+            db.close()
+        # 临时文件会在请求结束后由系统自动清理
+
+@modeltrain_bp.route('/download-scaler', methods=['GET'])
+def download_scaler():
+    """
+    下载训练好的标准化器文件
+    """
+    model_version = request.args.get('model_version')
+    
+    if not model_version:
+        return jsonify({"error": "缺少model_version参数"}), 400
+    
+    try:
+        # 从数据库获取模型信息
+        db = SessionLocal()
+        model = db.query(Model).filter(Model.model_name == model_version).first()
+        
+        if not model:
+            return jsonify({"error": f"未找到指定的模型: {model_version}"}), 404
+        
+        # 从MinIO获取scaler文件
+        scaler_object_name = model.scaler_path
+        
+        # 创建临时文件
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.joblib')
+        temp_file.close()
+        
+        # 下载scaler文件到临时文件
+        minio_client.fget_object(
+            "wind-scalers",
+            scaler_object_name,
+            temp_file.name
+        )
+        
+        current_app.logger.info(f"从MinIO下载标准化器文件: {scaler_object_name}")
+        
+        # 设置下载文件名
+        download_filename = f"wind_scaler_{model_version}.joblib"
+        
+        # 发送文件给客户端
+        return send_file(
+            temp_file.name,
+            mimetype='application/octet-stream',
+            as_attachment=True,
+            download_name=download_filename
+        )
+    except Exception as e:
+        current_app.logger.error(f"标准化器文件下载失败: {e}")
+        return jsonify({"error": f"标准化器文件下载失败: {str(e)}"}), 500
+    finally:
+        if 'db' in locals():
+            db.close()
+        # 临时文件会在请求结束后由系统自动清理
+
+# @modeltrain_bp.route('/check-training-status', methods=['GET'])
+# def check_training_status():
+#     """检查训练状态的接口
+    
+#     根据file_id查询训练状态和结果链接
+#     """
+#     file_id = request.args.get('file_id')
+    
+#     if not file_id:
+#         return jsonify({"error": "缺少file_id参数"}), 400
+    
+#     # 从状态字典中获取该训练任务的状态
+#     status_info = training_status.get(file_id, {})
+    
+#     # 如果找不到状态记录，尝试检查文件是否存在
+#     if not status_info:
+#         # 查找是否有对应的结果文件
+#         forecast_pattern = f"forecast_train_test_{file_id}_*.csv"
+#         report_pattern = f"report_train_test_{file_id}_*.txt"
+        
+#         forecast_files = glob.glob(os.path.join(current_app.config['FORECAST_FOLDER'], forecast_pattern))
+#         report_files = glob.glob(os.path.join(current_app.config['FORECAST_FOLDER'], report_pattern))
+        
+#         if forecast_files or report_files:
+#             # 文件存在，说明训练已完成
+#             status_info = {
+#                 "status": "completed",
+#                 "message": "训练已完成"
+#             }
             
-            # 提取最新的文件
-            if forecast_files:
-                latest_forecast = max(forecast_files, key=os.path.getctime)
-                forecast_filename = os.path.basename(latest_forecast)
-                status_info["download_url"] = f"/download/{forecast_filename}"
+#             # 提取最新的文件
+#             if forecast_files:
+#                 latest_forecast = max(forecast_files, key=os.path.getctime)
+#                 forecast_filename = os.path.basename(latest_forecast)
+#                 status_info["download_url"] = f"/download/{forecast_filename}"
             
-            if report_files:
-                latest_report = max(report_files, key=os.path.getctime)
-                report_filename = os.path.basename(latest_report)
-                status_info["report_download_url"] = f"/download/{report_filename}"
+#             if report_files:
+#                 latest_report = max(report_files, key=os.path.getctime)
+#                 report_filename = os.path.basename(latest_report)
+#                 status_info["report_download_url"] = f"/download/{report_filename}"
                 
-            # 更新状态记录
-            training_status[file_id] = status_info
-        else:
-            # 检查是否存在正在进行的训练任务
-            if os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], f"{file_id}.csv")):
-                status_info = {
-                    "status": "in_progress",
-                    "message": "训练正在进行中"
-                }
-            else:
-                status_info = {
-                    "status": "not_found",
-                    "message": "未找到相关训练任务"
-                }
+#             # 更新状态记录
+#             training_status[file_id] = status_info
+#         else:
+#             # 检查是否存在正在进行的训练任务
+#             if os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], f"{file_id}.csv")):
+#                 status_info = {
+#                     "status": "in_progress",
+#                     "message": "训练正在进行中"
+#                 }
+#             else:
+#                 status_info = {
+#                     "status": "not_found",
+#                     "message": "未找到相关训练任务"
+#                 }
     
-    return jsonify(status_info)
+#     return jsonify(status_info)

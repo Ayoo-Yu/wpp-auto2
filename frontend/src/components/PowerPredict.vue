@@ -1,7 +1,7 @@
 <template>
   <div class="power-predict-container">
     <div class="content-wrapper">
-      <h1 class="page-title">风电功率预测</h1>
+      <h1 class="page-title">功率预测</h1>
 
       <div class="main-content">
         <div class="upload-section">

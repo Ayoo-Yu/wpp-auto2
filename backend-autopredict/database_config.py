@@ -14,6 +14,7 @@ import os
 import subprocess
 from sqlalchemy.pool import QueuePool  # 添加QueuePool导入
 from sqlalchemy import event
+import json
 
 # 导入自定义金仓方言
 import kingbase_dialect
@@ -144,27 +145,28 @@ def init_minio_client():
     
     for attempt in range(max_retries):
         try:
-            # 构建完整的endpoint字符串，包含端口
-            endpoint = f"{MINIO_CONFIG['endpoint']}:{MINIO_CONFIG['port']}"
+            # Construct endpoint string from host and port
+            endpoint_address = f"{MINIO_CONFIG['endpoint_host']}:{MINIO_CONFIG['endpoint_port']}"
             
             client = Minio(
-                endpoint,
+                endpoint_address,
                 access_key=MINIO_CONFIG["access_key"],
                 secret_key=MINIO_CONFIG["secret_key"],
                 secure=MINIO_CONFIG["secure"]
             )
             
-            # 测试连接
+            # Test连接
             client.list_buckets()
+            print("[OK] MinIO connection successful")
             return client
             
         except Exception as e:
-            print(f"MinIO连接失败 (尝试 {attempt+1}/{max_retries}): {e}")
+            print(f"[ERROR] MinIO connection failed (attempt {attempt+1}/{max_retries}): {e}")
             if attempt < max_retries - 1:
-                print(f"等待 {retry_delay} 秒后重试...")
+                print(f"[INFO] Waiting {retry_delay} seconds before retrying...")
                 time.sleep(retry_delay)
             else:
-                print("达到最大重试次数，无法连接到MinIO")
+                print("[ERROR] Max retries reached, could not connect to MinIO")
                 raise
 
 try:
@@ -220,56 +222,131 @@ def get_db():
             print("调试: 关闭数据库会话")
             db.close()
 
-def cleanup_old_models(db: Session, keep_last=5):
-    """保留最近5个模型版本"""
-    if minio_client is None:
-        print("警告: MinIO客户端不可用，跳过清理旧模型")
-        return
-        
+def cleanup_old_models(keep_last=5):
+    """Clean up old model files from S3, keeping only the most recent ones."""
     try:
-        # 获取所有模型按时间倒序
-        models = db.query(Model).order_by(Model.train_time.desc()).all()
+        client = init_minio_client()
+        bucket = MINIO_CONFIG["buckets"]["models"]
         
-        # 删除旧版本
-        if len(models) > keep_last:
-            for model in models[keep_last:]:
-                print(f"准备删除旧模型: {model.model_name}")
-                
-                # 删除S3上的模型文件
-                if model.model_path:
-                    try:
-                        bucket_name = MINIO_CONFIG["buckets"]["models"]
-                        object_name = model.model_path.split("/")[-1]
-                        minio_client.remove_object(bucket_name, object_name)
-                        print(f"✅ 已从S3删除模型文件: {object_name}")
-                    except Exception as e:
-                        print(f"警告: 从S3删除模型文件失败: {e}")
-                
-                # 删除关联的缩放器
-                if model.scaler_path:
-                    try:
-                        bucket_name = MINIO_CONFIG["buckets"]["scalers"]
-                        object_name = model.scaler_path.split("/")[-1]
-                        minio_client.remove_object(bucket_name, object_name)
-                        print(f"✅ 已从S3删除缩放器文件: {object_name}")
-                    except Exception as e:
-                        print(f"警告: 从S3删除缩放器文件失败: {e}")
-                
-                # 删除关联的指标
-                if model.metrics_path:
-                    try:
-                        bucket_name = MINIO_CONFIG["buckets"]["metrics"]
-                        object_name = model.metrics_path.split("/")[-1]
-                        minio_client.remove_object(bucket_name, object_name)
-                        print(f"✅ 已从S3删除指标文件: {object_name}")
-                    except Exception as e:
-                        print(f"警告: 从S3删除指标文件失败: {e}")
-                
-                # 删除数据库中的记录
-                db.delete(model)
-            
-            db.commit()
-            print(f"✅ 成功清理旧模型，保留最新的{keep_last}个")
+        # List all objects in the models bucket
+        objects = client.list_objects(bucket)
+        model_files = []
+        
+        for obj in objects:
+            if obj.object_name.endswith('.pkl'):
+                model_files.append(obj)
+        
+        # Sort by last modified time
+        model_files.sort(key=lambda x: x.last_modified, reverse=True)
+        
+        # Keep only the most recent files
+        for obj in model_files[keep_last:]:
+            try:
+                client.remove_object(bucket, obj.object_name)
+                print(f"[OK] Deleted model file from S3: {obj.object_name}")
+            except Exception as e:
+                print(f"[ERROR] Failed to delete model file {obj.object_name}: {e}")
+        
+        print(f"[OK] Successfully cleaned up old models, keeping the latest {keep_last}")
+        
     except Exception as e:
-        print(f"警告: 清理旧模型失败: {e}")
-        db.rollback()
+        print(f"[ERROR] Failed to clean up old models: {e}")
+
+def cleanup_old_scalers(keep_last=5):
+    """Clean up old scaler files from S3, keeping only the most recent ones."""
+    try:
+        client = init_minio_client()
+        bucket = MINIO_CONFIG["buckets"]["scalers"]
+        
+        # List all objects in the scalers bucket
+        objects = client.list_objects(bucket)
+        scaler_files = []
+        
+        for obj in objects:
+            if obj.object_name.endswith('.pkl'):
+                scaler_files.append(obj)
+        
+        # Sort by last modified time
+        scaler_files.sort(key=lambda x: x.last_modified, reverse=True)
+        
+        # Keep only the most recent files
+        for obj in scaler_files[keep_last:]:
+            try:
+                client.remove_object(bucket, obj.object_name)
+                print(f"[OK] Deleted scaler file from S3: {obj.object_name}")
+            except Exception as e:
+                print(f"[ERROR] Failed to delete scaler file {obj.object_name}: {e}")
+        
+        print(f"[OK] Successfully cleaned up old scalers, keeping the latest {keep_last}")
+        
+    except Exception as e:
+        print(f"[ERROR] Failed to clean up old scalers: {e}")
+
+def cleanup_old_metrics(keep_last=5):
+    """Clean up old metrics files from S3, keeping only the most recent ones."""
+    try:
+        client = init_minio_client()
+        bucket = MINIO_CONFIG["buckets"]["metrics"]
+        
+        # List all objects in the metrics bucket
+        objects = client.list_objects(bucket)
+        metric_files = []
+        
+        for obj in objects:
+            if obj.object_name.endswith('.json'):
+                metric_files.append(obj)
+        
+        # Sort by last modified time
+        metric_files.sort(key=lambda x: x.last_modified, reverse=True)
+        
+        # Keep only the most recent files
+        for obj in metric_files[keep_last:]:
+            try:
+                client.remove_object(bucket, obj.object_name)
+                print(f"[OK] Deleted metrics file from S3: {obj.object_name}")
+            except Exception as e:
+                print(f"[ERROR] Failed to delete metrics file {obj.object_name}: {e}")
+        
+        print(f"[OK] Successfully cleaned up old metrics, keeping the latest {keep_last}")
+        
+    except Exception as e:
+        print(f"[ERROR] Failed to clean up old metrics: {e}")
+
+def setup_minio_buckets(client):
+    """Set up MinIO buckets with appropriate policies."""
+    for bucket_key, bucket_value in MINIO_CONFIG["buckets"].items():
+        try:
+            if not client.bucket_exists(bucket_value):
+                client.make_bucket(bucket_value)
+                print(f"[OK] Successfully created bucket: {bucket_value}")
+            else:
+                print(f"[INFO] Bucket already exists: {bucket_value}")
+        except Exception as e:
+            print(f"[ERROR] Failed to create bucket {bucket_value}: {e}")
+            continue
+
+        # Set bucket policy
+        try:
+            policy = MINIO_CONFIG["policies"][bucket_value]
+            if policy == "public-read":
+                policy_json = {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {"AWS": "*"},
+                            "Action": ["s3:GetObject"],
+                            "Resource": [f"arn:aws:s3:::{bucket_value}/*"]
+                        }
+                    ]
+                }
+            else:  # private
+                policy_json = {
+                    "Version": "2012-10-17",
+                    "Statement": []
+                }
+            
+            client.set_bucket_policy(bucket_value, json.dumps(policy_json))
+            print(f"[OK] Successfully set bucket policy: {bucket_value} -> {policy}")
+        except Exception as e:
+            print(f"[ERROR] Failed to set policy for bucket {bucket_value}: {e}")

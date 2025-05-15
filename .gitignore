@@ -32,3 +32,12 @@ pgadmin.tar
 kdb_x86_64_V009R001C002B0014.tar
 frontend.tar
 backend.rar
+0428backend-autopredict.rar
+backend/uploads/test1_20250427112937121666.csv
+backend/uploads/train_test_20250427113024405562.csv
+backend/uploads/ecmwf_data_ws_beijing_15min_v3_20250427110244884821.csv
+backend/forecasts/forecast_test1_20250427112937121666_20250427112959.csv
+backend-autopredict/auto_scripts/scripts/short/datasets/training_data_short.csv
+backend-autopredict/auto_scripts/scripts/middle/datasets/training_data_middle.csv
+backend-autopredict/auto_scripts/scripts/supershort/datasets/training_data_supershort.csv
+backend/wind-power-env/Lib/site-packages/xgboost/lib/xgboost.dll
